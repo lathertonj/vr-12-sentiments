@@ -9,6 +9,7 @@ public class ApplyWindToSeedlings : MonoBehaviour
     public float windIntensityCycle = 5; // seconds
     public float maxWindIntensity = 1f;
     public float maxAngleChange = 120;
+    public bool applyRandomTorque = false;
 
     // Use this for initialization
     void Start()
@@ -37,6 +38,14 @@ public class ApplyWindToSeedlings : MonoBehaviour
         foreach( Rigidbody seedling in seedlings )
         {
             seedling.AddForce( currentWindDirection * currentWindIntensity );
+            if( applyRandomTorque && Random.Range( 0, 1 ) > 0.4f )
+            {
+                seedling.AddTorque( new Vector3( 
+                    Random.Range( -currentWindIntensity, currentWindIntensity ),
+                    Random.Range( -currentWindIntensity, currentWindIntensity ),
+                    Random.Range( -currentWindIntensity, currentWindIntensity )
+                ) );
+            }
         }
     }
 }
