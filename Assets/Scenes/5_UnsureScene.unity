@@ -190,6 +190,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &89824124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 89824126}
+  - component: {fileID: 89824125}
+  m_Layer: 0
+  m_Name: WindZone (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &89824125
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 89824124}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.69
+  m_WindTurbulence: 0.025
+  m_WindPulseMagnitude: 0.8
+  m_WindPulseFrequency: 0.38
+--- !u!4 &89824126
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 89824124}
+  m_LocalRotation: {x: 0.16500485, y: -0.8881098, z: 0.21151905, w: -0.37322125}
+  m_LocalPosition: {x: 113.1, y: 8.32, z: 151.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 756096436}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 14.628, y: -229.224, z: -27.78}
 --- !u!1001 &267119194
 Prefab:
   m_ObjectHideFlags: 0
@@ -232,6 +274,38 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c689b2e1aeff564bbab184d5452e646, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &756096435
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 756096436}
+  m_Layer: 0
+  m_Name: Winds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &756096436
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 756096435}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1114398604}
+  - {fileID: 1135150106}
+  - {fileID: 990733287}
+  - {fileID: 89824126}
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &854199004
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,6 +378,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &990733285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 990733287}
+  - component: {fileID: 990733286}
+  m_Layer: 0
+  m_Name: WindZone (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &990733286
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 990733285}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.69
+  m_WindTurbulence: 0.025
+  m_WindPulseMagnitude: 0.8
+  m_WindPulseFrequency: 0.38
+--- !u!4 &990733287
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 990733285}
+  m_LocalRotation: {x: 0.23296042, y: -0.5676733, z: -0.00071579707, w: 0.78960496}
+  m_LocalPosition: {x: 134.5, y: 8.32, z: 45.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 756096436}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 21.536001, y: -74.604004, z: -16.592001}
 --- !u!1 &1074028617
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,6 +448,90 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1114398602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1114398604}
+  - component: {fileID: 1114398603}
+  m_Layer: 0
+  m_Name: WindZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &1114398603
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1114398602}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.69
+  m_WindTurbulence: 0.025
+  m_WindPulseMagnitude: 0.8
+  m_WindPulseFrequency: 0.38
+--- !u!4 &1114398604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1114398602}
+  m_LocalRotation: {x: 0.18723173, y: -0.9269883, z: 0.13861993, w: 0.29397562}
+  m_LocalPosition: {x: -25.2, y: 8.51, z: 131.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 756096436}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 21.536001, y: -147.98601, z: -16.592001}
+--- !u!1 &1135150104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1135150106}
+  - component: {fileID: 1135150105}
+  m_Layer: 0
+  m_Name: WindZone (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &1135150105
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1135150104}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.69
+  m_WindTurbulence: 0.025
+  m_WindPulseMagnitude: 0.8
+  m_WindPulseFrequency: 0.38
+--- !u!4 &1135150106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1135150104}
+  m_LocalRotation: {x: 0.22280198, y: -0.3151047, z: -0.06804709, w: 0.92002064}
+  m_LocalPosition: {x: -97.1, y: 8.51, z: -156.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 756096436}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 21.536001, y: -40.989002, z: -16.592001}
 --- !u!1 &1374234980
 GameObject:
   m_ObjectHideFlags: 0
