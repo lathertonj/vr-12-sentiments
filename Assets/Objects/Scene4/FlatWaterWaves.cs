@@ -113,12 +113,12 @@ public class FlatWaterWaves : MonoBehaviour
     {
         Mesh mesh = new Mesh();
         myMesh.mesh = mesh;
-        int oceanSize = 201; // so, 201 vertices per side
+        int oceanSize = 26;//51; // so, N vertices per side (originally 201 but that's too much work)
         Vector3[] newVertices = new Vector3[oceanSize * oceanSize];
         Vector2[] newUVs = new Vector2[oceanSize * oceanSize];
         int[] newTriangles = new int[3 * 2 * (2 * oceanSize) * (2 * oceanSize )];
         // vertices
-        float vertexScale = 0.05f;
+        float vertexScale = 0.05f * 2 * 2 * 2;// cus reduced from "200ish" to "25ish"
         for( int x = 0; x < oceanSize ; x++ )
         {
             for( int z = 0; z < oceanSize; z++ )
