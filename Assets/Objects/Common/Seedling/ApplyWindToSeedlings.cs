@@ -19,13 +19,17 @@ public class ApplyWindToSeedlings : MonoBehaviour
         currentWindDirection = Vector3.right;
         InvokeRepeating( "ChangeWindDirection", windIntensityCycle, windIntensityCycle );
 
-        foreach( Rigidbody seedling in seedlings )
+        if( randomizeInitialLocations )
         {
-            seedling.transform.localPosition = new Vector3(
-                Random.Range( -0.75f, 0.75f ),
-                Random.Range( -0.15f, 0.15f ),
-                Random.Range( -0.75f, 0.75f )
-            );
+            foreach( Rigidbody seedling in seedlings )
+            {
+                seedling.transform.localPosition = new Vector3(
+                    Random.Range( -0.75f, 0.75f ),
+                    Random.Range( -0.15f, 0.15f ),
+                    Random.Range( -0.75f, 0.75f )
+                );
+            }
+
         }
     }
 

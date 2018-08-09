@@ -1303,7 +1303,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1194187acde448449bb756666bd2c175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxWindIntensity: 2
+  windIntensityCycle: 5
+  maxWindIntensity: 1
+  maxAngleChange: 120
+  applyRandomTorque: 0
+  randomizeInitialLocations: 0
 --- !u!4 &1089996290 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4196448029242920, guid: 46b5ee821868cb94192c039106d36ea6,

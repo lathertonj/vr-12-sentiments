@@ -67,6 +67,8 @@ public class FlatWaterWaves : MonoBehaviour
 
         // set vertices
         m.vertices = vertices;
+        m.RecalculateNormals();
+        m.RecalculateTangents();
     }
 
     // "y" === z 
