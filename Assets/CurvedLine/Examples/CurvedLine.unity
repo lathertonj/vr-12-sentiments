@@ -891,7 +891,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineSegmentSize: 0.15
-  lineWidth: 0.1
+  startLineWidth: 0.1
+  endLineWidth: 5.8
   showGizmos: 1
   gizmoSize: 0.14
   gizmoColor: {r: 1, g: 0, b: 0, a: 0.5}
@@ -1068,7 +1069,7 @@ LineRenderer:
         outWeight: 0.24747457
       - serializedVersion: 3
         time: 1
-        value: 0.1
+        value: 5.8
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -1233,7 +1234,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineSegmentSize: 0.15
-  lineWidth: 0.1
+  startLineWidth: 0.1
+  endLineWidth: 0.1
   showGizmos: 1
   gizmoSize: 0.1
   gizmoColor: {r: 1, g: 0, b: 0, a: 0.5}

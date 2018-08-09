@@ -7,7 +7,8 @@ public class CurvedLineRenderer : MonoBehaviour
 {
     //PUBLIC
     public float lineSegmentSize = 0.15f;
-    public float lineWidth = 0.1f;
+    public float startLineWidth = 0.1f;
+    public float endLineWidth = 0.1f;
     [Header( "Gizmos" )]
     public bool showGizmos = true;
     public float gizmoSize = 0.1f;
@@ -16,6 +17,14 @@ public class CurvedLineRenderer : MonoBehaviour
     private CurvedLinePoint[] linePoints = new CurvedLinePoint[0];
     private Vector3[] linePositions = new Vector3[0];
     private Vector3[] linePositionsOld = new Vector3[0];
+    private float oldStartLineWidth;
+    private float oldEndLineWidth;
+
+    private void Start()
+    {
+        oldStartLineWidth = startLineWidth;
+        oldEndLineWidth = endLineWidth;
+    }
 
     // Update is called once per frame
     public void Update()
@@ -53,7 +62,20 @@ public class CurvedLineRenderer : MonoBehaviour
             if( linePositions[i] != linePositionsOld[i] )
             {
                 moved = true;
+                linePositionsOld[i] = linePositions[i];
             }
+        }
+
+        if( startLineWidth != oldStartLineWidth )
+        {
+            moved = true;
+            oldStartLineWidth = startLineWidth;
+        }
+
+        if( endLineWidth != oldEndLineWidth )
+        {
+            moved = true;
+            oldEndLineWidth = endLineWidth;
         }
 
         // update if moved
@@ -67,8 +89,8 @@ public class CurvedLineRenderer : MonoBehaviour
             // set line settings
             line.positionCount = smoothedPoints.Length;
             line.SetPositions( smoothedPoints );
-            line.startWidth = lineWidth;
-            line.endWidth = lineWidth;
+            line.startWidth = startLineWidth;
+            line.endWidth = endLineWidth;
         }
     }
 
