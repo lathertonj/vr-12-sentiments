@@ -140,7 +140,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 986885deb9cd0ae42af795a66a72453d, type: 2}
+  - {fileID: 21565426479796238}
   - {fileID: 21628116516474980}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -153,7 +153,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Name: Tree Data
   m_EditorClassIdentifier: 
   _uniqueID: 544
-  materialHash: bfec565df52b6806ca408423f9b967066291456
+  materialHash: 8c92665ea88be4e0b40a670baf0b1d7f6291456
   root:
     _uniqueID: 1
     seed: 1067901
