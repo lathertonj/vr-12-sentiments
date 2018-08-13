@@ -7,6 +7,14 @@
 //------------------|
 // our patch
 
+// Use in scene: how much you are leaned over 
+// (hands + head) from the initial starting point
+// determines the next base pitch (plus
+// maybe some base oscillation)
+
+// OR. oscillate a bit but also generally
+// trend upward in pitch the more sunlight you catch!
+
 ModalBar modey => JCRev r => dac;
 
 // set the gain
