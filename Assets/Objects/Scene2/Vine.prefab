@@ -769,16 +769,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1915674407943516}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 60.116, y: 14.598, z: 58.271}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 60.459, y: 14.79, z: 52.26}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 4616579602576090}
   - {fileID: 4269451449694924}
   - {fileID: 4164888095924626}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!4 &4509292250111006
 Transform:
   m_ObjectHideFlags: 1
@@ -1276,6 +1276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myRoot: {fileID: 4509292250111006}
   myThingToFollow: {fileID: 0}
+  followOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114558348090776144
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1289,6 +1290,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myRoot: {fileID: 4642499053652172}
   myThingToFollow: {fileID: 0}
+  followOffset: {x: 0, y: -0.35, z: 0}
 --- !u!114 &114563111857879860
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1386,6 +1388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myRoot: {fileID: 4839915050798300}
   myThingToFollow: {fileID: 0}
+  followOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114894687924062288
 MonoBehaviour:
   m_ObjectHideFlags: 1

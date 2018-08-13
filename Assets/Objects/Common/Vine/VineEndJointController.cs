@@ -6,6 +6,7 @@ public class VineEndJointController : MonoBehaviour
 {
     public Transform myRoot;
     public Transform myThingToFollow;
+    public Vector3 followOffset = Vector3.zero;
 
     private LinkedList<VineMidJointController> myMidpoints;
     private Vector3 myOriginalOffset;
@@ -43,7 +44,7 @@ public class VineEndJointController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 myNewPosition = myThingToFollow.position;
+        Vector3 myNewPosition = myThingToFollow.position + followOffset;
         Vector3 currentVineOffset = myNewPosition - myRoot.position;
         
         // calculate new position for each midpoint
