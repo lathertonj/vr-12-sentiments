@@ -151,7 +151,6 @@ for( int i; i < 4; i++ )
 Supersaw mySaw => ADSR myAdsr => hpf;
 myAdsr.set( 0.1::noteLength, 0.3::noteLength, 0.85, 0.05::noteLength );
 
-[G5, Fs5, Fs5, G5] @=> int melodyNotes[];
 
 // how much freq waves up and down as a % of current freq
 1.2 / 300 => mySaw.pitchLFODepthMultiplier; 
@@ -163,14 +162,36 @@ myAdsr.set( 0.1::noteLength, 0.3::noteLength, 0.85, 0.05::noteLength );
 0.05 => mySaw.gain;
 
 
+[63.0, 67, 70, 74] @=> float chordNotes[];
+[63.0, 67, 70, 74] @=> float currentChordNotes[];
+[0.05, 0.07, 0.09, 0.11] @=> float chordSlews[];
+fun void SlewChordFreqs()
+{
+    while( true )
+    {
+        for( int i; i < 4; i++ )
+        {
+            currentChordNotes[i] + chordSlews[i] * 
+                ( chordNotes[i] - currentChordNotes[i] ) => currentChordNotes[i];
+            currentChordNotes[i] - 12 => Std.mtof => mySaws[i].freq;
+        }
+        1::ms => now;
+    }
+}
+spork ~ SlewChordFreqs();
+
+
+
+[G5, Fs5, Fs5, G5] @=> int melodyNotes[];
+
 while( true )
 {
     for( int i; i < melodyNotes.size(); i++ )
     {
         melodyNotes[i] => Std.mtof => mySaw.freq;
-        myAdsr.keyOn( true );
+        //myAdsr.keyOn( true );
         noteLength - myAdsr.releaseTime() => now;
-        myAdsr.keyOff( true );
+        //myAdsr.keyOff( true );
         myAdsr.releaseTime() => now;
     }
 }
