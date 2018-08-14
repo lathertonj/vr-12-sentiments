@@ -9,46 +9,75 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1014887204847272}
+  m_RootGameObject: {fileID: 1163844826205826}
   m_IsPrefabAsset: 1
---- !u!1 &1014887204847272
+--- !u!1 &1163844826205826
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4725438710444916}
-  - component: {fileID: 33325279715427578}
-  - component: {fileID: 23104233316818306}
-  - component: {fileID: 65985270915185828}
-  - component: {fileID: 114067004862211764}
+  - component: {fileID: 4878346620175908}
+  - component: {fileID: 114310889806977828}
   m_Layer: 0
-  m_Name: Ray
+  m_Name: Sunbeam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4725438710444916
+--- !u!1 &1334035662978586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4582699367836062}
+  - component: {fileID: 33927415345065422}
+  - component: {fileID: 23896973996628618}
+  - component: {fileID: 65116818083383562}
+  m_Layer: 0
+  m_Name: SunbeamVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4582699367836062
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1014887204847272}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 61.94, y: 27.8, z: 50.5}
-  m_LocalScale: {x: 0.1, y: 30, z: 0.1}
+  m_GameObject: {fileID: 1334035662978586}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.1, y: 100, z: 0.1}
   m_Children: []
+  m_Father: {fileID: 4878346620175908}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4878346620175908
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1163844826205826}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 60.867134, y: 16.99344, z: 52.745007}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4582699367836062}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23104233316818306
+--- !u!23 &23896973996628618
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1014887204847272}
+  m_GameObject: {fileID: 1334035662978586}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 0
@@ -78,33 +107,35 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33325279715427578
+--- !u!33 &33927415345065422
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1014887204847272}
+  m_GameObject: {fileID: 1334035662978586}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65985270915185828
+--- !u!65 &65116818083383562
 BoxCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1014887204847272}
+  m_GameObject: {fileID: 1334035662978586}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114067004862211764
+--- !u!114 &114310889806977828
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1014887204847272}
+  m_GameObject: {fileID: 1163844826205826}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7dc1a0a4effe02744bb20c45234cba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visualPart: {fileID: 4582699367836062}
+  fadeCycleSeconds: 10
