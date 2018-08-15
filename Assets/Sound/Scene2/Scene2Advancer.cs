@@ -7,6 +7,9 @@ public class Scene2Advancer : MonoBehaviour
     public float chordSwitchCutoff = 15f;
     public float[] otherCutoffs;
     public SonifySunbeamInteractors[] hands;
+    public Light sun;
+    public float sunInitialValue, sunPrecutoffValue, sunPostCutoffValue;
+    private float sunH, sunS, sunV;
 
     private ChuckSubInstance myChuck;
 
@@ -22,19 +25,41 @@ public class Scene2Advancer : MonoBehaviour
         // every so often but not necessary every frame
         // (every 50ms)
         InvokeRepeating( "UpdateSunbeam", 0.0f, 0.05f );
+
+        Color.RGBToHSV( sun.color, out sunH, out sunS, out sunV ); 
     }
 
     // Update is called once per frame
     private bool haveSwitchedChords = false;
     void Update()
     {
+        if( !haveSwitchedChords )
+        {
+            sun.color = Color.HSVToRGB( sunH, sunS, 
+                SunbeamInteractors.sunbeamAccumulated.Map( 
+                    0,               chordSwitchCutoff, 
+                    sunInitialValue, sunPrecutoffValue 
+                ) 
+            );
+        }
+
         if( !haveSwitchedChords && SunbeamInteractors.sunbeamAccumulated > chordSwitchCutoff )
         {
-            foreach( SonifySunbeamInteractors hand in hands )
-            {
-                hand.AdvanceToSecondHalf();
-            }
+            SwitchToSecondHalf();
             haveSwitchedChords = true;
+
+            sun.color = Color.HSVToRGB( sunH, sunS, sunPostCutoffValue );
+        }
+    }
+
+    void SwitchToSecondHalf()
+    {
+        // TODO: spawn many more light columns and prevent them from fading?
+        // TODO: modify visuals more?
+
+        foreach( SonifySunbeamInteractors hand in hands )
+        {
+            hand.AdvanceToSecondHalf();
         }
     }
 
