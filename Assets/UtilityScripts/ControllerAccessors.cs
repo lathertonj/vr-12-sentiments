@@ -20,5 +20,10 @@ public class ControllerAccessors : MonoBehaviour
         Controller.TriggerHapticPulse( amount );
     }
 
+    public bool IsSqueezed()
+    {
+        return Controller.GetPress( SteamVR_Controller.ButtonMask.Grip );
+    }
+
     // TODO: accessor for grips and whatever else
 }

@@ -15,6 +15,11 @@ public class Scene2Advancer : MonoBehaviour
 
     private ChuckSubInstance myChuck;
 
+    // TODO: if accumulated sunbeam > cutoff + 20, find some way of advancing to the next scene
+    // e.g.: 
+    // - Sunbeams all increase in size
+    // - Chords go even higher
+
     // Use this for initialization
     void Start()
     {

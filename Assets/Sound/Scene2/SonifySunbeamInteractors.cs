@@ -38,6 +38,41 @@ public class SonifySunbeamInteractors : MonoBehaviour
         }
 
         myChuck.SetFloat( myGainVar, myInteractor.CurrentStrength() / 3999f );
+        UpdateChordTones();
+    }
+
+    private void UpdateChordTones()
+    {
+        if( !secondHalf ) return;
+
+        if( !haveIncrementedChordTones[3] && 
+            SunbeamInteractors.sunbeamAccumulated - sunbeamAmountAtSecondHalf > 20 )
+        {
+            chord2[3] += 12;
+            myChuck.SetFloatArray( myChordNotesVar, chord2 );
+            haveIncrementedChordTones[3] = true;
+        }
+        else if( !haveIncrementedChordTones[2] && 
+            SunbeamInteractors.sunbeamAccumulated - sunbeamAmountAtSecondHalf > 15 )
+        {
+            chord2[2] += 12;
+            myChuck.SetFloatArray( myChordNotesVar, chord2 );
+            haveIncrementedChordTones[2] = true;
+        }
+        else if( !haveIncrementedChordTones[1] && 
+            SunbeamInteractors.sunbeamAccumulated - sunbeamAmountAtSecondHalf > 10 )
+        {
+            chord2[1] += 12;
+            myChuck.SetFloatArray( myChordNotesVar, chord2 );
+            haveIncrementedChordTones[1] = true;
+        }
+        else if( !haveIncrementedChordTones[0] && 
+            SunbeamInteractors.sunbeamAccumulated - sunbeamAmountAtSecondHalf > 5 )
+        {
+            chord2[0] += 12;
+            myChuck.SetFloatArray( myChordNotesVar, chord2 );
+            haveIncrementedChordTones[0] = true;
+        }
     }
 
     private void TurnOn()
@@ -54,11 +89,13 @@ public class SonifySunbeamInteractors : MonoBehaviour
         iAmPlaying = false;
     }
 
+    private float sunbeamAmountAtSecondHalf;
+    private bool[] haveIncrementedChordTones = { false, false, false, false };
     public void AdvanceToSecondHalf()
     {
         secondHalf = true;
         myChuck.SetFloatArray( myChordNotesVar, chord2 );
-        // TODO slowly up-the-octave chords as things keep going up
+        sunbeamAmountAtSecondHalf = SunbeamInteractors.sunbeamAccumulated;
     }
 
     private string myChordNotesVar, myGainVar;
@@ -171,7 +208,7 @@ public class SonifySunbeamInteractors : MonoBehaviour
             2000 => lpf.freq; // orig 6000
             200 => hpf.freq;
             0.05 => reverb.mix;
-            0.3 => reverb.gain;
+            0.15 => reverb.gain;
 
             fun void AmpMod()
             {{
