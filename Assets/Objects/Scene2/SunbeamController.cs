@@ -14,6 +14,7 @@ public class SunbeamController : MonoBehaviour
     private MeshRenderer visualRenderer;
     private Vector3 originalPos;
     private float timePhase;
+    private float currentStrength = 0;
 
     private void Start()
     {
@@ -40,8 +41,8 @@ public class SunbeamController : MonoBehaviour
         {
             // color tone down to 0 to make invisible
             // (subtract a little and clamp01 so it's 0 for longer)
-            float currentOpacity = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.time - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
-            Color newColor = new Color( startColor.r, startColor.g, startColor.b, currentOpacity * maxAlpha );
+            currentStrength = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.time - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
+            Color newColor = new Color( startColor.r, startColor.g, startColor.b, currentStrength * maxAlpha );
             visualRenderer.material.color = newColor;
         }
     }
@@ -69,5 +70,10 @@ public class SunbeamController : MonoBehaviour
 
         // enable in case disabled
         visualRenderer.enabled = true;
+    }
+
+    public float GetStrength()
+    {
+        return currentStrength;
     }
 }

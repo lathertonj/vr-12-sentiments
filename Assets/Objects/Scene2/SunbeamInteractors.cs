@@ -5,17 +5,7 @@ using UnityEngine;
 public class SunbeamInteractors : MonoBehaviour
 {
     public static float sunbeamAccumulated = 0;
-
-    // VR preamble
-    private SteamVR_TrackedObject trackedObj;
-    private SteamVR_Controller.Device Controller
-    {
-        get { return SteamVR_Controller.Input( (int) trackedObj.index ); }
-    }
-    void Awake()
-    {
-        trackedObj = GetComponent<SteamVR_TrackedObject>();
-    }
+    public ControllerAccessors myController;
 
     // Use this for initialization
     void Start()
@@ -30,14 +20,17 @@ public class SunbeamInteractors : MonoBehaviour
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse
-            ushort currentStrength = (ushort) elapsedTime.PowMapClamp( 0, 5, 0, 3999, 3 );
-            Controller.TriggerHapticPulse( currentStrength );
+            ushort currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, 5, 0, 3999, 3 ) 
+                * currentSunbeamController.GetStrength()    
+            );
+            myController.Vibrate( currentStrength );
 
             sunbeamAccumulated += currentStrength * 1.0f / 3999 * Time.deltaTime;
         }
     }
 
     private GameObject currentSunbeam = null;
+    private SunbeamController currentSunbeamController = null;
     private float sunbeamTime;
     private void OnTriggerEnter( Collider other )
     {
@@ -45,6 +38,7 @@ public class SunbeamInteractors : MonoBehaviour
             other.gameObject.CompareTag( "Sunbeam" ) )
         {
             currentSunbeam = other.gameObject;
+            currentSunbeamController = currentSunbeam.GetComponentInParent<SunbeamController>();
             sunbeamTime = Time.time;
         }
     }
@@ -59,7 +53,8 @@ public class SunbeamInteractors : MonoBehaviour
         if( other.gameObject == currentSunbeam )
         {
             currentSunbeam = null;
+            currentSunbeamController = null;
+            Debug.Log( "on this exit, sunbeam accumulated is " + sunbeamAccumulated.ToString( "0.000" ) );
         }
-        Debug.Log( "on this exit, sunbeam accumulated is " + sunbeamAccumulated.ToString( "0.000" ) );
     }
 }

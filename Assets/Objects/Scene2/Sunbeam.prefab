@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114310889806977828}
   m_Layer: 0
   m_Name: Sunbeam
-  m_TagString: Untagged
+  m_TagString: Sunbeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 4885020168643646}
   m_Layer: 0
   m_Name: Icosahedron
-  m_TagString: Untagged
+  m_TagString: Sunbeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 64001008668131022}
   m_Layer: 0
   m_Name: SunbeamVisual
-  m_TagString: Untagged
+  m_TagString: Sunbeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
