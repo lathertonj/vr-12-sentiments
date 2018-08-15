@@ -7,6 +7,7 @@ public class SunbeamInteractors : MonoBehaviour
     public static float sunbeamAccumulated = 0;
     public ControllerAccessors myController;
     private ushort currentStrength = 0;
+    public static float sunbeamFadeinTime = 5;
 
     // Use this for initialization
     void Start()
@@ -20,7 +21,7 @@ public class SunbeamInteractors : MonoBehaviour
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse
-            currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, 5, 0, 3999, 3 ) 
+            currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, 3999, 3 ) 
                 * currentSunbeamController.GetStrength()    
             );
             myController.Vibrate( currentStrength );

@@ -16,16 +16,19 @@ public class SunbeamController : MonoBehaviour
     private float timePhase;
     private float currentStrength = 0;
 
+    public static bool shouldFade = true;
+
     private void Start()
     {
         visualRenderer = visualPart.GetComponent<MeshRenderer>();
         startColor = visualRenderer.material.color;
         maxAlpha = startColor.a;
-        originalPos = transform.position;
+        originalPos = transform.localPosition;
         
         timePhase = Random.Range( 1f, fadeCycleSeconds - 1f );
         InvokeRepeating( "SwitchLocation", timePhase, fadeCycleSeconds );
-        visualRenderer.enabled = false;
+        visualRenderer.enabled = true;
+        visualRenderer.material.color = new Color( 0, 0, 0, 0 );
     }
 
     // Update is called once per frame
@@ -35,15 +38,24 @@ public class SunbeamController : MonoBehaviour
         visualPart.rotation *= Quaternion.AngleAxis( 10 * Time.deltaTime, Vector3.up );
 
         // rotate the beam externally
-        transform.rotation *= Quaternion.AngleAxis( rotationPerSecond.x * Time.deltaTime, Vector3.left ) * Quaternion.AngleAxis( rotationPerSecond.z * Time.deltaTime, Vector3.forward );
+        if( shouldFade )
+        {
+            transform.rotation *= Quaternion.AngleAxis( rotationPerSecond.x * Time.deltaTime, Vector3.left ) * Quaternion.AngleAxis( rotationPerSecond.z * Time.deltaTime, Vector3.forward );
+        }
 
-        if( Time.time > timePhase )
+        // color
+        if( Time.time > timePhase && shouldFade )
         {
             // color tone down to 0 to make invisible
             // (subtract a little and clamp01 so it's 0 for longer)
             currentStrength = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.time - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
             Color newColor = new Color( startColor.r, startColor.g, startColor.b, currentStrength * maxAlpha );
             visualRenderer.material.color = newColor;
+        }
+        else if( !shouldFade )
+        {
+            currentStrength = 1;
+            visualRenderer.material.color = startColor;
         }
     }
 
@@ -52,6 +64,8 @@ public class SunbeamController : MonoBehaviour
     // called every time the sunbeam moves
     void SwitchLocation()
     {
+        if( !shouldFade ) return;
+
         // new angle 
         float newXRotation = Random.Range( -maxBaseAngle, maxBaseAngle );
         float newZRotation = Random.Range( -maxBaseAngle, maxBaseAngle );
@@ -62,14 +76,14 @@ public class SunbeamController : MonoBehaviour
         rotationPerSecond.z = Random.Range( -maxSweepAngle, maxSweepAngle ) / fadeCycleSeconds;
 
         // new position
-        transform.position = originalPos + new Vector3(
+        transform.localPosition = originalPos + new Vector3(
             Random.Range( -maxRepositionRadius, maxRepositionRadius ),
             0,
             Random.Range( -maxRepositionRadius, maxRepositionRadius )
         );
 
         // enable in case disabled
-        visualRenderer.enabled = true;
+        //visualRenderer.enabled = true;
     }
 
     public float GetStrength()

@@ -58,6 +58,7 @@ public class SonifySunbeamInteractors : MonoBehaviour
     {
         secondHalf = true;
         myChuck.SetFloatArray( myChordNotesVar, chord2 );
+        // TODO slowly up-the-octave chords as things keep going up
     }
 
     private string myChordNotesVar, myGainVar;

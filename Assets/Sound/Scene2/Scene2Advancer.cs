@@ -10,11 +10,10 @@ public class Scene2Advancer : MonoBehaviour
     public Light sun;
     public float sunInitialValue, sunPrecutoffValue, sunPostCutoffValue;
     private float sunH, sunS, sunV;
+    public Transform sunbeamPrefab;
+    public Transform sunbeamHolder;
 
     private ChuckSubInstance myChuck;
-
-    // TODO: music that becomes more complex when sunbeam accumulated gets higher
-    // TODO: increase amount of daylight over time slowly, and a big jump at the cutoff
 
     // Use this for initialization
     void Start()
@@ -54,7 +53,26 @@ public class Scene2Advancer : MonoBehaviour
 
     void SwitchToSecondHalf()
     {
-        // TODO: spawn many more light columns and prevent them from fading?
+        // spawn many more light columns
+        for( int i = 0; i < 10; i++ )
+        {
+            Quaternion newRotation = Quaternion.AngleAxis( Random.Range( -25, 25 ), Vector3.left ) * 
+                                     Quaternion.AngleAxis( Random.Range( -25, 25 ), Vector3.forward );
+            Vector3 newPosition = new Vector3( 
+                Random.Range( -1.5f, 1.5f ), 
+                0, 
+                Random.Range( -1.5f, 1.5f ) 
+            ) + sunbeamHolder.position;
+
+            Instantiate( sunbeamPrefab, newPosition, newRotation, sunbeamHolder );
+        }
+        
+        // prevent them from fading
+        SunbeamController.shouldFade = false;
+        
+        // make it quicker to interact with one (from 5s to 0.1s)
+        SunbeamInteractors.sunbeamFadeinTime = 0.1f;
+
         // TODO: modify visuals more?
 
         foreach( SonifySunbeamInteractors hand in hands )
