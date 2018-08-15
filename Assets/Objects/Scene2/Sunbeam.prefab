@@ -172,4 +172,4 @@ MonoBehaviour:
   fadeCycleSeconds: 10
   maxBaseAngle: 25
   maxSweepAngle: 8
-  maxRepositionRadius: 3
+  maxRepositionRadius: 1

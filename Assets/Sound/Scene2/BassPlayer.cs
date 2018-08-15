@@ -13,7 +13,7 @@ public class BassPlayer : MonoBehaviour
         myChuck.RunCode( @"
             SinOsc bass => NRev reverb => dac;
             0.05 => reverb.mix; 
-            0.18 => bass.gain;
+            0.04 => bass.gain;
             //[47.0, 42.0, 38.0, 40.0 ] @=> float bassNotes[];
 
 // for some reason, the bass is a lot louder on note 47 than note 42. I can't figure out why. Maybe it's these speakers

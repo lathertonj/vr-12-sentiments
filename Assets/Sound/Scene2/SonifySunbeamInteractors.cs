@@ -12,7 +12,7 @@ public class SonifySunbeamInteractors : MonoBehaviour
 
     public float bassNote1, bassNote2;
     public double[] chord1, chord2;
-    public bool secondHalf = false;
+    private bool secondHalf = false;
 
     // Use this for initialization
     void Start()
@@ -64,7 +64,6 @@ public class SonifySunbeamInteractors : MonoBehaviour
     private void StartChuck()
     {
         myChordNotesVar = myChuck.GetUniqueVariableName();
-        Debug.Log( "myChordNotesVar is " + myChordNotesVar );
         myGainVar = myChuck.GetUniqueVariableName();
         myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
@@ -171,6 +170,7 @@ public class SonifySunbeamInteractors : MonoBehaviour
             2000 => lpf.freq; // orig 6000
             200 => hpf.freq;
             0.05 => reverb.mix;
+            0.3 => reverb.gain;
 
             fun void AmpMod()
             {{

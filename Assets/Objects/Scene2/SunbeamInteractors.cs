@@ -49,7 +49,7 @@ public class SunbeamInteractors : MonoBehaviour
 
     private void OnTriggerStay( Collider other )
     {
-
+        OnTriggerEnter( other );
     }
 
     private void OnTriggerExit( Collider other )
