@@ -6,11 +6,11 @@ public class SunbeamInteractors : MonoBehaviour
 {
     public static float sunbeamAccumulated = 0;
     public ControllerAccessors myController;
+    private ushort currentStrength = 0;
 
     // Use this for initialization
     void Start()
     {
-
     }
 
     // Update is called once per frame
@@ -20,12 +20,16 @@ public class SunbeamInteractors : MonoBehaviour
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse
-            ushort currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, 5, 0, 3999, 3 ) 
+            currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, 5, 0, 3999, 3 ) 
                 * currentSunbeamController.GetStrength()    
             );
             myController.Vibrate( currentStrength );
 
             sunbeamAccumulated += currentStrength * 1.0f / 3999 * Time.deltaTime;
+        }
+        else
+        {
+            currentStrength = 0;
         }
     }
 
@@ -56,5 +60,10 @@ public class SunbeamInteractors : MonoBehaviour
             currentSunbeamController = null;
             Debug.Log( "on this exit, sunbeam accumulated is " + sunbeamAccumulated.ToString( "0.000" ) );
         }
+    }
+
+    public ushort CurrentStrength()
+    {
+        return currentStrength;
     }
 }

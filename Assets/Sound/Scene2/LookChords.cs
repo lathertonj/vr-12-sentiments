@@ -120,7 +120,7 @@ public class LookChords : MonoBehaviour
                 }
             }
 
-            HPF hpf => LPF lpf => Gain ampMod => NRev reverb => dac;
+            HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => dac;
             1800 => hpf.freq;
             2000 => lpf.freq; // orig 6000
             200 => hpf.freq;
