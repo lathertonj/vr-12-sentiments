@@ -55,7 +55,7 @@ public class Scene2Advancer : MonoBehaviour
 
             // prevent them from fading -- do it early? for now
             // TODO decide 
-            SunbeamController.shouldFade = false;
+            SunbeamController.shouldStopFading = true;
         }
     }
 
@@ -79,7 +79,7 @@ public class Scene2Advancer : MonoBehaviour
         }
         
         // prevent them from fading
-        SunbeamController.shouldFade = false;
+        SunbeamController.shouldStopFading = true;
         
         // make it quicker to interact with one (from 5s to 0.1s)
         SunbeamInteractors.sunbeamFadeinTime = 0.1f;

@@ -16,7 +16,8 @@ public class SunbeamController : MonoBehaviour
     private float timePhase;
     private float currentStrength = 0;
 
-    public static bool shouldFade = true;
+    private bool shouldFade = true;
+    public static bool shouldStopFading = false;
 
     private void Start()
     {
@@ -51,6 +52,10 @@ public class SunbeamController : MonoBehaviour
             currentStrength = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.time - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
             Color newColor = new Color( startColor.r, startColor.g, startColor.b, currentStrength * maxAlpha );
             visualRenderer.material.color = newColor;
+            if( shouldStopFading && shouldFade && currentStrength > 0.99f )
+            {
+                shouldFade = false;
+            }
         }
         else if( !shouldFade )
         {

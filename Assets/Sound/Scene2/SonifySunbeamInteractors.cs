@@ -102,6 +102,11 @@ public class SonifySunbeamInteractors : MonoBehaviour
         secondHalf = true;
         myChuck.SetFloatArray( myChordNotesVar, chord2 );
         sunbeamAmountAtSecondHalf = SunbeamInteractors.sunbeamAccumulated;
+
+        if( iAmPlaying )
+        {
+            TheChuck.instance.SetFloat( "bassNote", bassNote2 );
+        }
     }
 
     private string myChordNotesVar, myGainVar;
