@@ -25,8 +25,14 @@ public class VineGrowth : MonoBehaviour
             rightController.Vibrate( intensity );
 
             // change my scale
-            float scaleMultiplier = heightChange.MapClamp( 0, 0.01f, 1, 1.01f );
-            vrRoom.localScale *= scaleMultiplier;
+            // float scaleMultiplier = heightChange.MapClamp( 0, 0.01f, 1, 1.01f );
+            // vrRoom.localScale *= scaleMultiplier;
+            float scaleIncrease = heightChange.MapClamp( 0, 0.005f, 0, 0.001f );
+            vrRoom.localScale = new Vector3( 
+                vrRoom.localScale.x + scaleIncrease,
+                vrRoom.localScale.y + scaleIncrease, 
+                vrRoom.localScale.z + scaleIncrease 
+            );
         }
 
         previousPosition = transform.position;

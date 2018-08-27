@@ -6,6 +6,7 @@ public class NPCLeafController : MonoBehaviour
 {
     public Vector2 cycleRange;
     public Vector2 effectRange;
+    public Vector3 effectDamping = Vector3.one;
     private Vector3 originalPosition;
     private float xCycle, yCycle, zCycle,
         xPhase, yPhase, zPhase,
@@ -24,9 +25,9 @@ public class NPCLeafController : MonoBehaviour
         yPhase = Random.Range( 1, yCycle - 1 );
         zPhase = Random.Range( 1, zCycle - 1 );
 
-        xEffectSize = Random.Range( effectRange.x, effectRange.y );
-        yEffectSize = Random.Range( effectRange.x, effectRange.y ) / 2;
-        zEffectSize = Random.Range( effectRange.x, effectRange.y );
+        xEffectSize = effectDamping.x * Random.Range( effectRange.x, effectRange.y );
+        yEffectSize = effectDamping.y * Random.Range( effectRange.x, effectRange.y ) / 2;
+        zEffectSize = effectDamping.z * Random.Range( effectRange.x, effectRange.y );
     }
 
     // Update is called once per frame
