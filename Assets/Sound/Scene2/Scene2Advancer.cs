@@ -14,6 +14,7 @@ public class Scene2Advancer : MonoBehaviour
     public Transform sunbeamHolder;
 
     private ChuckSubInstance myChuck;
+    private ChuckEventListener myEventListener;
 
     // TODO: if accumulated sunbeam > cutoff + 20, find some way of advancing to the next scene
     // e.g.: 
@@ -34,10 +35,10 @@ public class Scene2Advancer : MonoBehaviour
     }
 
     // Update is called once per frame
-    private bool haveSwitchedChords = false;
+    private bool haveStartedTransition = false;
     void Update()
     {
-        if( !haveSwitchedChords )
+        if( !haveStartedTransition )
         {
             sun.color = Color.HSVToRGB( sunH, sunS, 
                 SunbeamInteractors.sunbeamAccumulated.Map( 
@@ -47,17 +48,22 @@ public class Scene2Advancer : MonoBehaviour
             );
         }
 
-        if( !haveSwitchedChords && SunbeamInteractors.sunbeamAccumulated > chordSwitchCutoff )
+        if( !haveStartedTransition && SunbeamInteractors.sunbeamAccumulated > chordSwitchCutoff )
         {
-            SwitchToSecondHalf();
-            haveSwitchedChords = true;
+            myChuck.BroadcastEvent( "scene2StartTransition" );
+            haveStartedTransition = true;
 
-            sun.color = Color.HSVToRGB( sunH, sunS, sunPostCutoffValue );
+            // prevent them from fading -- do it early? for now
+            // TODO decide 
+            SunbeamController.shouldFade = false;
         }
     }
 
     void SwitchToSecondHalf()
     {
+        // don't respond to this event any more
+        myEventListener.StopListening();
+
         // spawn many more light columns
         for( int i = 0; i < 10; i++ )
         {
@@ -84,6 +90,8 @@ public class Scene2Advancer : MonoBehaviour
         {
             hand.AdvanceToSecondHalf();
         }
+
+        sun.color = Color.HSVToRGB( sunH, sunS, sunPostCutoffValue );
     }
 
     void UpdateSunbeam()
@@ -214,5 +222,94 @@ public class Scene2Advancer : MonoBehaviour
             }}
 
         ", otherCutoffs[0], otherCutoffs[1], otherCutoffs[2], otherCutoffs[3] ) );
+        
+        
+        myChuck.RunCode( @"
+            global Event scene2StartTransition;
+            global Event scene2TransitionFinished;
+            0 => global float scene2TransitionProgress;
+
+            false => int scene2StartTransitionFired;
+            0.12::second => dur tatum;
+
+            fun void WaitForTransition()
+            {
+                scene2StartTransition => now;
+                true => scene2StartTransitionFired;
+            }
+            spork ~ WaitForTransition();
+            
+            while( true )
+            {
+                if( scene2StartTransitionFired ) 
+                {
+                    break;
+                }
+                16::tatum => now;
+            }
+
+            Shakers s => JCRev reverb => dac;
+            0.05 => reverb.mix;
+
+            // params
+            0.7 => s.decay; // 0 to 1
+            50 => s.objects; // 0 to 128
+            11 => s.preset; // 0 to 22.  0 is good for galloping. 
+            // 11 is good for eighths
+
+            fun void OnBeats()
+            {
+                while( true )
+                {
+                    Math.random2f( 0.7, 0.9 ) => s.energy;
+                    1 => s.noteOn;
+                    2::tatum => now;
+    
+                    Math.random2f( 0.3, 0.5 ) => s.energy;
+                    1 => s.noteOn;
+                    2::tatum => now;
+                }
+
+            }
+            spork ~ OnBeats();
+
+            fun void OffBeats()
+            {
+                1::tatum => now;
+    
+                while( true )
+                {
+                    Math.random2f( 0.1, 0.3 ) => s.energy;
+                    1 => s.noteOn;
+                    2::tatum => now;
+                }
+            }
+
+            64 => int numInFirstPart;
+            for( int i; i < numInFirstPart; i++ )
+            {
+                0.05 + 0.2 * i / numInFirstPart => s.gain;
+                s.gain() => scene2TransitionProgress;
+                1::tatum => now;
+            }
+            spork ~ OffBeats();
+
+            32 => int numInSecondPart;
+            for( int i; i < numInSecondPart; i++ )
+            {
+                0.25 + 0.75 * Math.pow( i * 1.0 / numInSecondPart, 2 ) => s.gain;
+                s.gain() => scene2TransitionProgress;
+                1::tatum => now;
+            }
+
+            1 => scene2TransitionProgress;
+            scene2TransitionFinished.broadcast();
+            
+            while( true ) { 1::second => now; }
+            
+        " );
+        myEventListener = gameObject.AddComponent<ChuckEventListener>();
+        myEventListener.ListenForEvent( myChuck, "scene2TransitionFinished", SwitchToSecondHalf );
     }
+
 }

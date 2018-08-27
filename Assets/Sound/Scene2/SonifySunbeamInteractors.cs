@@ -37,10 +37,16 @@ public class SonifySunbeamInteractors : MonoBehaviour
             otherSonifier.TurnOff();
         }
 
-        myChuck.SetFloat( myGainVar, myInteractor.CurrentStrength() / 3999f );
-        UpdateChordTones();
+        double myCurrentGain = myInteractor.CurrentStrength() / 3999f;
+        if( iAmPlaying )
+        {
+            myChuck.SetFloat( "bassGain", myCurrentGain );
+        }
+
+        myChuck.SetFloat( myGainVar, myCurrentGain );
     }
 
+    // called by my event listener every 16 tatums
     private void UpdateChordTones()
     {
         if( !secondHalf ) return;
@@ -99,6 +105,7 @@ public class SonifySunbeamInteractors : MonoBehaviour
     }
 
     private string myChordNotesVar, myGainVar;
+    private ChuckEventListener myRegularTatum;
     private void StartChuck()
     {
         myChordNotesVar = myChuck.GetUniqueVariableName();
@@ -269,8 +276,32 @@ public class SonifySunbeamInteractors : MonoBehaviour
             }}
             spork ~ SlewChordFreqs();
 
+            fun void SetLPFCutoff()
+            {{
+                global float scene2TransitionProgress;
+                while( true )
+                {{
+                    1200 + 4000 * scene2TransitionProgress => lpf.freq;
+                    10::ms => now;
+//if( Math.random2f( 0, 1 ) < 0.005 ) {{ <<< scene2TransitionProgress >>>; }}
+                }}
+            }}
+            spork ~ SetLPFCutoff();
+
             while( true ) {{ 1::second => now; }}
         ", myChordNotesVar, myGainVar ) );
         
+
+        myChuck.RunCode( @"
+            0.12::second => dur tatum;
+            global Event scene2Regular16Tatum;
+            while( true )
+            {
+                scene2Regular16Tatum.broadcast();
+                16::tatum => now;
+            }
+        " );
+        myRegularTatum = gameObject.AddComponent<ChuckEventListener>();
+        myRegularTatum.ListenForEvent( myChuck, "scene2Regular16Tatum", UpdateChordTones );
     }
 }
