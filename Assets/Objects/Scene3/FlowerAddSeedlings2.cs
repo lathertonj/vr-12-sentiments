@@ -8,11 +8,13 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     public Transform seedlingPrefab;
     private SonifyFlowerSeedlings mySonifier;
     private ChuckSubInstance myChuck;
+    private List<Transform> addedSeedlings;
 
     // Use this for initialization
     void Start()
     {
         StartChuck();
+        addedSeedlings = new List<Transform>();
     }
 
     private string myStartBuzzEvent, myStopBuzzEvent, mySqueezedEvent, myUnsqueezedEvent;
@@ -118,6 +120,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         if( myController.IsUnSqueezed() )
         {
             myChuck.BroadcastEvent( myUnsqueezedEvent );
+            ReleaseSeedlings(); 
         }
 
         if( !myController.IsSqueezed() )
@@ -137,16 +140,39 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     private void CreateSeedling()
     {
         Vector3 newPosition = new Vector3(
-            Random.Range( -0.05f, 0.05f ),
+            Random.Range( -1f, 1f ),
             0,
-            Random.Range( -0.05f, 0.05f )
+            Random.Range( -1f, 1f )
         );
         Quaternion newRotation = Quaternion.AngleAxis( Random.Range( 0, 359 ), Vector3.up );
-        Transform newSeed = Instantiate( seedlingPrefab, newPosition + transform.position, transform.rotation, transform );
+        Transform newSeed = Instantiate( seedlingPrefab, /*newPosition + transform.position*/ transform.TransformPoint( newPosition * 0.005f ), transform.rotation, transform );
         newSeed.localRotation = newRotation;
         // set height to 0. why isn't it already?
         Vector3 p = newSeed.localPosition;
         p.y = 0;
         newSeed.localPosition = p;
+
+        addedSeedlings.Add( newSeed );
+    }
+
+    private void ReleaseSeedlings()
+    {
+        mySonifier.PlayArpeggio( addedSeedlings.Count );
+
+        foreach( Transform seedling in addedSeedlings )
+        {
+            Rigidbody rb = seedling.GetComponent<Rigidbody>();
+            // remove freezing of rotation or position
+            rb.constraints = RigidbodyConstraints.None;
+            // unparent
+            seedling.parent = null;
+            // set velocity / angular velocity
+            rb.velocity = myController.Velocity();
+            rb.angularVelocity = myController.AngularVelocity();
+            // add small upward force in the direction of flower head
+            rb.AddForce( 1 * transform.up, ForceMode.Impulse );
+        }
+
+        addedSeedlings = new List<Transform>();
     }
 }

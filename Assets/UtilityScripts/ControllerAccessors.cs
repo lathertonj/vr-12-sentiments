@@ -35,5 +35,15 @@ public class ControllerAccessors : MonoBehaviour
         return Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip );
     }
 
+    public Vector3 Velocity()
+    {
+        return Controller.velocity;
+    }
+
+    public Vector3 AngularVelocity()
+    {
+        return Controller.angularVelocity;
+    }
+
     // TODO: accessor for grips and whatever else
 }

@@ -7,12 +7,14 @@ public class SonifyFlowerSeedlings : MonoBehaviour
 {
     private ChuckSubInstance myChuck;
     public double[] myChord;
+    public double[] myArpeggio;
 
-    private string myChordNotesVar;
+    private string myChordNotesVar, myArpeggioNotesVar;
     public void StartChuck( string startChordEvent, string stopChordEvent, string tatum, string squeezedEvent, string unsqueezedEvent )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myChordNotesVar = myChuck.GetUniqueVariableName();
+        myArpeggioNotesVar = myChuck.GetUniqueVariableName();
         myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -252,5 +254,87 @@ ADSR adsr => lpf; // should be: hpf
             
             
         ", tatum, squeezedEvent, unsqueezedEvent ) );
+    }
+
+    public void PlayArpeggio( int numNotes )
+    {
+        Debug.Log( "playing " + numNotes.ToString() );
+        // strategy 1: just fill the array, repeating
+        /* int j = 0;
+        double[] newArpeggio = new double[numNotes];
+        for( int i = 0; i < numNotes; i++ )
+        {
+            newArpeggio[i] = myArpeggio[j];
+            j++;
+            j %= myArpeggio.Length;
+        }*/
+
+        // strategy 2: fill it with one copy, then random notes
+        string[] newArpeggio = new string[numNotes];
+        int j = 0;
+        int prevJ = j;
+        for( int i = 0; i < numNotes; i++ )
+        {
+            if( i < myArpeggio.Length )
+            {
+                j = i;
+            }
+            else
+            {
+                while( j == prevJ )
+                {
+                    j = Random.Range( 0, myArpeggio.Length );
+                }
+            }
+            newArpeggio[i] = myArpeggio[j].ToString("0.0");
+            prevJ = j;
+        }
+
+        string notes = "[" + string.Join( ", ", newArpeggio ) + "]";
+
+        myChuck.RunCode( string.Format( @"
+            {1} @=> float {0}[]; // global float {0}[4];
+                                 // 2::ms => now;
+
+            ModalBar modey => JCRev r => dac;
+
+            // set the gain
+            .9 => r.gain;
+            // set the reverb mix
+            .05 => r.mix;
+
+            0.05::second => dur noteLength;
+            true => int hardPick;
+
+            fun void PlayArray()
+            {{
+                2 => modey.preset; // I like 6 and 2
+                for( int i; i < {0}.size(); i++ )
+                {{
+                    if( {0}[i] > 10 )
+                    {{
+                        // strike position
+                        Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
+                        // freq
+                        {0}[i] => Std.mtof => modey.freq;
+                        // strike it!
+                        Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => modey.strike;
+                        // next pick in opposite direction
+                        !hardPick => hardPick;
+                    }}
+                    else
+                    {{
+                        // next pick in stronger direction
+                        true => hardPick;
+                    }}
+        
+                    noteLength => now;
+                    1.09 *=> noteLength;
+                }}
+            }}
+            PlayArray();
+            5::second => now;
+        ", myArpeggioNotesVar, notes ) );
+        // myChuck.SetFloatArray( myArpeggioNotesVar, newArpeggio );
     }
 }
