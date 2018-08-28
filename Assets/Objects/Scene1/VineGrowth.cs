@@ -7,11 +7,14 @@ public class VineGrowth : MonoBehaviour
     public ControllerAccessors leftController, rightController;
     public Transform vrRoom;
     private Vector3 previousPosition;
+    private float prevHeightChange = 0;
+    private SonifyVineGrowth mySonifier;
 
     // Use this for initialization
     void Start()
     {
         previousPosition = transform.position;
+        mySonifier = GetComponent<SonifyVineGrowth>();
     }
 
     // Update is called once per frame
@@ -20,6 +23,11 @@ public class VineGrowth : MonoBehaviour
         float heightChange = transform.position.y - previousPosition.y;
         if( heightChange > 0 && ( leftController.IsSqueezed() || rightController.IsSqueezed() ) )
         {
+            if( prevHeightChange < 0 )
+            {
+                mySonifier.StartPlaying();
+            }
+
             ushort intensity = (ushort) heightChange.MapClamp( 0, 0.01f, 0, 3999 );
             leftController.Vibrate( intensity );
             rightController.Vibrate( intensity );
@@ -34,7 +42,13 @@ public class VineGrowth : MonoBehaviour
                 vrRoom.localScale.z + scaleIncrease 
             );
         }
+        // TODO is this the right condition?
+        else // if( heightChange < 0 && prevHeightChange > 0 )
+        {
+            mySonifier.StopPlaying();
+        }
 
         previousPosition = transform.position;
+        prevHeightChange = heightChange;
     }
 }

@@ -22,7 +22,7 @@ public class NPCSproutController : MonoBehaviour
         float heightChange = currentPos.y - prevPos.y;
         if( heightChange > 0 )
         {
-            float scaleIncrease = heightChange.MapClamp( 0, 0.005f, 0, 0.0005f );
+            float scaleIncrease = heightChange.MapClamp( 0, 0.005f, 0, 0.0009f );
             float newScale = parentToEmbiggen.localScale.x + scaleIncrease;
             parentToEmbiggen.localScale = newScale * Vector3.one;
 
