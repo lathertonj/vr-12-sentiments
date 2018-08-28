@@ -25,5 +25,15 @@ public class ControllerAccessors : MonoBehaviour
         return Controller.GetPress( SteamVR_Controller.ButtonMask.Grip );
     }
 
+    public bool IsFirstSqueezed()
+    {
+        return Controller.GetPressDown( SteamVR_Controller.ButtonMask.Grip );
+    }
+    
+    public bool IsUnSqueezed()
+    {
+        return Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip );
+    }
+
     // TODO: accessor for grips and whatever else
 }

@@ -8,36 +8,11 @@ public class SonifyFlowerSeedlings : MonoBehaviour
     private ChuckSubInstance myChuck;
     public double[] myChord;
 
-    // Use this for initialization
-    void Start()
-    {
-        StartChuck();
-    }
-
-    public void PlayChord()
-    {
-        if( myChuck != null )
-        {
-            myChuck.SetFloatArray( myChordNotesVar, myChord );
-            myChuck.BroadcastEvent( myADSRStart );
-        }
-    }
-
-    public void StopChord()
-    {
-        if( myChuck != null )
-        {
-            myChuck.BroadcastEvent( myADSREnd );
-        }
-    }
-
-    private string myChordNotesVar, myADSRStart, myADSREnd;
-    private void StartChuck()
+    private string myChordNotesVar;
+    public void StartChuck( string startChordEvent, string stopChordEvent, string tatum, string squeezedEvent, string unsqueezedEvent )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myChordNotesVar = myChuck.GetUniqueVariableName();
-        myADSRStart = myChuck.GetUniqueVariableName();
-        myADSREnd = myChuck.GetUniqueVariableName();
         myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -139,12 +114,12 @@ public class SonifyFlowerSeedlings : MonoBehaviour
             }}
 
             HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => dac;
-ADSR adsr => ampMod; // should be: hpf
+ADSR adsr => lpf; // should be: hpf
             8000 => lpf.freq; // orig 2000
             50 => hpf.freq; // possibly 1800
             0.05 => reverb.mix;
             0.85 => reverb.gain;
-            adsr.set( 0.05::second, 0.05::second, 0.7, 0.1::second );
+            adsr.set( 0.01::second, 0.01::second, 0.7, 0.1::second );
 
             fun void AmpMod()
             {{
@@ -158,11 +133,10 @@ ADSR adsr => ampMod; // should be: hpf
             }}
             spork ~ AmpMod();
 
-            // TODO: this could use some amplitude modulation
-            Supersaw mySaws[4];
+            Supersaw mySaws[{3}];
 
 
-            for( int i; i < 4; i++ )
+            for( int i; i < mySaws.size(); i++ )
             {{
                 // how much freq waves up and down as a % of current freq
                 1.2 / 300 => mySaws[i].pitchLFODepthMultiplier; 
@@ -176,18 +150,23 @@ ADSR adsr => ampMod; // should be: hpf
                 mySaws[i] => adsr;
             }}
 
-            [66.0, 69, 73, 76] @=> global float {0}[];
-            [66.0, 69, 73, 76] @=> float currentChordNotes[];
-            [0.005, 0.0046, 0.0044, 0.0041] @=> float chordSlews[];
+            global float {0}[{3}];
+            float currentChordNotes[{3}];
+            for( int i; i < {0}.size(); i++ )
+            {{
+                66 => {0}[i];
+                66 => currentChordNotes[i];
+            }}
+            0.5 => float chordSlew;
             fun void SlewChordFreqs()
             {{
                 while( true )
                 {{
-                    for( int i; i < 4; i++ )
+                    for( int i; i < mySaws.size(); i++ )
                     {{
-                        currentChordNotes[i] + 3 * chordSlews[i] * 
+                        currentChordNotes[i] + chordSlew * 
                             ( {0}[i] - currentChordNotes[i] ) => currentChordNotes[i];
-                        currentChordNotes[i] - 12 => Std.mtof => mySaws[i].freq;
+                        currentChordNotes[i] - 0 => Std.mtof => mySaws[i].freq;
                     }}
                     1::ms => now;
                 }}
@@ -199,7 +178,7 @@ ADSR adsr => ampMod; // should be: hpf
                 global float scene3TransitionProgress;
                 while( true )
                 {{
-                    1200 + 4000 * scene3TransitionProgress => lpf.freq;
+                    15000 + 8000 * scene3TransitionProgress => lpf.freq;
                     10::ms => now;
                 }}
             }}
@@ -213,7 +192,65 @@ ADSR adsr => ampMod; // should be: hpf
                 {2} => now;
                 1 => adsr.keyOff;
             }}
-        ", myChordNotesVar, myADSRStart, myADSREnd ) );
-        
+        ", myChordNotesVar, startChordEvent, stopChordEvent, myChord.Length ) );
+        myChuck.SetFloatArray( myChordNotesVar, myChord );
+
+
+        myChuck.RunCode( string.Format( @"
+            global float {0};
+            global Event {1}, {2};
+            // 0: tatum in seconds, filled in by another shred
+            // 1: squeezed event
+            // 2: unsqueezed event
+
+            Shakers s => JCRev reverb => dac;
+            0.05 => reverb.mix;
+
+            // params
+            0.7 => s.decay; // 0 to 1
+            50 => s.objects; // 0 to 128
+            11 => s.preset; // 0 to 22.  0 is good for galloping. 
+            // 11 is good for eighths
+
+            fun void Play()
+            {{
+                while( true )
+                {{
+                    me.yield();
+                    {0}::second => dur tatum; // TODO duplicate below if have syncing issues, but I don't expect any
+                    
+                    me.yield();
+                    Math.random2f( 0.7, 0.9 ) => s.energy;
+                    1 => s.noteOn;
+                    1::tatum => now;
+
+                    me.yield();
+                    Math.random2f( 0.1, 0.3 ) => s.energy;
+                    1 => s.noteOn;
+                    1::tatum => now;
+    
+                    me.yield();
+                    Math.random2f( 0.3, 0.5 ) => s.energy;
+                    1 => s.noteOn;
+                    1::tatum => now;
+
+                    me.yield();
+                    Math.random2f( 0.1, 0.3 ) => s.energy;
+                    1 => s.noteOn;
+                    1::tatum => now;
+                }}
+
+            }}
+
+            while( true )
+            {{
+                {1} => now;
+                spork ~ Play() @=> Shred playShred;
+                {2} => now;
+                playShred.exit();
+            }}
+            
+            
+        ", tatum, squeezedEvent, unsqueezedEvent ) );
     }
 }
