@@ -256,7 +256,7 @@ ADSR adsr => lpf; // should be: hpf
         ", tatum, squeezedEvent, unsqueezedEvent ) );
     }
 
-    public void PlayArpeggio( int numNotes )
+    public float[] PlayArpeggio( int numNotes )
     {
         Debug.Log( "playing " + numNotes.ToString() );
         // strategy 1: just fill the array, repeating
@@ -271,6 +271,7 @@ ADSR adsr => lpf; // should be: hpf
 
         // strategy 2: fill it with one copy, then random notes
         string[] newArpeggio = new string[numNotes];
+        float[] toReturn = new float[numNotes];
         int j = 0;
         int prevJ = j;
         for( int i = 0; i < numNotes; i++ )
@@ -286,6 +287,7 @@ ADSR adsr => lpf; // should be: hpf
                     j = Random.Range( 0, myArpeggio.Length );
                 }
             }
+            toReturn[i] = (float) myArpeggio[j];
             newArpeggio[i] = myArpeggio[j].ToString("0.0");
             prevJ = j;
         }
@@ -336,5 +338,27 @@ ADSR adsr => lpf; // should be: hpf
             5::second => now;
         ", myArpeggioNotesVar, notes ) );
         // myChuck.SetFloatArray( myArpeggioNotesVar, newArpeggio );
+
+        return toReturn;
+    }
+
+    public void SonifyIndividualNote( float note )
+    {
+        myChuck.RunCode( string.Format( @"
+            ModalBar modey => JCRev r => dac;
+
+            // set the gain
+            .9 => r.gain;
+            // set the reverb mix
+            .05 => r.mix;
+
+            2 => modey.preset;
+            Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
+            {0} => Std.mtof => modey.freq;
+            Math.random2f( 0.3, 0.4 ) + 0.17 => modey.strike;
+
+            5::second => now; 
+        ", note ) );
+
     }
 }

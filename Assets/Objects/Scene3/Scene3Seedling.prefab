@@ -1649,6 +1649,7 @@ GameObject:
   - component: {fileID: 4895944539137206}
   - component: {fileID: 54296551099675080}
   - component: {fileID: 114680011494353088}
+  - component: {fileID: 114673170021160408}
   m_Layer: 0
   m_Name: Scene3Seedling
   m_TagString: Untagged
@@ -3479,6 +3480,17 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.015, y: 0.19684024, z: 0.015}
   m_Center: {x: -0.000000036778303, y: 0.061579764, z: -0.000000018405613}
+--- !u!114 &114673170021160408
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1933851884786410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d7afdf01240314aa5ec3feaa7e343a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114680011494353088
 MonoBehaviour:
   m_ObjectHideFlags: 1

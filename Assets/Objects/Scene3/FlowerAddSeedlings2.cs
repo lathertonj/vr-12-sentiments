@@ -158,12 +158,17 @@ public class FlowerAddSeedlings2 : MonoBehaviour
 
     private void ReleaseSeedlings()
     {
-        mySonifier.PlayArpeggio( addedSeedlings.Count );
+        float[] notes = mySonifier.PlayArpeggio( addedSeedlings.Count );
         myCollider.enabled = false;
         Invoke( "EnableCollider", 0.5f );
 
+        int i = 0;
         foreach( Transform seedling in addedSeedlings )
         {
+            // assign note
+            seedling.GetComponent<NumberHolder>().theNumber = notes[i];
+            i++;
+
             Rigidbody rb = seedling.GetComponent<Rigidbody>();
             // remove freezing of rotation or position
             rb.constraints = RigidbodyConstraints.None;
@@ -183,4 +188,15 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     {
         myCollider.enabled = true;
     }
+
+    // I tried playing their note when you collide with them but it happens way
+    // too much and sounds glitchy and awful
+    /*private void OnCollisionEnter( Collision collision )
+    {
+        NumberHolder maybeSeedling = collision.gameObject.GetComponent<NumberHolder>();
+        if( maybeSeedling != null )
+        {
+            mySonifier.SonifyIndividualNote( maybeSeedling.theNumber );
+        }
+    }*/
 }
