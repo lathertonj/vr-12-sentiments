@@ -9,6 +9,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     private SonifyFlowerSeedlings mySonifier;
     private ChuckSubInstance myChuck;
     private List<Transform> addedSeedlings;
+    public Collider myCollider;
 
     // Use this for initialization
     void Start()
@@ -158,6 +159,8 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     private void ReleaseSeedlings()
     {
         mySonifier.PlayArpeggio( addedSeedlings.Count );
+        myCollider.enabled = false;
+        Invoke( "EnableCollider", 0.5f );
 
         foreach( Transform seedling in addedSeedlings )
         {
@@ -174,5 +177,10 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         }
 
         addedSeedlings = new List<Transform>();
+    }
+
+    private void EnableCollider()
+    {
+        myCollider.enabled = true;
     }
 }
