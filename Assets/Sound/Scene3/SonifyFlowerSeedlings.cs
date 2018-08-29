@@ -374,4 +374,56 @@ ADSR adsr => lpf; // should be: hpf
     {
         SonifyIndividualNote( (float) myArpeggio[ Random.Range( 0, myArpeggio.Length ) ] );
     }
+
+    public void SonifySpewingNotes( float waitTime, float noteLength )
+    {
+        string[] newArpeggio = new string[myArpeggio.Length];
+        for( int i = 0; i < newArpeggio.Length; i++ )
+        {
+            newArpeggio[i] = myArpeggio[i].ToString("0.0");
+        }
+
+        string notes = "[" + string.Join( ", ", newArpeggio ) + "]";
+        myChuck.RunCode( string.Format( @"
+            {1} @=> float {0}[]; // global float {0}[4];
+                                 // 2::ms => now;
+
+            global ModalBar {2};
+
+            {4}::second => dur noteLength;
+            true => int hardPick;
+
+            // wait time
+            {3}::second => now;
+            
+            fun void PlayArrayRandomly()
+            {{
+                int i, prevI;
+                while( true )
+                {{
+                    // play note
+                    // strike position
+                    Math.random2f( 0.2, 0.8 ) => {2}.strikePosition;
+                    // freq
+                    {0}[i] => Std.mtof => {2}.freq;
+                    // strike it!
+                    Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => {2}.strike;
+                    // next pick in opposite direction
+                    !hardPick => hardPick;
+                    
+
+                    // choose next note
+                    while( i == prevI )
+                    {{
+                        Math.random2( 0, {0}.size() - 1 ) => i;
+                    }}
+                    i => prevI;
+
+                    noteLength => now;
+                }}
+            }}
+            PlayArrayRandomly();
+            
+        ", myArpeggioNotesVar, notes, myModey, waitTime, noteLength ) );
+    }
 }

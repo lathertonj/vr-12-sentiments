@@ -20,7 +20,7 @@ public class Scene3Advancer : MonoBehaviour
         {
             haveAdvanced = true; 
             // advance!
-            float period = 0.23f;
+            float period = 0.17f;
             float timeToStart = 0;
             leftHand.StartSpewing( timeToStart, period );
             rightHand.StartSpewing( timeToStart + period / 2, period );

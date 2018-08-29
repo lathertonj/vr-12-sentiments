@@ -203,7 +203,13 @@ public class FlowerAddSeedlings2 : MonoBehaviour
 
     public void StartSpewing( float timeToStart, float period )
     {
-        InvokeRepeating( "SpewASeedling", timeToStart, period );
+        // This causes too much memory usage
+        // InvokeRepeating( "SpewASeedling", timeToStart, period );
+
+        // start my particle emitter which spews fake seedlings
+        GetComponentInChildren<ParticleSystem>().Play();
+        // play a lot of notes. ssshhh they aren't synced up
+        mySonifier.SonifySpewingNotes( timeToStart, period );
     }
 
     private void SpewASeedling()
