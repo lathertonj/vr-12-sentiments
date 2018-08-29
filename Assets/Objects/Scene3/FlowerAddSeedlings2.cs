@@ -113,14 +113,15 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         shouldBuzz = false;
     }
 
+    bool shouldRespondToControllers = true;
     private void Update()
     {
-        if( myController.IsFirstSqueezed() )
+        if( shouldRespondToControllers && myController.IsFirstSqueezed() )
         {
             myChuck.BroadcastEvent( mySqueezedEvent );
         }
 
-        if( myController.IsUnSqueezed() )
+        if( shouldRespondToControllers && myController.IsUnSqueezed() )
         {
             myChuck.BroadcastEvent( myUnsqueezedEvent );
             ReleaseSeedlings(); 
@@ -132,7 +133,8 @@ public class FlowerAddSeedlings2 : MonoBehaviour
             shouldBuzz = false;
         }
 
-        if( shouldBuzz )
+        // buzz if regular buzzing or if I turned the controllers off
+        if( shouldBuzz || !shouldRespondToControllers )
         {
             // TODO strength
             myController.Vibrate( 1000 );
@@ -210,6 +212,22 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         GetComponentInChildren<ParticleSystem>().Play();
         // play a lot of notes. ssshhh they aren't synced up
         mySonifier.SonifySpewingNotes( timeToStart, period );
+        
+        // start a new chord and don't stop 
+        shouldRespondToControllers = false;
+        mySonifier.AdvanceToSecondHalf();
+        // sometimes it doesn't react to this and I don't understand why
+        // TODO is it getting a stop chord event right afterward?
+        myChuck.BroadcastEvent( myStartChordEvent );
+        // do it again shortly in case of an out of order event error
+        Invoke( "StartChordLate", 0.15f );
+
+
+    }
+
+    private void StartChordLate()
+    {
+        myChuck.BroadcastEvent( myStartChordEvent );
     }
 
     private void SpewASeedling()

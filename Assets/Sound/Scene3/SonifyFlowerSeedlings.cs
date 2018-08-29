@@ -7,6 +7,7 @@ public class SonifyFlowerSeedlings : MonoBehaviour
 {
     private ChuckSubInstance myChuck;
     public double[] myChord;
+    public double[] mySecondHalfChord;
     public double[] myArpeggio;
 
     private string myChordNotesVar, myArpeggioNotesVar, myModey;
@@ -282,6 +283,12 @@ ADSR adsr => lpf; // should be: hpf
             }}
 
         ", myModey, myModeyNote, myModeyPlayNow ) );
+    }
+
+    public void AdvanceToSecondHalf()
+    {
+        myChuck.SetFloatArray( myChordNotesVar, mySecondHalfChord );
+        // TODO mess with the advancer global float
     }
 
     public float[] PlayArpeggio( int numNotes )
