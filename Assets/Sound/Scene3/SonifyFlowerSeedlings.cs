@@ -9,12 +9,18 @@ public class SonifyFlowerSeedlings : MonoBehaviour
     public double[] myChord;
     public double[] myArpeggio;
 
-    private string myChordNotesVar, myArpeggioNotesVar;
+    private string myChordNotesVar, myArpeggioNotesVar, myModey;
+    private string myModeyNote, myModeyPlayNow;
     public void StartChuck( string startChordEvent, string stopChordEvent, string tatum, string squeezedEvent, string unsqueezedEvent )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myChordNotesVar = myChuck.GetUniqueVariableName();
         myArpeggioNotesVar = myChuck.GetUniqueVariableName();
+        myModey = myChuck.GetUniqueVariableName();
+        myModeyNote = myChuck.GetUniqueVariableName();
+        myModeyPlayNow = myChuck.GetUniqueVariableName();
+
+        // synth chords
         myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -197,7 +203,7 @@ ADSR adsr => lpf; // should be: hpf
         ", myChordNotesVar, startChordEvent, stopChordEvent, myChord.Length ) );
         myChuck.SetFloatArray( myChordNotesVar, myChord );
 
-
+        // shakers and create modey
         myChuck.RunCode( string.Format( @"
             global float {0};
             global Event {1}, {2};
@@ -206,6 +212,9 @@ ADSR adsr => lpf; // should be: hpf
             // 2: unsqueezed event
 
             Shakers s => JCRev reverb => dac;
+            global ModalBar {3} => reverb;
+            2 => {3}.preset;
+
             0.05 => reverb.mix;
 
             // params
@@ -253,7 +262,26 @@ ADSR adsr => lpf; // should be: hpf
             }}
             
             
-        ", tatum, squeezedEvent, unsqueezedEvent ) );
+        ", tatum, squeezedEvent, unsqueezedEvent, myModey ) );
+
+        // respond to individual notes
+        myChuck.RunCode( string.Format( @"
+            global ModalBar {0};
+            global float {1};
+            global Event {2};
+
+            true => int playStrong;
+
+            while( true )
+            {{
+                {2} => now;
+                Math.random2f( 0.2, 0.8 ) => {0}.strikePosition;
+                {1} => Std.mtof => {0}.freq;
+                Math.random2f( 0.3, 0.4 ) + playStrong * 0.17 => {0}.strike;
+                !playStrong => playStrong;
+            }}
+
+        ", myModey, myModeyNote, myModeyPlayNow ) );
     }
 
     public float[] PlayArpeggio( int numNotes )
@@ -298,29 +326,23 @@ ADSR adsr => lpf; // should be: hpf
             {1} @=> float {0}[]; // global float {0}[4];
                                  // 2::ms => now;
 
-            ModalBar modey => JCRev r => dac;
-
-            // set the gain
-            .9 => r.gain;
-            // set the reverb mix
-            .05 => r.mix;
+            global ModalBar {2};
 
             0.05::second => dur noteLength;
             true => int hardPick;
 
             fun void PlayArray()
             {{
-                2 => modey.preset; // I like 6 and 2
                 for( int i; i < {0}.size(); i++ )
                 {{
                     if( {0}[i] > 10 )
                     {{
                         // strike position
-                        Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
+                        Math.random2f( 0.2, 0.8 ) => {2}.strikePosition;
                         // freq
-                        {0}[i] => Std.mtof => modey.freq;
+                        {0}[i] => Std.mtof => {2}.freq;
                         // strike it!
-                        Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => modey.strike;
+                        Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => {2}.strike;
                         // next pick in opposite direction
                         !hardPick => hardPick;
                     }}
@@ -336,7 +358,7 @@ ADSR adsr => lpf; // should be: hpf
             }}
             PlayArray();
             5::second => now;
-        ", myArpeggioNotesVar, notes ) );
+        ", myArpeggioNotesVar, notes, myModey ) );
         // myChuck.SetFloatArray( myArpeggioNotesVar, newArpeggio );
 
         return toReturn;
@@ -344,21 +366,12 @@ ADSR adsr => lpf; // should be: hpf
 
     public void SonifyIndividualNote( float note )
     {
-        myChuck.RunCode( string.Format( @"
-            ModalBar modey => JCRev r => dac;
+        myChuck.SetFloat( myModeyNote, note );
+        myChuck.BroadcastEvent( myModeyPlayNow );
+    }
 
-            // set the gain
-            .9 => r.gain;
-            // set the reverb mix
-            .05 => r.mix;
-
-            2 => modey.preset;
-            Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
-            {0} => Std.mtof => modey.freq;
-            Math.random2f( 0.3, 0.4 ) + 0.17 => modey.strike;
-
-            5::second => now; 
-        ", note ) );
-
+    public void SonifyRandomNote()
+    {
+        SonifyIndividualNote( (float) myArpeggio[ Random.Range( 0, myArpeggio.Length ) ] );
     }
 }

@@ -11,6 +11,8 @@ public class FlowerAddSeedlings2 : MonoBehaviour
     private List<Transform> addedSeedlings;
     public Collider myCollider;
 
+    public float numLongPresses = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -138,7 +140,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
 
     }
 
-    private void CreateSeedling()
+    private Transform CreateSeedling( bool addToList = true )
     {
         Vector3 newPosition = new Vector3(
             Random.Range( -1f, 1f ),
@@ -153,40 +155,61 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         p.y = 0;
         newSeed.localPosition = p;
 
-        addedSeedlings.Add( newSeed );
+        if( addToList )
+        {
+            addedSeedlings.Add( newSeed );
+        }
+
+        return newSeed;
     }
 
     private void ReleaseSeedlings()
     {
+        if( addedSeedlings.Count > 11 )
+        {
+            numLongPresses++;
+        }
+
         float[] notes = mySonifier.PlayArpeggio( addedSeedlings.Count );
         myCollider.enabled = false;
         Invoke( "EnableCollider", 0.5f );
 
-        int i = 0;
         foreach( Transform seedling in addedSeedlings )
         {
-            // assign note
-            seedling.GetComponent<NumberHolder>().theNumber = notes[i];
-            i++;
-
-            Rigidbody rb = seedling.GetComponent<Rigidbody>();
-            // remove freezing of rotation or position
-            rb.constraints = RigidbodyConstraints.None;
-            // unparent
-            seedling.parent = null;
-            // set velocity / angular velocity
-            rb.velocity = myController.Velocity();
-            rb.angularVelocity = myController.AngularVelocity();
-            // add small upward force in the direction of flower head
-            rb.AddForce( 1 * transform.up, ForceMode.Impulse );
+            ReleaseOneSeedling( seedling );
         }
 
         addedSeedlings = new List<Transform>();
     }
 
+    private void ReleaseOneSeedling( Transform seedling )
+    {
+        Rigidbody rb = seedling.GetComponent<Rigidbody>();
+        // remove freezing of rotation or position
+        rb.constraints = RigidbodyConstraints.None;
+        // unparent
+        seedling.parent = null;
+        // set velocity / angular velocity
+        rb.velocity = myController.Velocity();
+        rb.angularVelocity = myController.AngularVelocity();
+        // add small upward force in the direction of flower head
+        rb.AddForce( 1 * transform.up, ForceMode.Impulse );
+    }
+
     private void EnableCollider()
     {
         myCollider.enabled = true;
+    }
+
+    public void StartSpewing( float timeToStart, float period )
+    {
+        InvokeRepeating( "SpewASeedling", timeToStart, period );
+    }
+
+    private void SpewASeedling()
+    {
+        ReleaseOneSeedling( CreateSeedling( addToList: false ) );
+        mySonifier.SonifyRandomNote();
     }
 
     // I tried playing their note when you collide with them but it happens way
