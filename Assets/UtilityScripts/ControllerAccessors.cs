@@ -15,6 +15,8 @@ public class ControllerAccessors : MonoBehaviour
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
+    private float squeezeStartTime;
+
     public void Vibrate( ushort amount )
     {
         Controller.TriggerHapticPulse( amount );
@@ -43,6 +45,16 @@ public class ControllerAccessors : MonoBehaviour
     public Vector3 AngularVelocity()
     {
         return Controller.angularVelocity;
+    }
+
+    public void RecordSqueezeStartTime()
+    {
+        squeezeStartTime = Time.time;
+    }
+
+    public float ElapsedSqueezeTime()
+    {
+        return Time.time - squeezeStartTime;
     }
 
     // TODO: accessor for grips and whatever else
