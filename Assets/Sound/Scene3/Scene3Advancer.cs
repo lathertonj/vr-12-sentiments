@@ -25,6 +25,7 @@ public class Scene3Advancer : MonoBehaviour
             leftHand.StartSpewing( timeToStart, period );
             rightHand.StartSpewing( timeToStart + period / 2, period );
             AdvanceChuck();
+            Invoke( "DoCameraFade", time: 15f );
         }
     }
 
@@ -211,5 +212,11 @@ public class Scene3Advancer : MonoBehaviour
             
         " ) );
         // TODO fade to white later on and also high pass up?
+
+    }
+
+    void DoCameraFade()
+    {
+        SteamVR_Fade.Start( Color.white, duration: 8f, fadeOverlay: true );
     }
 }
