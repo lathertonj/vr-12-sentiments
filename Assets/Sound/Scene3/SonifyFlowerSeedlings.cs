@@ -123,8 +123,8 @@ public class SonifyFlowerSeedlings : MonoBehaviour
             }}
 
             HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => dac;
-ADSR adsr => lpf; // should be: hpf
-            8000 => lpf.freq; // orig 2000
+ADSR adsr => hpf; // should be: hpf
+            15000 => lpf.freq; // orig 2000
             50 => hpf.freq; // possibly 1800
             0.05 => reverb.mix;
             0.85 => reverb.gain;
@@ -182,12 +182,12 @@ ADSR adsr => lpf; // should be: hpf
             }}
             spork ~ SlewChordFreqs();
 
+            global float scene3TransitionProgress;
             fun void SetLPFCutoff()
             {{
-                global float scene3TransitionProgress;
                 while( true )
                 {{
-                    15000 + 8000 * scene3TransitionProgress => lpf.freq;
+                    250 - 230 * scene3TransitionProgress => hpf.freq;
                     10::ms => now;
                 }}
             }}
@@ -288,7 +288,6 @@ ADSR adsr => lpf; // should be: hpf
     public void AdvanceToSecondHalf()
     {
         myChuck.SetFloatArray( myChordNotesVar, mySecondHalfChord );
-        // TODO mess with the advancer global float
     }
 
     public float[] PlayArpeggio( int numNotes )

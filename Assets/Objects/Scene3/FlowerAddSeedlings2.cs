@@ -220,7 +220,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         // TODO is it getting a stop chord event right afterward?
         myChuck.BroadcastEvent( myStartChordEvent );
         // do it again shortly in case of an out of order event error
-        Invoke( "StartChordLate", 0.15f );
+        Invoke( "StartChordLate", 0.25f );
 
 
     }
