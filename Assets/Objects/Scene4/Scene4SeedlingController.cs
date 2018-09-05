@@ -43,14 +43,14 @@ public class Scene4SeedlingController : MonoBehaviour
     void LaunchASeedling()
     {
         Rigidbody seedling = mySeedlings[Random.Range( 0, mySeedlings.Length - 1 )];
-        seedling.AddForce( 1f * Vector3.up, ForceMode.VelocityChange );
+        seedling.AddForce( 0.5f * Vector3.up, ForceMode.VelocityChange );
         Vector3 randomAngularVelocity = new Vector3(
             Random.Range( -1f, 1f ),
             Random.Range( -1f, 1f ),
             Random.Range( -1f, 1f )
         );
         seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
-        Debug.Log( "I launched a seedling!" );
+        // TODO: a sound for when a squeeze is building up; an animation or model for your hands
     }
 
     // Update is called once per frame
@@ -126,10 +126,13 @@ public class Scene4SeedlingController : MonoBehaviour
                     seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
                 }
                 numSeedlingsProcessed++;
+
             }
+
+            // sonify arpeggio by num seedlings affected
+            Debug.Log( "affecting " + numSeedlingsToAffect.ToString() );
+            mySonifier.PlayArpeggio( numSeedlingsToAffect );
         }
     }
-
-    // TODO: on schedule of X seconds, make a sound; a short delay later, make a seedling leap up.
 
 }
