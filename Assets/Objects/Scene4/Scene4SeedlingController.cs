@@ -12,6 +12,11 @@ public class Scene4SeedlingController : MonoBehaviour
     public ControllerAccessors leftController, rightController;
     public float maxSqueezeTime = 5f;
 
+    public float[] chord1, chord2;
+
+    private Scene4SonifyFlowerSeedlings mySonifier;
+    private int numSqueezed = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -24,13 +29,28 @@ public class Scene4SeedlingController : MonoBehaviour
                 Random.Range( -spawnRadius.z, spawnRadius.z )
             );
 
-            newSeedling.localRotation = 
+            newSeedling.localRotation =
                 Quaternion.AngleAxis( Random.Range( -20f, 20f ), Vector3.forward ) *
                 Quaternion.AngleAxis( Random.Range( 5f, 355f ), Vector3.up );
 
         }
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
+        mySonifier = GetComponent<Scene4SonifyFlowerSeedlings>();
+        mySonifier.StartChuck( jumpDelay: 1.0f, launchASeedling: LaunchASeedling );
+    }
+
+    void LaunchASeedling()
+    {
+        Rigidbody seedling = mySeedlings[Random.Range( 0, mySeedlings.Length - 1 )];
+        seedling.AddForce( 1f * Vector3.up, ForceMode.VelocityChange );
+        Vector3 randomAngularVelocity = new Vector3(
+            Random.Range( -1f, 1f ),
+            Random.Range( -1f, 1f ),
+            Random.Range( -1f, 1f )
+        );
+        seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
+        Debug.Log( "I launched a seedling!" );
     }
 
     // Update is called once per frame
@@ -45,6 +65,11 @@ public class Scene4SeedlingController : MonoBehaviour
         if( controller.IsFirstSqueezed() )
         {
             controller.RecordSqueezeStartTime();
+            numSqueezed++;
+            if( numSqueezed == 1 )
+            {
+                mySonifier.InformSqueezed();
+            }
         }
 
         if( controller.IsSqueezed() )
@@ -58,8 +83,14 @@ public class Scene4SeedlingController : MonoBehaviour
 
         if( controller.IsUnSqueezed() )
         {
+            numSqueezed--;
+            if( numSqueezed == 0 )
+            {
+                mySonifier.InformUnsqueezed();
+            }
+
             float squeezeTime = controller.ElapsedSqueezeTime();
-            Vector3 velocity = controller.Velocity(); 
+            Vector3 velocity = controller.Velocity();
             // x and z are reversed for some reason
             velocity.x *= -1;
             velocity.z *= -1;
@@ -79,7 +110,7 @@ public class Scene4SeedlingController : MonoBehaviour
                     Random.Range( -1f, 1f ),
                     Random.Range( -1f, 1f ),
                     Random.Range( -1f, 1f )
-                );  
+                );
                 if( numSeedlingsProcessed < numSeedlingsToAffect )
                 {
                     // primary action
@@ -98,4 +129,7 @@ public class Scene4SeedlingController : MonoBehaviour
             }
         }
     }
+
+    // TODO: on schedule of X seconds, make a sound; a short delay later, make a seedling leap up.
+
 }
