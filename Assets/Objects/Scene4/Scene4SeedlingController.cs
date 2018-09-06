@@ -10,7 +10,9 @@ public class Scene4SeedlingController : MonoBehaviour
     public Vector3 spawnRadius = 3f * Vector3.one;
     private Rigidbody[] mySeedlings;
     public ControllerAccessors leftController, rightController;
+    private ParticleSystem leftHand, rightHand;
     public float maxSqueezeTime = 5f;
+    public Color handPinkColor;
 
     public float[] chord1, chord2;
 
@@ -38,6 +40,9 @@ public class Scene4SeedlingController : MonoBehaviour
         mySeedlings = GetComponentsInChildren<Rigidbody>();
         mySonifier = GetComponent<Scene4SonifyFlowerSeedlings>();
         mySonifier.StartChuck( jumpDelay: 1.0f, launchASeedling: LaunchASeedling );
+
+        leftHand = leftController.GetComponentInChildren<ParticleSystem>();
+        rightHand = rightController.GetComponentInChildren<ParticleSystem>();
     }
 
     void LaunchASeedling()
@@ -51,16 +56,17 @@ public class Scene4SeedlingController : MonoBehaviour
         );
         seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
         // TODO: a sound for when a squeeze is building up; an animation or model for your hands
+        // TODO: end the scene gracefully when all the seedlings are beyond a certain height
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessControllerInput( leftController );
-        ProcessControllerInput( rightController );
+        ProcessControllerInput( leftController, leftHand );
+        ProcessControllerInput( rightController, rightHand );
     }
 
-    void ProcessControllerInput( ControllerAccessors controller )
+    void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
     {
         if( controller.IsFirstSqueezed() )
         {
@@ -74,11 +80,22 @@ public class Scene4SeedlingController : MonoBehaviour
 
         if( controller.IsSqueezed() )
         {
-            // TODO intensity
             float timeElapsed = controller.ElapsedSqueezeTime();
+            
             // map within low intensity values. this movement is not intense so vibration is not strong.
             ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
             controller.Vibrate( intensity );
+
+            // hand gets pinker and pinker colors as you squeeze
+            float fractionElapsed = Mathf.Clamp01( timeElapsed / maxSqueezeTime );
+            ParticleSystem.MainModule main = hand.main;
+            main.startColor = fractionElapsed * handPinkColor + ( 1f - fractionElapsed ) * Color.white;
+        }
+        else
+        {
+            // hand gets white particles
+            ParticleSystem.MainModule main = hand.main;
+            main.startColor = Color.white;
         }
 
         if( controller.IsUnSqueezed() )
