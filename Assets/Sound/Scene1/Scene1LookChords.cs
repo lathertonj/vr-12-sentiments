@@ -232,17 +232,23 @@ public class Scene1LookChords : MonoBehaviour
             }
             spork ~ SetCurrentLoudness();
 
-            global Event scene1TurnOffSoundsEvent;
-            global Event scene1TurnOnSoundsEvent;
+            global float scene1GoalLoudness;
+            float currentLoudness;
+            float scene1LoudnessSlew;
             while( true )
             {
-                scene1TurnOnSoundsEvent => now;
-                // turn on sounds
-                spork ~ SetVolumeLevel( 1.0 );    
-
-                scene1TurnOffSoundsEvent => now;
-                // turn off sounds
-                spork ~ SetVolumeLevel( 0.0 );
+                if( currentLoudness < scene1GoalLoudness )
+                {
+                    0.0003 => scene1LoudnessSlew; // ascend slowly
+                }
+                else
+                {
+                    0.002 => scene1LoudnessSlew; // descend quickly
+                }
+                
+                scene1LoudnessSlew * ( scene1GoalLoudness - currentLoudness ) +=> currentLoudness;
+                currentLoudness => volumeControl.gain;
+                1::ms => now;
             }
             
         " );
@@ -292,40 +298,38 @@ public class Scene1LookChords : MonoBehaviour
                 {
                     case 0:
                         // TURN THINGS OFF
-                        myChuck.BroadcastEvent( "scene1TurnOffSoundsEvent" );
+                        myChuck.SetFloat( "scene1GoalLoudness", 0 );
                         break;
                     case 1:
                         // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord1Notes );
                         myChuck.SetInt( "bassNote", 1 );
-                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 2:
                         // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord2Notes );
                         myChuck.SetInt( "bassNote", 2 );
-                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 3:
                         // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord3Notes );
                         myChuck.SetInt( "bassNote", 3 );
-                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 4:
                         // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord4Notes );
                         myChuck.SetInt( "bassNote", 4 );
-                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                 }
                 
             }
         }
     }
-    // TODO what is in second half?
     // TODO mess with freq slews
-    // TODO actually grow when you're looking up
 
     private bool secondSetOfChords = false;
     public void SwitchToSecondSetOfChords()

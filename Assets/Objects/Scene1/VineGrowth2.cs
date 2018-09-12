@@ -7,8 +7,17 @@ public class VineGrowth2 : MonoBehaviour
     public Transform vrRoom;
     private Scene1LookChords mySonifier;
     public ControllerAccessors leftController, rightController;
+    public float growthCutoff1 = 0.3f, growthCutoff2 = 0.45f, growthCutoff3 = 0.6f;
+    public Color skyFadeColor;
+    
+    public Transform[] thingsToDisableAtTransition, thingsToEnableAtTransition;
 
     private float growthSoFar = 0;
+
+    // plot: when growthCutoff1 reached, start vibrating
+    //       when growthCutoff2 reached, flash the orange sky color to the headset
+    //          and add arms and leaves, and switch the chords
+    //       when growthCutoff3 reached, fade to orange sky color and end scene (TODO)
 
     // Use this for initialization
     void Start()
@@ -16,21 +25,55 @@ public class VineGrowth2 : MonoBehaviour
         mySonifier = GetComponent<Scene1LookChords>();
     }
 
-    // Update is called once per frame
+    bool haveSwitchedToSecondHalf = false;
+    bool haveEndedScene = false;
     void Update()
     {
         float currentIntensity = mySonifier.GetCurrentLoudness();
 
-        // TODO: should controllers vibrate with sound?
-        // or only when growing something?
-        ushort intensity = (ushort) currentIntensity.MapClamp( 0, 1f, 0, 100 );
-        leftController.Vibrate( intensity );
-        rightController.Vibrate( intensity );
+        // controllers vibrate only when growing a significant amount
+        if( growthSoFar > growthCutoff1 && growthSoFar <= growthCutoff2 )
+        {
+            ushort intensity = (ushort) growthSoFar.MapClamp( growthCutoff1, growthCutoff2, 0, 300 );
+            leftController.Vibrate( intensity );
+            rightController.Vibrate( intensity );
+        }
+
+        if( !haveSwitchedToSecondHalf && growthSoFar > growthCutoff2 )
+        {
+            // change sound 
+            mySonifier.SwitchToSecondSetOfChords();
+            
+            // visual flash
+            SteamVR_Fade.Start( skyFadeColor, duration: 0f );
+            SteamVR_Fade.Start( Color.clear, duration: 3f );
+
+            // enable and disable models
+            foreach( Transform t in thingsToDisableAtTransition )
+            {
+                t.gameObject.SetActive( false );
+            }
+            
+            foreach( Transform t in thingsToEnableAtTransition )
+            {
+                t.gameObject.SetActive( true );
+            }
+
+            // remember
+            haveSwitchedToSecondHalf = true;
+        }
+
+        if( !haveEndedScene && growthSoFar > growthCutoff3 )
+        {
+            SteamVR_Fade.Start( skyFadeColor, duration: 5f );
+            // TODO: switch to next scene after duration + N::second
+            haveEndedScene = true;
+        }
 
         // change my scale
         // float scaleMultiplier = currentIntensity.MapClamp( 0, 1, 1, 1.01f );
         // vrRoom.localScale *= scaleMultiplier;
-        float scaleIncrease = currentIntensity.MapClamp( 0, 1, 0, 0.0003f );
+        float scaleIncrease = currentIntensity.MapClamp( 0, 1, 0, 0.0001f );
         growthSoFar += scaleIncrease;
         vrRoom.localScale = new Vector3( 
             vrRoom.localScale.x + scaleIncrease,

@@ -7,8 +7,10 @@ public class VineEndJointController : MonoBehaviour
     public Transform myRoot;
     public Transform myThingToFollow;
     public Vector3 followOffset = Vector3.zero;
+    public float extraDirectionFromRoot = 0;
 
     private LinkedList<VineMidJointController> myMidpoints;
+    private VineMidJointController myNextMidpoint = null;
     private Vector3 myOriginalOffset;
     private float myOriginalDistance;
 
@@ -24,6 +26,7 @@ public class VineEndJointController : MonoBehaviour
         while( maybeMidpoint != myRoot )
         {
             VineMidJointController midPoint = maybeMidpoint.GetComponent<VineMidJointController>();
+            if( myNextMidpoint == null ) { myNextMidpoint = midPoint; }
             
             // calculate some properties
             Vector3 midPointOffset = maybeMidpoint.position - myRoot.position;
@@ -45,6 +48,9 @@ public class VineEndJointController : MonoBehaviour
     void Update()
     {
         Vector3 myNewPosition = myThingToFollow.position + followOffset;
+        Vector3 offsetFromPreviousJoint = extraDirectionFromRoot * ( myNewPosition - myNextMidpoint.transform.position );
+        myNewPosition += offsetFromPreviousJoint;
+
         Vector3 currentVineOffset = myNewPosition - myRoot.position;
         
         // calculate new position for each midpoint
