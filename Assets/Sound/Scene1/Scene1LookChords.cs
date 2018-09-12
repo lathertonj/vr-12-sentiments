@@ -8,14 +8,14 @@ public class Scene1LookChords : MonoBehaviour
     public float secondsToChordChange = 1;
     private int currentChord = 0;
     public Collider chord1Plane, chord2Plane;
-
-    // TODO:
-    // - Finish porting this from scene 1
+    private ChuckSubInstance myChuck;
+    private ChuckFloatSyncer myCurrentLoudnessSyncer;
 
     // Use this for initialization
     void Start()
     {
-        TheChuck.instance.RunCode( @"
+        myChuck = GetComponent<ChuckSubInstance>();
+        myChuck.RunCode( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
             // where the filter cutoff frequency is usually 
@@ -221,6 +221,17 @@ public class Scene1LookChords : MonoBehaviour
                 }   
             }
 
+            global float scene1CurrentLoudness;
+            fun void SetCurrentLoudness()
+            {
+                while( true )
+                {
+                    volumeControl.gain() => scene1CurrentLoudness;
+                    1::ms => now;
+                }
+            }
+            spork ~ SetCurrentLoudness();
+
             global Event scene1TurnOffSoundsEvent;
             global Event scene1TurnOnSoundsEvent;
             while( true )
@@ -233,8 +244,11 @@ public class Scene1LookChords : MonoBehaviour
                 // turn off sounds
                 spork ~ SetVolumeLevel( 0.0 );
             }
+            
+        " );
+        myCurrentLoudnessSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
+        myCurrentLoudnessSyncer.SyncFloat( myChuck, "scene1CurrentLoudness" );
 
-    " );
     }
 
     // Update is called once per frame
@@ -278,31 +292,31 @@ public class Scene1LookChords : MonoBehaviour
                 {
                     case 0:
                         // TURN THINGS OFF
-                        TheChuck.instance.BroadcastEvent( "scene1TurnOffSoundsEvent" );
+                        myChuck.BroadcastEvent( "scene1TurnOffSoundsEvent" );
                         break;
                     case 1:
                         // TODO set melody?
-                        TheChuck.instance.SetFloatArray( "chordNotes", chord1Notes );
-                        TheChuck.instance.SetInt( "bassNote", 1 );
-                        TheChuck.instance.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloatArray( "chordNotes", chord1Notes );
+                        myChuck.SetInt( "bassNote", 1 );
+                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
                         break;
                     case 2:
                         // TODO set melody?
-                        TheChuck.instance.SetFloatArray( "chordNotes", chord2Notes );
-                        TheChuck.instance.SetInt( "bassNote", 2 );
-                        TheChuck.instance.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloatArray( "chordNotes", chord2Notes );
+                        myChuck.SetInt( "bassNote", 2 );
+                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
                         break;
                     case 3:
                         // TODO set melody?
-                        TheChuck.instance.SetFloatArray( "chordNotes", chord3Notes );
-                        TheChuck.instance.SetInt( "bassNote", 3 );
-                        TheChuck.instance.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloatArray( "chordNotes", chord3Notes );
+                        myChuck.SetInt( "bassNote", 3 );
+                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
                         break;
                     case 4:
                         // TODO set melody?
-                        TheChuck.instance.SetFloatArray( "chordNotes", chord4Notes );
-                        TheChuck.instance.SetInt( "bassNote", 4 );
-                        TheChuck.instance.BroadcastEvent( "scene1TurnOnSoundsEvent" );
+                        myChuck.SetFloatArray( "chordNotes", chord4Notes );
+                        myChuck.SetInt( "bassNote", 4 );
+                        myChuck.BroadcastEvent( "scene1TurnOnSoundsEvent" );
                         break;
                 }
                 
@@ -317,5 +331,10 @@ public class Scene1LookChords : MonoBehaviour
     public void SwitchToSecondSetOfChords()
     {
         secondSetOfChords = true;
+    }
+
+    public float GetCurrentLoudness()
+    {
+        return myCurrentLoudnessSyncer.GetCurrentValue();
     }
 }
