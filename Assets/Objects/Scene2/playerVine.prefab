@@ -819,6 +819,7 @@ MonoBehaviour:
   myRoot: {fileID: 4164357271679024}
   myThingToFollow: {fileID: 0}
   followOffset: {x: 0, y: -0.35, z: 0}
+  extraDirectionFromRoot: 0
 --- !u!114 &114332431396055250
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -847,6 +848,7 @@ MonoBehaviour:
   myRoot: {fileID: 4903642244782644}
   myThingToFollow: {fileID: 0}
   followOffset: {x: 0, y: 0, z: 0}
+  extraDirectionFromRoot: 0
 --- !u!114 &114452420398253528
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1015,6 +1017,7 @@ MonoBehaviour:
   myRoot: {fileID: 4062466001338144}
   myThingToFollow: {fileID: 0}
   followOffset: {x: 0, y: 0, z: 0}
+  extraDirectionFromRoot: 0
 --- !u!137 &137041359183353728
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -1052,7 +1055,7 @@ SkinnedMeshRenderer:
   m_SortingOrder: 0
   serializedVersion: 2
   m_Quality: 0
-  m_UpdateWhenOffscreen: 0
+  m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
   m_Mesh: {fileID: 4300000, guid: 4bf5fa1f196a11c46a5bf4e125b95ea7, type: 3}
   m_Bones:
