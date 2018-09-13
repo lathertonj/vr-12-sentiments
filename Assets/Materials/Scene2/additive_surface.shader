@@ -1,4 +1,4 @@
-﻿Shader "Custom/Additive Surface Shader" {
+﻿Shader "Custom/Additive Surface" {
     Properties{
         _MainTex( "Texture", 2D ) = "white" {}
         _Color( "_Color", Color ) = (1.0, 0.6, 0.6, 1.0)
@@ -7,6 +7,14 @@
         Tags{ "Queue"="Transparent" "RenderType" = "Transparent" }
         ZWrite Off
         Blend SrcAlpha One // additive One One; soft additive would be OneMinusDstColor One; very soft additive is SrcAlpha One
+
+        Stencil{
+            Ref 101
+            Comp NotEqual // this shader should only render when the stencil != 101
+            Pass keep // don't do anything in particular; the stencil test passed so I render like normal.
+            Fail zero // write 0 into the buffer. if I failed the depth test, then I won't render. but other things should.
+        }
+
         CGPROGRAM
         #pragma surface surf Lambert finalcolor:mycolor keepalpha //alpha
         struct Input {
