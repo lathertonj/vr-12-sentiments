@@ -8,14 +8,12 @@
         ZWrite Off
         Blend SrcAlpha One // additive One One; soft additive would be OneMinusDstColor One; very soft additive is SrcAlpha One
 
-            // UNDO STENCIL FOR NOW
-        //Stencil{
-        //    Ref 101
-        //    Comp NotEqual // this shader should only render when the stencil != 101
-        //    Pass keep // don't do anything in particular; the stencil test passed so I render like normal.
-        //    Fail zero // write 0 into the buffer. if I failed the depth test, then I won't render. but other things should.
-        //    ZFail zero // write 0 if z fail...
-        //}
+        Stencil{
+            Ref 101
+            Comp NotEqual // this shader should only render when the stencil != 101
+            Pass keep // don't do anything in particular; the stencil test passed so I render like normal.
+            Fail zero // write 0 into the buffer. if I failed the depth test, then I won't render. but other things should.
+        }
 
         CGPROGRAM
         #pragma surface surf Lambert finalcolor:mycolor keepalpha //alpha

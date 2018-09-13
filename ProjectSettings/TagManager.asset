@@ -7,7 +7,6 @@ TagManager:
   - Sunbeam
   - Chord1
   - Chord2
-  - PlayerHandModel
   layers:
   - Default
   - TransparentFX
