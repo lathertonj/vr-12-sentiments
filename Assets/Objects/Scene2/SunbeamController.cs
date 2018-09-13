@@ -5,7 +5,6 @@ using UnityEngine;
 public class SunbeamController : MonoBehaviour
 {
     public Transform visualPart;
-    public Transform hiddenPart;
     public float fadeCycleSeconds = 10;
     public float maxBaseAngle = 25;
     public float maxSweepAngle = 8;
@@ -31,26 +30,6 @@ public class SunbeamController : MonoBehaviour
         InvokeRepeating( "SwitchLocation", timePhase, fadeCycleSeconds );
         visualRenderer.enabled = true;
         visualRenderer.material.color = new Color( 0, 0, 0, 0 );
-
-        // send hider way down -- we want to show it at first
-        DisableHider();
-    }
-
-    void DisableHider()
-    {
-        SetHiddenHeight( transform.position - 300 * transform.up );
-    }
-
-    void SetHiddenHeight( Vector3 globalPosition )
-    {
-        // transform global position to local position
-        Vector3 localPosition = transform.InverseTransformPoint( globalPosition );
-        // take only the y part of it
-        float hiddenHeight = localPosition.y;
-        // set the localHiddenPosition.y to that
-        Vector3 localHiddenPosition = hiddenPart.localPosition;
-        localHiddenPosition.y = hiddenHeight;
-        hiddenPart.localPosition = localHiddenPosition;
     }
 
     // Update is called once per frame
@@ -115,35 +94,5 @@ public class SunbeamController : MonoBehaviour
     public float GetStrength()
     {
         return currentStrength;
-    }
-
-    // TODO: make it work for multiple hands. we need to undo our other one if this new one is higher...
-    // v1: only works for one hand
-    private GameObject myIntersectingHand = null;
-    private void OnTriggerEnter( Collider other )
-    {
-        if( other.gameObject.CompareTag( "PlayerHandModel" ) )
-        {
-            myIntersectingHand = other.gameObject;
-        }
-        Debug.Log( other.gameObject.name );
-    }
-
-    private void OnTriggerStay( Collider other )
-    {
-        if( other.gameObject == myIntersectingHand )
-        {
-            SetHiddenHeight( other.transform.position );
-        }
-    }
-
-    private void OnTriggerExit( Collider other )
-    {
-        // stop
-        if( other.gameObject == myIntersectingHand )
-        {
-            myIntersectingHand = null;
-            DisableHider();
-        }
     }
 }
