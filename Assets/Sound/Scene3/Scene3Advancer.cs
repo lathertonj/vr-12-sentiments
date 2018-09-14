@@ -5,11 +5,12 @@ using UnityEngine;
 public class Scene3Advancer : MonoBehaviour
 {
     public FlowerAddSeedlings2 leftHand, rightHand;
+    public Color skyColor;
 
     // Use this for initialization
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
@@ -217,6 +218,6 @@ public class Scene3Advancer : MonoBehaviour
 
     void DoCameraFade()
     {
-        SteamVR_Fade.Start( Color.white, duration: 8f, fadeOverlay: true );
+        SteamVR_Fade.Start( skyColor, duration: 8f, fadeOverlay: true );
     }
 }
