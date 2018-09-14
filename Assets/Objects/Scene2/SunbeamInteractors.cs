@@ -44,6 +44,7 @@ public class SunbeamInteractors : MonoBehaviour
             glowLeafOriginalColor.b, 
             glowAlpha
         );
+
         foreach( Material m in myGlowLeaf.materials )
         {
             m.color = currentGlow;
