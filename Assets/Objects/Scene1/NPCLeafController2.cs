@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class NPCLeafController2 : MonoBehaviour
 {
+    public Transform myHeadLeaf;
     public Vector2 cycleRange;
     public Vector2 effectRange;
     public Vector3 effectDamping;
@@ -64,5 +65,11 @@ public class NPCLeafController2 : MonoBehaviour
             yEffectSize * height,    
             zEffectSize * Mathf.Cos( 2 * Mathf.PI * ( Time.time + zPhase ) / zCycle )
         );
+
+        // map to angle
+        float headAngle = height.Map( -1, 1, 55, 10 );
+        Vector3 localEulerAngles = myHeadLeaf.localEulerAngles;
+        localEulerAngles.z = headAngle;
+        myHeadLeaf.localEulerAngles = localEulerAngles;
     }
 }
