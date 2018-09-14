@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SunbeamInteractors : MonoBehaviour
 {
+    public MeshRenderer myGlowLeaf;
+    private Color glowLeafOriginalColor;
     public static float sunbeamAccumulated = 0;
     public ControllerAccessors myController;
     private ushort currentStrength = 0;
@@ -12,6 +14,7 @@ public class SunbeamInteractors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        glowLeafOriginalColor = myGlowLeaf.material.color;
     }
 
     // Update is called once per frame
@@ -21,8 +24,8 @@ public class SunbeamInteractors : MonoBehaviour
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse
-            currentStrength = (ushort)( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, 3999, 3 ) 
-                * currentSunbeamController.GetStrength()    
+            currentStrength = (ushort) ( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, 3999, 3 )
+                * currentSunbeamController.GetStrength()
             );
             myController.Vibrate( currentStrength );
 
@@ -31,6 +34,19 @@ public class SunbeamInteractors : MonoBehaviour
         else
         {
             currentStrength = 0;
+        }
+
+        // color the glow
+        float glowAlpha = ( (float) currentStrength ).PowMapClamp( 0, 3999, 0, glowLeafOriginalColor.a, 0.65f );
+        Color currentGlow = new Color( 
+            glowLeafOriginalColor.r, 
+            glowLeafOriginalColor.g, 
+            glowLeafOriginalColor.b, 
+            glowAlpha
+        );
+        foreach( Material m in myGlowLeaf.materials )
+        {
+            m.color = currentGlow;
         }
     }
 
