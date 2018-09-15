@@ -144,7 +144,6 @@ public class Scene4SonifyFlowerSeedlings : MonoBehaviour
         }
 
         string notes = "[" + string.Join( ", ", newArpeggio ) + "]";
-        Debug.Log( notes );
 
         myChuck.RunCode( string.Format( @"
             {1} @=> float {0}[]; 

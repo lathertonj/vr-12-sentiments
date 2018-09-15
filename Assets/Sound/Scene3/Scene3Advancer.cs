@@ -212,7 +212,7 @@ public class Scene3Advancer : MonoBehaviour
             
             
         " ) );
-        // TODO fade to white later on and also high pass up?
+        // TODO high pass up or other sound processing when fading out scene?
 
     }
 

@@ -58,5 +58,4 @@ public class ControllerAccessors : MonoBehaviour
         return Time.time - squeezeStartTime;
     }
 
-    // TODO: accessor for grips and whatever else
 }

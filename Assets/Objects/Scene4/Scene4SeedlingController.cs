@@ -55,7 +55,7 @@ public class Scene4SeedlingController : MonoBehaviour
             Random.Range( -1f, 1f )
         );
         seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
-        // TODO: a sound for when a squeeze is building up; an animation or model for your hands
+        // TODO: a sound for when a squeeze is building up
         // TODO: end the scene gracefully when all the seedlings are beyond a certain height
     }
 
@@ -87,15 +87,15 @@ public class Scene4SeedlingController : MonoBehaviour
             controller.Vibrate( intensity );
 
             // hand gets pinker and pinker colors as you squeeze
-            float fractionElapsed = Mathf.Clamp01( timeElapsed / maxSqueezeTime );
-            ParticleSystem.MainModule main = hand.main;
-            main.startColor = fractionElapsed * handPinkColor + ( 1f - fractionElapsed ) * Color.white;
+            // float fractionElapsed = Mathf.Clamp01( timeElapsed / maxSqueezeTime );
+            // ParticleSystem.MainModule main = hand.main;
+            // main.startColor = fractionElapsed * handPinkColor + ( 1f - fractionElapsed ) * Color.white;
         }
         else
         {
             // hand gets white particles
-            ParticleSystem.MainModule main = hand.main;
-            main.startColor = Color.white;
+            // ParticleSystem.MainModule main = hand.main;
+            // main.startColor = Color.white;
         }
 
         if( controller.IsUnSqueezed() )
@@ -147,8 +147,9 @@ public class Scene4SeedlingController : MonoBehaviour
             }
 
             // sonify arpeggio by num seedlings affected
-            Debug.Log( "affecting " + numSeedlingsToAffect.ToString() );
             mySonifier.PlayArpeggio( numSeedlingsToAffect );
+
+            // TODO: do something to the hand animation when the controller is unsqueezed
         }
     }
 

@@ -416,7 +416,7 @@ GameObject:
   - component: {fileID: 135793971800675738}
   m_Layer: 0
   m_Name: Collider2
-  m_TagString: Untagged
+  m_TagString: Seedling
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
