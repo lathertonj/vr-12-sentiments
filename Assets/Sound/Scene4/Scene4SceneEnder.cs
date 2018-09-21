@@ -28,11 +28,6 @@ public class Scene4SceneEnder : MonoBehaviour
         if( other.gameObject.CompareTag( "Seedling" ) )
         {
             numSeedlingsInsideMe--;
-            Debug.Log( "numSeedlings is now " + numSeedlingsInsideMe.ToString() );
-        }
-        else
-        {
-            Debug.Log( other.gameObject.name + " left me " );
         }
     }
 }
