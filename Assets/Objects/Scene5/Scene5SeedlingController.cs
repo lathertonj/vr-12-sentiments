@@ -6,7 +6,7 @@ using UnityEngine;
 public class Scene5SeedlingController : MonoBehaviour
 {
     public Transform seedlingPrefab;
-    public Transform room;
+    public Transform room, head;
     public int numSeedlings = 40;
     public Vector3 spawnRadius = 3f * Vector3.one;
     private Rigidbody[] mySeedlings;
@@ -67,7 +67,7 @@ public class Scene5SeedlingController : MonoBehaviour
     {
         ProcessControllerInput( leftController, leftHand );
         ProcessControllerInput( rightController, rightHand );
-        CenterRoomOnSeedlings();
+        MoveRoomWithHead();
     }
 
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
@@ -154,21 +154,24 @@ public class Scene5SeedlingController : MonoBehaviour
         }
     }
 
-    Vector3 roomOffset;
-    Vector3 goalRoomPosition;
-    Vector3 currentRoomPosition;
-    float roomSlew = 0.05f;
+    Vector3 prevHeadPosition;
+    public float roomHeadMovementMultiplier = 5;
     private void CalculateRoomOffset()
     {
-        roomOffset = room.transform.position - SeedlingCenter();
-        goalRoomPosition = currentRoomPosition = room.transform.position;
+        prevHeadPosition = head.position;
     }
 
-    private void CenterRoomOnSeedlings()
+    private void MoveRoomWithHead()
     {
-        goalRoomPosition = SeedlingCenter() + roomOffset;
-        currentRoomPosition += roomSlew * ( goalRoomPosition - currentRoomPosition );
-        room.transform.position = currentRoomPosition;
+        Vector3 headMovementDirection = head.position - prevHeadPosition;
+        Vector3 roomMovement = roomHeadMovementMultiplier * headMovementDirection;
+        if( roomHeadMovementMultiplier < 0 )
+        {
+            roomMovement.y *= -1;
+        }
+        room.position += roomMovement;
+
+        prevHeadPosition = head.position;
     }
 
     private Vector3 SeedlingCenter()
