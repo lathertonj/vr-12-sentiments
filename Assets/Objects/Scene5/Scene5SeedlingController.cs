@@ -17,7 +17,7 @@ public class Scene5SeedlingController : MonoBehaviour
 
     public float[] chord1, chord2;
 
-    //private Scene5SonifyFlowerSeedlings mySonifier;
+    private Scene5SonifyFlowerSeedlings mySonifier;
     private int numSqueezed = 0;
 
     // Use this for initialization
@@ -39,13 +39,12 @@ public class Scene5SeedlingController : MonoBehaviour
         }
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
-        //mySonifier = GetComponent<Scene4SonifyFlowerSeedlings>();
-        //mySonifier.StartChuck( jumpDelay: 1.0f, launchASeedling: LaunchASeedling );
+        mySonifier = GetComponent<Scene5SonifyFlowerSeedlings>();
+        mySonifier.StartChuck( jumpDelay: 0.25f, launchASeedling: LaunchASeedling, numSeedlings: numSeedlings );
 
         leftHand = leftController.GetComponentInChildren<ParticleSystem>();
         rightHand = rightController.GetComponentInChildren<ParticleSystem>();
 
-        CalculateRoomOffset();
     }
 
     void LaunchASeedling()
@@ -58,16 +57,19 @@ public class Scene5SeedlingController : MonoBehaviour
             Random.Range( -1f, 1f )
         );
         seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
-        // TODO: a sound for when a squeeze is building up
-        // TODO: end the scene gracefully when all the seedlings are beyond a certain height
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessControllerInput( leftController, leftHand );
-        ProcessControllerInput( rightController, rightHand );
-        MoveRoomWithHead();
+        //ProcessControllerInput( leftController, leftHand );
+        //ProcessControllerInput( rightController, rightHand );
+        
+        // Testing lost seedlings
+        /*if( Random.Range(0.0f, 1.0f ) < 0.05 )
+        {
+            mySonifier.InformLostSeedling( Random.Range( 0, mySeedlings.Length ) );
+        }*/
     }
 
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
@@ -152,26 +154,6 @@ public class Scene5SeedlingController : MonoBehaviour
 
             // TODO: do something to the hand animation when the controller is unsqueezed
         }
-    }
-
-    Vector3 prevHeadPosition;
-    public float roomHeadMovementMultiplier = 5;
-    private void CalculateRoomOffset()
-    {
-        prevHeadPosition = head.position;
-    }
-
-    private void MoveRoomWithHead()
-    {
-        Vector3 headMovementDirection = head.position - prevHeadPosition;
-        Vector3 roomMovement = roomHeadMovementMultiplier * headMovementDirection;
-        if( roomHeadMovementMultiplier < 0 )
-        {
-            roomMovement.y *= -1;
-        }
-        room.position += roomMovement;
-
-        prevHeadPosition = head.position;
     }
 
     private Vector3 SeedlingCenter()
