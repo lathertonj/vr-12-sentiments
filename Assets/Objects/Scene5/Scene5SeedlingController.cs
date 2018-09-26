@@ -10,12 +10,12 @@ public class Scene5SeedlingController : MonoBehaviour
     public int numSeedlings = 40;
     public Vector3 spawnRadius = 3f * Vector3.one;
     private Rigidbody[] mySeedlings;
+    private bool[] mySeedlingsActive;
     public ControllerAccessors leftController, rightController;
     private ParticleSystem leftHand, rightHand;
-    public float maxSqueezeTime = 5f;
+    public float moveSpeed = 5f;
+    public float lossChance = 0.05f;
     //public Color handColor;
-
-    public float[] chord1, chord2;
 
     private Scene5SonifyFlowerSeedlings mySonifier;
     private int numSqueezed = 0;
@@ -39,6 +39,9 @@ public class Scene5SeedlingController : MonoBehaviour
         }
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
+        mySeedlingsActive = new bool[mySeedlings.Length];
+        for( int i = 0; i < mySeedlingsActive.Length; i++ ) { mySeedlingsActive[i] = true; }
+
         mySonifier = GetComponent<Scene5SonifyFlowerSeedlings>();
         mySonifier.StartChuck( jumpDelay: 0.25f, launchASeedling: LaunchASeedling, numSeedlings: numSeedlings );
 
@@ -47,16 +50,42 @@ public class Scene5SeedlingController : MonoBehaviour
 
     }
 
+    int currentSeedling = 0;
     void LaunchASeedling()
     {
-        Rigidbody seedling = mySeedlings[Random.Range( 0, mySeedlings.Length - 1 )];
-        seedling.AddForce( 0.5f * Vector3.up, ForceMode.VelocityChange );
-        Vector3 randomAngularVelocity = new Vector3(
-            Random.Range( -1f, 1f ),
-            Random.Range( -1f, 1f ),
-            Random.Range( -1f, 1f )
-        );
-        seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
+        if( mySeedlingsActive[currentSeedling] )
+        {
+            Rigidbody seedling = mySeedlings[currentSeedling];
+            seedling.AddForce( 0.15f * Vector3.up + 0.45f * transform.forward, ForceMode.VelocityChange );
+            Vector3 randomAngularVelocity = new Vector3(
+                Random.Range( -1f, 1f ),
+                Random.Range( -1f, 1f ),
+                Random.Range( -1f, 1f )
+            );
+            seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
+
+            if( Random.Range( 0f, 1f ) < lossChance )
+            {
+                // no longer active
+                mySeedlingsActive[currentSeedling] = false;
+                // change sonification
+                mySonifier.InformLostSeedling( currentSeedling );
+                // leave behind
+                seedling.transform.parent = null;
+                // give it a little forward movement, and also movement to the side, to make it seem less like it's just stopping
+                int leftRight = Random.Range( 0f, 1f ) < 0.5f ? 1 : -1;
+                seedling.AddForce( 2.5f * transform.forward + leftRight * 1.2f * transform.right, ForceMode.VelocityChange );
+                // make it spin a little more too
+                seedling.AddTorque( randomAngularVelocity * 4, ForceMode.VelocityChange );
+
+            }
+        }
+        else
+        {
+            // do nothing
+        }
+
+        currentSeedling++; currentSeedling %= mySeedlings.Length;
     }
 
     // Update is called once per frame
@@ -64,12 +93,13 @@ public class Scene5SeedlingController : MonoBehaviour
     {
         //ProcessControllerInput( leftController, leftHand );
         //ProcessControllerInput( rightController, rightHand );
-        
+
         // Testing lost seedlings
         /*if( Random.Range(0.0f, 1.0f ) < 0.05 )
         {
             mySonifier.InformLostSeedling( Random.Range( 0, mySeedlings.Length ) );
         }*/
+        room.position += moveSpeed * Time.deltaTime * room.forward;
     }
 
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
@@ -87,9 +117,9 @@ public class Scene5SeedlingController : MonoBehaviour
         if( controller.IsSqueezed() )
         {
             float timeElapsed = controller.ElapsedSqueezeTime();
-            
+
             // map within low intensity values. this movement is not intense so vibration is not strong.
-            ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
+            ushort intensity = (ushort) timeElapsed.MapClamp( 0, 5, 30, 180 );
             controller.Vibrate( intensity );
 
             // hand gets pinker and pinker colors as you squeeze
@@ -117,7 +147,7 @@ public class Scene5SeedlingController : MonoBehaviour
             Vector3 angularVelocity = controller.AngularVelocity();
 
             // map time to number of seedlings affected
-            int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
+            int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, 5, 0, mySeedlings.Length - 0.01f );
             // pick which ones by traversing in a random order;
             // the first numSeedlingsToAffect are affected in a primary way
             // and the remaining seedlings are affected in a secondary way

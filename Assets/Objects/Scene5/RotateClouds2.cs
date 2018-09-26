@@ -12,7 +12,7 @@ public class RotateClouds2 : MonoBehaviour
     {
         myController = GetComponentInParent<ControllerAccessors>();
         // I am lazy
-        maxSqueezeTime = ( (Scene5SeedlingController) FindObjectOfType( typeof( Scene5SeedlingController ) ) ).maxSqueezeTime;
+        maxSqueezeTime = 5;//( (Scene5SeedlingController) FindObjectOfType( typeof( Scene5SeedlingController ) ) ).maxSqueezeTime;
     }
 
     void Update()
