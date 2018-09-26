@@ -1544,6 +1544,7 @@ GameObject:
   - component: {fileID: 4220198327184316}
   - component: {fileID: 54454344001894604}
   - component: {fileID: 114423816985697810}
+  - component: {fileID: 114248549399758614}
   m_Layer: 0
   m_Name: Scene5 Seedling
   m_TagString: Untagged
@@ -3421,6 +3422,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.015, y: 0.19684024, z: 0.015}
   m_Center: {x: -0.000000036778303, y: 0.061579764, z: -0.000000018405613}
+--- !u!114 &114248549399758614
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1871835290105334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3feaa82a885b014cb006c52784a65e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  howMuch: 0.1
+  howOften: 5
 --- !u!114 &114423816985697810
 MonoBehaviour:
   m_ObjectHideFlags: 1

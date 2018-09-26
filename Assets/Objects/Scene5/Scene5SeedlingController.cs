@@ -16,6 +16,7 @@ public class Scene5SeedlingController : MonoBehaviour
     public float moveSpeed = 5f;
     public float lossChance = 0.05f;
     //public Color handColor;
+    private ParticleSystem myParticleEmitter;
 
     private Scene5SonifyFlowerSeedlings mySonifier;
     private int numSqueezed = 0;
@@ -23,6 +24,8 @@ public class Scene5SeedlingController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        myParticleEmitter = GetComponentInChildren<ParticleSystem>();
+
         for( int i = 0; i < numSeedlings; i++ )
         {
             Transform newSeedling = Instantiate( seedlingPrefab, transform );
@@ -79,6 +82,13 @@ public class Scene5SeedlingController : MonoBehaviour
                 seedling.AddTorque( randomAngularVelocity * 4, ForceMode.VelocityChange );
 
             }
+
+            // animate particle
+            ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+            emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.position );
+            emitParams.velocity = 0.15f * Vector3.up + 0.45f * transform.forward; // match to seedling?
+                //seedling.velocity;//seedling.velocity.y * Vector3.up;  // take only the y velocity?
+            myParticleEmitter.Emit( emitParams, count: 1 );
         }
         else
         {
