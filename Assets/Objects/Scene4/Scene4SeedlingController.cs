@@ -20,6 +20,8 @@ public class Scene4SeedlingController : MonoBehaviour
     private ParticleSystem myParticleEmitter;
     private int numSqueezed = 0;
 
+    public static bool shouldPlayArpeggios = true;
+
     // Use this for initialization
     void Start()
     {
@@ -161,7 +163,10 @@ public class Scene4SeedlingController : MonoBehaviour
             }
 
             // sonify arpeggio by num seedlings affected
-            mySonifier.PlayArpeggio( numSeedlingsToAffect );
+            if( shouldPlayArpeggios )
+            {
+                mySonifier.PlayArpeggio( numSeedlingsToAffect );
+            }
         }
     }
 

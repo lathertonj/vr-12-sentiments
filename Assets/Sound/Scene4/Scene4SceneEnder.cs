@@ -18,11 +18,18 @@ public class Scene4SceneEnder : MonoBehaviour
     {
         if( !haveFaded && numSeedlingsInsideMe < 5 )
         {
-            // End scene
+            // End scene soon
             haveFaded = true;
-            SteamVR_Fade.Start( skyColor, duration: 5 );
-            Invoke( "SwitchToNextScene", 9 );
+            Invoke( "EndScene", 5 );
         }
+    }
+
+    void EndScene()
+    {
+        SteamVR_Fade.Start( skyColor, duration: 5 );
+        Scene4SeedlingController.shouldPlayArpeggios = false;
+        TheChuck.instance.BroadcastEvent( "scene4EndEvent" );
+        Invoke( "SwitchToNextScene", 9 );
     }
 
     void SwitchToNextScene()

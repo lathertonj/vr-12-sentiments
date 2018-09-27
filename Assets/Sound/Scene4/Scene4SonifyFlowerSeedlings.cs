@@ -94,14 +94,29 @@ public class Scene4SonifyFlowerSeedlings : MonoBehaviour
             }}
             spork ~ IncreaseNoteSpeed();
 
-            while( true )
+            fun void RespondToSqueezes() 
             {{
-                spork ~ PlayNotes() @=> Shred playNotesShred;
-                {2} => now; // when squeezed, stop jumping and playing
-                playNotesShred.exit();
-                {3} => now;
-                5::noteLength => now; // wait 3 notes after unsqueezed to resume
+                while( true )
+                {{
+                    spork ~ PlayNotes() @=> Shred playNotesShred;
+                    {2} => now; // when squeezed, stop jumping and playing
+                    playNotesShred.exit();
+                    {3} => now;
+                    5::noteLength => now; // wait 3 notes after unsqueezed to resume
+                }}
             }}
+            spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
+
+            global Event scene4EndEvent;
+            scene4EndEvent => now;
+            squeezeResponseShred.exit();
+            
+            // let it die out
+            while( true ) 
+            {{ 
+                {0}.gain() * 0.99 => {0}.gain;
+                10::ms => now;
+            }} 
 
         ", myModey, myChordNotesVar, mySqueezedEvent, myUnsqueezedEvent, jumpDelay, myJumpEvent ) );
         myChuck.SetFloatArray( myChordNotesVar, myChord );
@@ -268,14 +283,31 @@ public class Scene4SonifyFlowerSeedlings : MonoBehaviour
             }}
             spork ~ ApplyGain();
 
-            global Event {0}, {1};            
-            while( true )
+            global Event {0}, {1};
+            fun void RespondToSqueezes()
             {{
-                {0} => now;
-                1 => goalGain;
-                {1} => now;
-                0 => goalGain;
+                while( true )
+                {{
+                    {0} => now;
+                    1 => goalGain;
+                    {1} => now;
+                    0 => goalGain;
+                }}
             }}
+            spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
+            
+            // turn off chord at end of movement
+            global Event scene4EndEvent;
+            scene4EndEvent => now;
+            squeezeResponseShred.exit();
+            0 => goalGain;
+            
+            // let it die out
+            while( true ) 
+            {{ 
+                0 => goalGain;
+                1::second => now;
+            }} 
         ", mySqueezedEvent, myUnsqueezedEvent ) );
     }
 
