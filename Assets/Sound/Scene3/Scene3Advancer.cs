@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Scene3Advancer : MonoBehaviour
 {
@@ -191,33 +192,55 @@ public class Scene3Advancer : MonoBehaviour
             [[81, 80, 80, 81]] @=> myNotes;
             [1] @=> numRepetitions;
 
-            while( true )
+            fun void PlayMelodyNotes()
             {{
-                for( int j; j < myNotes.size(); j++ )
+                while( true )
                 {{
-                    repeat( numRepetitions[j] ) 
-                    {{  
-                        for( int i; i < myNotes[j].size(); i++ )
-                        {{
-                            myNotes[j][i] => Std.mtof => mySaw.freq;
-                            1 => adsr.keyOn;
-                            noteLength - adsr.releaseTime() => now;
-                            1 => adsr.keyOff;
-                            adsr.releaseTime() => now;
+                    for( int j; j < myNotes.size(); j++ )
+                    {{
+                        repeat( numRepetitions[j] ) 
+                        {{  
+                            for( int i; i < myNotes[j].size(); i++ )
+                            {{
+                                myNotes[j][i] => Std.mtof => mySaw.freq;
+                                1 => adsr.keyOn;
+                                noteLength - adsr.releaseTime() => now;
+                                1 => adsr.keyOff;
+                                adsr.releaseTime() => now;
+                            }}
                         }}
                     }}
                 }}
             }}
-
+            spork ~ PlayMelodyNotes();
             
+            global Event scene3FadeOut;
+            scene3FadeOut => now;
+            while( true )
+            {{
+                adsr.gain() * 0.99 => adsr.gain;
+                10::ms => now;
+            }}
             
         " ) );
-        // TODO high pass up or other sound processing when fading out scene?
-
     }
 
     void DoCameraFade()
     {
         SteamVR_Fade.Start( skyColor, duration: 8f, fadeOverlay: true );
+        Invoke( "DoAudioFade", 2.5f );
+        Invoke( "SwitchToNextScene", 11f );
+    }
+
+    void DoAudioFade()
+    {
+        TheChuck.instance.BroadcastEvent( "scene3FadeOut" );
+        // also fade vibration
+        FlowerAddSeedlings2.decreaseVibrationIntensity = true;
+    }
+
+    void SwitchToNextScene()
+    {
+        SceneManager.LoadScene( "4_FlowingLightness" );
     }
 }

@@ -13,6 +13,9 @@ public class FlowerAddSeedlings2 : MonoBehaviour
 
     public float numLongPresses = 0;
 
+    public static bool decreaseVibrationIntensity = false;
+    private ushort vibrateAmount = 1000;
+
     // Use this for initialization
     void Start()
     {
@@ -87,14 +90,14 @@ public class FlowerAddSeedlings2 : MonoBehaviour
                 {1}.broadcast(); // stop vibrating if unsqueezed
             }}
 
-        ", myStartBuzzEvent, myStopBuzzEvent, 
-           mySqueezedEvent, myUnsqueezedEvent, 
-           myStartChordEvent, myStopChordEvent, 
+        ", myStartBuzzEvent, myStopBuzzEvent,
+           mySqueezedEvent, myUnsqueezedEvent,
+           myStartChordEvent, myStopChordEvent,
            myTatumFloat ) );
 
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myStartBuzzEvent, StartBuzzing );
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myStopBuzzEvent, StopBuzzing );
-        
+
         // tell sonifier which events to listen to for starting the chords
         // this all happens within chuck so no need to worry about unity timing
         mySonifier = GetComponent<SonifyFlowerSeedlings>();
@@ -124,7 +127,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         if( shouldRespondToControllers && myController.IsUnSqueezed() )
         {
             myChuck.BroadcastEvent( myUnsqueezedEvent );
-            ReleaseSeedlings(); 
+            ReleaseSeedlings();
         }
 
         if( !myController.IsSqueezed() )
@@ -133,11 +136,22 @@ public class FlowerAddSeedlings2 : MonoBehaviour
             shouldBuzz = false;
         }
 
+        // maybe decrease vibration intensity
+        if( decreaseVibrationIntensity )
+        {
+            vibrateAmount -= (ushort) ( 300 * Time.deltaTime );
+
+            // don't wrap
+            if( vibrateAmount < 10 || vibrateAmount > 1000 )
+            {
+                vibrateAmount = 0;
+            }
+        }
+
         // buzz if regular buzzing or if I turned the controllers off
         if( shouldBuzz || !shouldRespondToControllers )
         {
-            // TODO strength
-            myController.Vibrate( 1000 );
+            myController.Vibrate( vibrateAmount );
         }
 
     }
@@ -212,7 +226,7 @@ public class FlowerAddSeedlings2 : MonoBehaviour
         GetComponentInChildren<ParticleSystem>().Play();
         // play a lot of notes. ssshhh they aren't synced up
         mySonifier.SonifySpewingNotes( timeToStart, period );
-        
+
         // start a new chord and don't stop 
         shouldRespondToControllers = false;
         mySonifier.AdvanceToSecondHalf();

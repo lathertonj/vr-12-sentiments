@@ -195,11 +195,25 @@ ADSR adsr => hpf; // should be: hpf
 
 
             global Event {1}, {2};
-            while( true ) {{
-                {1} => now;
-                1 => adsr.keyOn;
-                {2} => now;
-                1 => adsr.keyOff;
+            
+            fun void RespondToChordEvents()
+            {{
+                while( true ) {{
+                    {1} => now;
+                    1 => adsr.keyOn;
+                    {2} => now;
+                    1 => adsr.keyOff;
+                }}
+            }}
+            spork ~ RespondToChordEvents();
+
+            global Event scene3FadeOut;
+            scene3FadeOut => now;
+            
+            while( true )
+            {{
+                adsr.gain() * 0.99 => adsr.gain;
+                10::ms => now;
             }}
         ", myChordNotesVar, startChordEvent, stopChordEvent, myChord.Length ) );
         myChuck.SetFloatArray( myChordNotesVar, myChord );
@@ -254,12 +268,27 @@ ADSR adsr => hpf; // should be: hpf
 
             }}
 
+            fun void RespondToSqueezeEvents()
+            {{
+                while( true )
+                {{
+                    {1} => now;
+                    spork ~ Play() @=> Shred playShred;
+                    {2} => now;
+                    playShred.exit();
+                }}
+            }}
+            spork ~ RespondToSqueezeEvents();
+
+            global Event scene3FadeOut;
+            scene3FadeOut => now;
+            
+            // mute shakers AND modalbar
             while( true )
             {{
-                {1} => now;
-                spork ~ Play() @=> Shred playShred;
-                {2} => now;
-                playShred.exit();
+                s.gain() * 0.99 => s.gain;
+                s.gain() => {3}.gain;
+                10::ms => now;
             }}
             
             
