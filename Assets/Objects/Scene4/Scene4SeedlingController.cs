@@ -75,7 +75,6 @@ public class Scene4SeedlingController : MonoBehaviour
 
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
     {
-        // TODO: a sound for when a squeeze is building up
         if( controller.IsFirstSqueezed() )
         {
             controller.RecordSqueezeStartTime();
