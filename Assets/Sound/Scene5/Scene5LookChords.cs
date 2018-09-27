@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Scene5LookChords : MonoBehaviour
 {
+    public Color skyColor;
+
     void Start()
     {
         currentCutoffs = new float[4];
@@ -177,6 +180,7 @@ public class Scene5LookChords : MonoBehaviour
             }
 
             global float scene5LookAmount;
+            global Event scene5AdvanceToEnd;
             float currentScene5LookAmount;
             0.001 => float slewScene5LookAmount;
             50 => float lpfLowCutoff;
@@ -214,7 +218,26 @@ public class Scene5LookChords : MonoBehaviour
             }
             spork ~ SetSound();
             
-            while( true ) { 1::second => now; }
+            scene5AdvanceToEnd => now;
+            
+            0 => scene5LookAmount;
+            5::second => now;
+
+            0.0004 => slewScene5LookAmount;
+            0.5 => scene5LookAmount;
+            10::second => now;
+            0 => scene5LookAmount;
+            10::second => now;
+
+            // slowly mute
+            global Event scene5FadeSeedlings;
+            scene5FadeSeedlings.broadcast();
+            
+            // wait
+            while( true ) 
+            { 
+                1::second => now; 
+            }
             
     " );
     }
@@ -227,6 +250,19 @@ public class Scene5LookChords : MonoBehaviour
     private float[] currentCutoffs;
     void Update()
     {
+        if( Time.time > cutoffTransitionStartTime + cutoffTransitionTime )
+        {
+            // end scene
+            // ChucK turns everything to 0, has a small swell of negative chord, then turns everything back to 0
+            TheChuck.instance.BroadcastEvent( "scene5AdvanceToEnd" );
+            
+            // we should fade in time with it
+            Invoke( "FadeVisuals", 25 );
+            
+            return;
+        }
+
+        // do angle calculation and setting if we aren't at end of scene yet
         float angle = transform.localEulerAngles.x;
         if( angle > 180 ) { angle -= 360; }
 
@@ -246,15 +282,17 @@ public class Scene5LookChords : MonoBehaviour
             amount = angle.MapClamp( currentCutoffs[2], currentCutoffs[3], 0, 1 );
         }
 
+        TheChuck.instance.SetFloat( "scene5LookAmount", amount ); 
+    }
 
-        TheChuck.instance.SetFloat( "scene5LookAmount", amount );
+    void FadeVisuals()
+    {
+        SteamVR_Fade.Start( skyColor, duration: 6 );
+        Invoke( "LaunchNextScene", 10 );
+    }
 
-        if( Time.time > cutoffTransitionStartTime + cutoffTransitionTime )
-        {
-            // TODO end scene
-            // turn everything to 0 (do it by just increasing slew then setting amount to 0)
-            // have a small swell of negative chord (do it by waiting, then just setting amount to 0.3)
-            // then turn everything back to 0 and fade scene (do it by waiting, then just setting amount to 0)
-        }
+    void LaunchNextScene()
+    {
+        SceneManager.LoadScene( "6_BleakSerene" );
     }
 }

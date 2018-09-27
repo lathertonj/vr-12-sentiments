@@ -105,10 +105,20 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
             spork ~ MuteNotes();
 
             spork ~ PlayNotes() @=> Shred playNotesShred;
-            while( true )
+
+            global Event scene5FadeSeedlings;
+            scene5FadeSeedlings => now;
+
+            // Actually, just let the whole shred exit
+            playNotesShred.exit();
+            while( true ) {{ 1::second => now; }}
+            
+            /*while( true )
             {{
-                1::second => now;
-            }}
+                // x ^ 6000 = 0.001
+                0.998849 * modey.gain() => modey.gain;
+                1::ms => now;
+            }}*/
 
         ", jumpDelay, myJumpEvent, notesString, myMuteNoteNumber, myMuteNoteEvent ) );
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myJumpEvent, launchASeedling );
