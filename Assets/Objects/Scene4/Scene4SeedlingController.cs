@@ -17,11 +17,13 @@ public class Scene4SeedlingController : MonoBehaviour
     public float[] chord1, chord2;
 
     private Scene4SonifyFlowerSeedlings mySonifier;
+    private ParticleSystem myParticleEmitter;
     private int numSqueezed = 0;
 
     // Use this for initialization
     void Start()
     {
+        myParticleEmitter = GetComponentInChildren<ParticleSystem>();
         for( int i = 0; i < numSeedlings; i++ )
         {
             Transform newSeedling = Instantiate( seedlingPrefab, transform );
@@ -55,8 +57,13 @@ public class Scene4SeedlingController : MonoBehaviour
             Random.Range( -1f, 1f )
         );
         seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
-        // TODO: a sound for when a squeeze is building up
-        // TODO: end the scene gracefully when all the seedlings are beyond a certain height
+
+        // animate particle
+        ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.transform.TransformPoint( 0.2f * Vector3.up ) );
+        emitParams.velocity = 0.15f * Vector3.up + 0.45f * transform.forward; // match to seedling?
+            //seedling.velocity;//seedling.velocity.y * Vector3.up;  // take only the y velocity?
+        myParticleEmitter.Emit( emitParams, count: 1 );
     }
 
     // Update is called once per frame
@@ -68,6 +75,7 @@ public class Scene4SeedlingController : MonoBehaviour
 
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
     {
+        // TODO: a sound for when a squeeze is building up
         if( controller.IsFirstSqueezed() )
         {
             controller.RecordSqueezeStartTime();
@@ -134,6 +142,13 @@ public class Scene4SeedlingController : MonoBehaviour
                     float randomLargeMultiplier = Random.Range( 0.4f, 0.6f );
                     seedling.AddForce( randomLargeMultiplier * velocity, ForceMode.VelocityChange );
                     seedling.AddTorque( angularVelocity * 0.05f + randomAngularVelocity, ForceMode.VelocityChange );
+
+                    // animate for primary action
+                    ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+                    emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.transform.TransformPoint( 0.2f * Vector3.up ) );
+                    emitParams.velocity = 0.15f * Vector3.up + 0.45f * transform.forward; // match to seedling?
+                        //seedling.velocity;//seedling.velocity.y * Vector3.up;  // take only the y velocity?
+                    myParticleEmitter.Emit( emitParams, count: 1 );
                 }
                 else
                 {
@@ -148,8 +163,6 @@ public class Scene4SeedlingController : MonoBehaviour
 
             // sonify arpeggio by num seedlings affected
             mySonifier.PlayArpeggio( numSeedlingsToAffect );
-
-            // TODO: do something to the hand animation when the controller is unsqueezed
         }
     }
 
