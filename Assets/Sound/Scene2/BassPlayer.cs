@@ -11,7 +11,8 @@ public class BassPlayer : MonoBehaviour
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myChuck.RunCode( @"
-            SinOsc bass => NRev reverb => dac;
+            SinOsc bass => NRev reverb => HPF hpf => dac;
+            20 => hpf.freq;
             0.05 => reverb.mix; 
             0.05 => float maxBassGain;
             //[47.0, 42.0, 38.0, 40.0 ] @=> float bassNotes[];
@@ -36,7 +37,16 @@ public class BassPlayer : MonoBehaviour
             }
             spork ~ SlewBass();
 
-            while( true ) { 1::second => now; }
+            global Event scene2AllShutOff;
+            scene2AllShutOff => now;
+            
+            // fade out
+            while( true ) 
+            {{ 
+                if( hpf.freq() > 20000 ) {{ break; }}
+                hpf.freq() * 1.02 => hpf.freq;
+                10::ms => now;
+            }}
         " );
     }
 

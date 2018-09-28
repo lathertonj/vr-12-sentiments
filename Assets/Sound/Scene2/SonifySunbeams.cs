@@ -12,7 +12,8 @@ public class SonifySunbeams : MonoBehaviour
         myChuck = GetComponent<ChuckSubInstance>();
 
         myChuck.RunCode(@"
-            ModalBar modey => JCRev r => dac;
+            ModalBar modey => JCRev r => HPF hpf => dac;
+            20 => hpf.freq;
 
             // set the gain
             .9 => r.gain;
@@ -79,13 +80,27 @@ public class SonifySunbeams : MonoBehaviour
 
             }
 
-
+            
             // our main loop
-
-            while( true )
+            fun void MainLoop()
             {
-                PlayArrayInterp( notes, 12 );
+                while( true )
+                {
+                    PlayArrayInterp( notes, 12 );
+                }
             }
+            spork ~ MainLoop();
+            
+            global Event scene2AllShutOff;
+            scene2AllShutOff => now;
+            
+            // fade out
+            while( true ) 
+            {{ 
+                if( hpf.freq() > 20000 ) {{ break; }}
+                hpf.freq() * 1.02 => hpf.freq;
+                10::ms => now;
+            }}
         ");
     }
 

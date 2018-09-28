@@ -10,6 +10,8 @@ public class SunbeamInteractors : MonoBehaviour
     public ControllerAccessors myController;
     private ushort currentStrength = 0;
     public static float sunbeamFadeinTime = 5;
+    public static bool turnDownVibrate = false;
+    private float vibrateIntensity = 1;
 
     // Use this for initialization
     void Start()
@@ -20,6 +22,11 @@ public class SunbeamInteractors : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if( turnDownVibrate )
+        {
+            vibrateIntensity *= 0.96f;
+        }
+
         if( currentSunbeam != null )
         {
             float elapsedTime = Time.time - sunbeamTime;
@@ -27,7 +34,7 @@ public class SunbeamInteractors : MonoBehaviour
             currentStrength = (ushort) ( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, 3999, 3 )
                 * currentSunbeamController.GetStrength()
             );
-            myController.Vibrate( currentStrength );
+            myController.Vibrate( (ushort) ( currentStrength * vibrateIntensity ) );
 
             sunbeamAccumulated += currentStrength * 1.0f / 3999 * Time.deltaTime;
         }
@@ -38,10 +45,10 @@ public class SunbeamInteractors : MonoBehaviour
 
         // color the glow
         float glowAlpha = ( (float) currentStrength ).PowMapClamp( 0, 3999, 0, glowLeafOriginalColor.a, 0.65f );
-        Color currentGlow = new Color( 
-            glowLeafOriginalColor.r, 
-            glowLeafOriginalColor.g, 
-            glowLeafOriginalColor.b, 
+        Color currentGlow = new Color(
+            glowLeafOriginalColor.r,
+            glowLeafOriginalColor.g,
+            glowLeafOriginalColor.b,
             glowAlpha
         );
 

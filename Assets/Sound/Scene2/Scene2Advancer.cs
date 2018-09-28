@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Scene2Advancer : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class Scene2Advancer : MonoBehaviour
     private float sunH, sunS, sunV;
     public Transform sunbeamPrefab;
     public Transform sunbeamHolder;
+
+    public Color skyColor;
 
     private ChuckSubInstance myChuck;
     private ChuckEventListener myEventListener;
@@ -31,7 +34,7 @@ public class Scene2Advancer : MonoBehaviour
         // (every 50ms)
         InvokeRepeating( "UpdateSunbeam", 0.0f, 0.05f );
 
-        Color.RGBToHSV( sun.color, out sunH, out sunS, out sunV ); 
+        Color.RGBToHSV( sun.color, out sunH, out sunS, out sunV );
     }
 
     // Update is called once per frame
@@ -40,11 +43,11 @@ public class Scene2Advancer : MonoBehaviour
     {
         if( !haveStartedTransition )
         {
-            sun.color = Color.HSVToRGB( sunH, sunS, 
-                SunbeamInteractors.sunbeamAccumulated.Map( 
-                    0,               chordSwitchCutoff, 
-                    sunInitialValue, sunPrecutoffValue 
-                ) 
+            sun.color = Color.HSVToRGB( sunH, sunS,
+                SunbeamInteractors.sunbeamAccumulated.Map(
+                    0, chordSwitchCutoff,
+                    sunInitialValue, sunPrecutoffValue
+                )
             );
         }
 
@@ -57,6 +60,33 @@ public class Scene2Advancer : MonoBehaviour
             // TODO decide 
             SunbeamController.shouldStopFading = true;
         }
+
+        if( SunbeamInteractors.sunbeamAccumulated > chordSwitchCutoff + 35 )
+        {
+            // commence end of scene!
+            SunbeamController.shouldIncreaseSize = true;
+            Invoke( "FadeAudioAndVisuals", 10 );
+        }
+    }
+
+    void FadeAudioAndVisuals()
+    {
+        // fade visuals
+        SteamVR_Fade.Start( skyColor, duration: 3f );
+
+        // fade audio
+        TheChuck.instance.BroadcastEvent( "scene2AllShutOff" );
+
+        // fade vibrate
+        SunbeamInteractors.turnDownVibrate = true;
+
+        // switch
+        Invoke( "SwitchToNextScene", 4f );
+    }
+
+    void SwitchToNextScene()
+    {
+        SceneManager.LoadScene( "3_IntensityWeightinessAwe" );
     }
 
     void SwitchToSecondHalf()
@@ -67,20 +97,20 @@ public class Scene2Advancer : MonoBehaviour
         // spawn many more light columns
         for( int i = 0; i < 10; i++ )
         {
-            Quaternion newRotation = Quaternion.AngleAxis( Random.Range( -25, 25 ), Vector3.left ) * 
+            Quaternion newRotation = Quaternion.AngleAxis( Random.Range( -25, 25 ), Vector3.left ) *
                                      Quaternion.AngleAxis( Random.Range( -25, 25 ), Vector3.forward );
-            Vector3 newPosition = new Vector3( 
-                Random.Range( -1.5f, 1.5f ), 
-                0, 
-                Random.Range( -1.5f, 1.5f ) 
+            Vector3 newPosition = new Vector3(
+                Random.Range( -1.5f, 1.5f ),
+                0,
+                Random.Range( -1.5f, 1.5f )
             ) + sunbeamHolder.position;
 
             Instantiate( sunbeamPrefab, newPosition, newRotation, sunbeamHolder );
         }
-        
+
         // prevent them from fading
         SunbeamController.shouldStopFading = true;
-        
+
         // make it quicker to interact with one (from 5s to 0.1s)
         SunbeamInteractors.sunbeamFadeinTime = 0.1f;
 
@@ -102,7 +132,9 @@ public class Scene2Advancer : MonoBehaviour
     void StartChuck()
     {
         myChuck.RunCode( string.Format( @"
-            ModalBar modey => JCRev r => dac;
+            ModalBar modey => JCRev r => HPF hpf => dac;
+            // disable hpf
+            20 => hpf.freq;
 
             // set the gain
             .9 => r.gain;
@@ -161,69 +193,84 @@ public class Scene2Advancer : MonoBehaviour
             // our main loop
             global float sunbeamAccumulation;
 
-            while( true )
+            fun void PlayMainLoop()
             {{
-                // play a base
-                PlayArray( bases[ Math.random2( 0, bases.size() - 1 ) ] );
-    
-                // with small chance, don't play a top (== play a base twice in a row)
-                if( Math.randomf() < 0.2 )
+                while( true )
                 {{
-                    continue;
-                }}
+                    // play a base
+                    PlayArray( bases[ Math.random2( 0, bases.size() - 1 ) ] );
+    
+                    // with small chance, don't play a top (== play a base twice in a row)
+                    if( Math.randomf() < 0.2 )
+                    {{
+                        continue;
+                    }}
 
-                // below the first cutoff, only play bottoms
-                if( sunbeamAccumulation < {0} )
-                {{
-                    continue;
-                }}
+                    // below the first cutoff, only play bottoms
+                    if( sunbeamAccumulation < {0} )
+                    {{
+                        continue;
+                    }}
     
-                // with a medium chance, rest once
-                if( Math.randomf() < 0.45 )
-                {{
-                    noteLength => now;
-                }}
+                    // with a medium chance, rest once
+                    if( Math.randomf() < 0.45 )
+                    {{
+                        noteLength => now;
+                    }}
     
-                // play a top
-                PlayArray( tops[ Math.random2( 0, tops.size() - 1 ) ] );
+                    // play a top
+                    PlayArray( tops[ Math.random2( 0, tops.size() - 1 ) ] );
     
-                // with a small chance, play a super top
-                // PARAMETER TO MODULATE: freq of super top
-                0.0 => float superTopChance;
-                0 => int maxSuperTopAllowed;
-                if( sunbeamAccumulation > {3} )
-                {{
-                    0.6 => superTopChance;
-                    supertops.size() - 1 => maxSuperTopAllowed;
-                }}
-                else if( sunbeamAccumulation > {2} )
-                {{
-                    0.4 => superTopChance;
-                    1 => maxSuperTopAllowed;
-                }}
-                else if( sunbeamAccumulation > {1} )
-                {{
-                    0.2 => superTopChance;
-                    0 => maxSuperTopAllowed;
-                }}
-                if( Math.randomf() < superTopChance ) 
-                {{
-                    // PARAMETER TO MODULATE: upper limit of allowed super top 
-                    // (the array should only get more and more intense left to right)
-                    PlayArray( supertops[ Math.random2( 0, maxSuperTopAllowed ) ] );
-                }}
+                    // with a small chance, play a super top
+                    // PARAMETER TO MODULATE: freq of super top
+                    0.0 => float superTopChance;
+                    0 => int maxSuperTopAllowed;
+                    if( sunbeamAccumulation > {3} )
+                    {{
+                        0.6 => superTopChance;
+                        supertops.size() - 1 => maxSuperTopAllowed;
+                    }}
+                    else if( sunbeamAccumulation > {2} )
+                    {{
+                        0.4 => superTopChance;
+                        1 => maxSuperTopAllowed;
+                    }}
+                    else if( sunbeamAccumulation > {1} )
+                    {{
+                        0.2 => superTopChance;
+                        0 => maxSuperTopAllowed;
+                    }}
+                    if( Math.randomf() < superTopChance ) 
+                    {{
+                        // PARAMETER TO MODULATE: upper limit of allowed super top 
+                        // (the array should only get more and more intense left to right)
+                        PlayArray( supertops[ Math.random2( 0, maxSuperTopAllowed ) ] );
+                    }}
     
-                // with a small chance, rest a while
-                if( Math.randomf() < 0.05 )
-                {{
-                    Math.random2( 1, 3 )::noteLength => now;
-                }}
+                    // with a small chance, rest a while
+                    if( Math.randomf() < 0.05 )
+                    {{
+                        Math.random2( 1, 3 )::noteLength => now;
+                    }}
         
+                }}
+            }}
+            spork ~ PlayMainLoop();
+            
+            global Event scene2AllShutOff;
+            scene2AllShutOff => now;
+            
+            // fade out
+            while( true ) 
+            {{ 
+                if( hpf.freq() > 20000 ) {{ break; }}
+                hpf.freq() * 1.02 => hpf.freq;
+                10::ms => now;
             }}
 
         ", otherCutoffs[0], otherCutoffs[1], otherCutoffs[2], otherCutoffs[3] ) );
-        
-        
+
+
         myChuck.RunCode( @"
             global Event scene2StartTransition;
             global Event scene2TransitionFinished;
@@ -248,7 +295,8 @@ public class Scene2Advancer : MonoBehaviour
                 16::tatum => now;
             }
 
-            Shakers s => JCRev reverb => dac;
+            Shakers s => JCRev reverb => HPF hpf => dac;
+            20 => hpf.freq;
             0.05 => reverb.mix;
 
             // params
@@ -304,8 +352,17 @@ public class Scene2Advancer : MonoBehaviour
 
             1 => scene2TransitionProgress;
             scene2TransitionFinished.broadcast();
+
+            global Event scene2AllShutOff;
+            scene2AllShutOff => now;
             
-            while( true ) { 1::second => now; }
+            // fade out
+            while( true ) 
+            {{ 
+                if( hpf.freq() > 20000 ) {{ break; }}
+                hpf.freq() * 1.02 => hpf.freq;
+                10::ms => now;
+            }}
             
         " );
         myEventListener = gameObject.AddComponent<ChuckEventListener>();

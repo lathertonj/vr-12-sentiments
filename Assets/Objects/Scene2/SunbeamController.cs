@@ -18,6 +18,7 @@ public class SunbeamController : MonoBehaviour
 
     private bool shouldFade = true;
     public static bool shouldStopFading = false;
+    public static bool shouldIncreaseSize = false;
 
     private void Start()
     {
@@ -42,6 +43,18 @@ public class SunbeamController : MonoBehaviour
         if( shouldFade )
         {
             transform.rotation *= Quaternion.AngleAxis( rotationPerSecond.x * Time.deltaTime, Vector3.left ) * Quaternion.AngleAxis( rotationPerSecond.z * Time.deltaTime, Vector3.forward );
+        }
+
+        // increase size 
+        if( shouldIncreaseSize )
+        {
+            visualPart.localScale *= 1 + 0.5f * Time.deltaTime;
+
+            // if get too big, turn off for everyone
+            if( visualPart.localScale.x > 25 )
+            {
+                shouldIncreaseSize = false;
+            }
         }
 
         // color

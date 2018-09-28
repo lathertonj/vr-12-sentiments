@@ -293,7 +293,17 @@ public class SonifySunbeamInteractors : MonoBehaviour
             }}
             spork ~ SetLPFCutoff();
 
-            while( true ) {{ 1::second => now; }}
+            global Event scene2AllShutOff;
+            scene2AllShutOff => now;
+            
+            // fade out
+            while( true ) 
+            {{ 
+                if( hpf.freq() > 20000 ) {{ break; }}
+                hpf.freq() * 1.02 => hpf.freq;
+                10::ms => now;
+            }}
+
         ", myChordNotesVar, myGainVar ) );
         
 
