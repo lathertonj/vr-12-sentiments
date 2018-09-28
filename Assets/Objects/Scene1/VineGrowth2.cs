@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VineGrowth2 : MonoBehaviour
 {
@@ -66,7 +67,10 @@ public class VineGrowth2 : MonoBehaviour
         if( !haveEndedScene && growthSoFar > growthCutoff3 )
         {
             SteamVR_Fade.Start( skyFadeColor, duration: 5f );
-            // TODO: switch to next scene after duration + N::second
+            // TODO: fade audio in Scene1LookChords.
+            // TODO: make growth more obvious
+            // switch to next scene after duration + N::second
+            Invoke( "SwitchToNextScene", 8f );
             haveEndedScene = true;
         }
 
@@ -81,5 +85,10 @@ public class VineGrowth2 : MonoBehaviour
             vrRoom.localScale.z + scaleIncrease 
         );
 
+    }
+
+    void SwitchToNextScene()
+    {
+        SceneManager.LoadScene( "2_ExcitementLonging" );
     }
 }

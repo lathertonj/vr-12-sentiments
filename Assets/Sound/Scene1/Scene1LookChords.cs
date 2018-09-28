@@ -301,25 +301,21 @@ public class Scene1LookChords : MonoBehaviour
                         myChuck.SetFloat( "scene1GoalLoudness", 0 );
                         break;
                     case 1:
-                        // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord1Notes );
                         myChuck.SetInt( "bassNote", 1 );
                         myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 2:
-                        // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord2Notes );
                         myChuck.SetInt( "bassNote", 2 );
                         myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 3:
-                        // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord3Notes );
                         myChuck.SetInt( "bassNote", 3 );
                         myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                     case 4:
-                        // TODO set melody?
                         myChuck.SetFloatArray( "chordNotes", chord4Notes );
                         myChuck.SetInt( "bassNote", 4 );
                         myChuck.SetFloat( "scene1GoalLoudness", 1 );
@@ -329,7 +325,7 @@ public class Scene1LookChords : MonoBehaviour
             }
         }
     }
-    // TODO mess with freq slews
+    // TODO: at end of scene, set scene1GoalLoudness to 0 to turn off sounds. maybe decrease slew, too.
 
     private bool secondSetOfChords = false;
     public void SwitchToSecondSetOfChords()
