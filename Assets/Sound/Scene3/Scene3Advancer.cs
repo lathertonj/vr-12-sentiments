@@ -166,7 +166,7 @@ public class Scene3Advancer : MonoBehaviour
             // basic loudness
             0 => mySaw.gain;
 
-            0.08 => float goalGain;
+            0 => float goalGain;
             0 => float currentGain;
             0.001 => float gainSlew;
 
@@ -213,6 +213,10 @@ public class Scene3Advancer : MonoBehaviour
                 }}
             }}
             spork ~ PlayMelodyNotes();
+
+            // wait a bit before playing melody
+            5::second => now;
+            0.08 => goalGain;
             
             global Event scene3FadeOut;
             scene3FadeOut => now;
