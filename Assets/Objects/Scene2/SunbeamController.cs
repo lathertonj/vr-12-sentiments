@@ -58,11 +58,11 @@ public class SunbeamController : MonoBehaviour
         }
 
         // color
-        if( Time.time > timePhase && shouldFade )
+        if( Time.timeSinceLevelLoad > timePhase && shouldFade )
         {
             // color tone down to 0 to make invisible
             // (subtract a little and clamp01 so it's 0 for longer)
-            currentStrength = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.time - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
+            currentStrength = Mathf.Clamp01( 0.5f * ( 1 - Mathf.Cos( 2 * Mathf.PI * ( Time.timeSinceLevelLoad - timePhase ) / fadeCycleSeconds ) ) - 0.001f );
             Color newColor = new Color( startColor.r, startColor.g, startColor.b, currentStrength * maxAlpha );
             visualRenderer.material.color = newColor;
             if( shouldStopFading && shouldFade && currentStrength > 0.99f )

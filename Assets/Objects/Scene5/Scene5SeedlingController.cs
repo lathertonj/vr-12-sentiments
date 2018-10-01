@@ -60,11 +60,11 @@ public class Scene5SeedlingController : MonoBehaviour
         {
             return 0.0f;
         }
-        else if( Time.time > loseManySeedTime )
+        else if( Time.timeSinceLevelLoad > loseManySeedTime )
         {
             return 0.15f;
         }
-        else if( Time.time > loseSeedTime )
+        else if( Time.timeSinceLevelLoad > loseSeedTime )
         {
             return 0.05f;
         }

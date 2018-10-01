@@ -250,7 +250,7 @@ public class Scene5LookChords : MonoBehaviour
     private float[] currentCutoffs;
     void Update()
     {
-        if( Time.time > cutoffTransitionStartTime + cutoffTransitionTime )
+        if( Time.timeSinceLevelLoad > cutoffTransitionStartTime + cutoffTransitionTime )
         {
             // end scene
             // ChucK turns everything to 0, has a small swell of negative chord, then turns everything back to 0
@@ -266,7 +266,7 @@ public class Scene5LookChords : MonoBehaviour
         float angle = transform.localEulerAngles.x;
         if( angle > 180 ) { angle -= 360; }
 
-        float normElapsedTime = Mathf.Clamp01( ( Time.time - cutoffTransitionStartTime ) / cutoffTransitionTime );
+        float normElapsedTime = Mathf.Clamp01( ( Time.timeSinceLevelLoad - cutoffTransitionStartTime ) / cutoffTransitionTime );
         for( int i = 0; i < currentCutoffs.Length; i++ )
         {
             currentCutoffs[i] = startCutoffs[i] + normElapsedTime * ( endCutoffs[i] - startCutoffs[i] );
