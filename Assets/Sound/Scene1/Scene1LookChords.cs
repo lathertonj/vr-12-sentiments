@@ -235,6 +235,16 @@ public class Scene1LookChords : MonoBehaviour
             global float scene1GoalLoudness;
             float currentLoudness;
             float scene1LoudnessSlew;
+
+            global Event endScene1;
+            fun void ListenForEnd()
+            {
+                endScene1 => now;
+                0.0003 => scene1LoudnessSlew;
+                0 => scene1GoalLoudness;
+            }
+            spork ~ ListenForEnd();
+
             while( true )
             {
                 if( currentLoudness < scene1GoalLoudness )
@@ -255,6 +265,13 @@ public class Scene1LookChords : MonoBehaviour
         myCurrentLoudnessSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
         myCurrentLoudnessSyncer.SyncFloat( myChuck, "scene1CurrentLoudness" );
 
+    }
+
+    static private bool shouldUpdateChuck = true;
+    static public void EndSceneAudio()
+    {
+        shouldUpdateChuck = false;
+        TheChuck.instance.BroadcastEvent( "endScene1" );
     }
 
     // Update is called once per frame
@@ -286,7 +303,7 @@ public class Scene1LookChords : MonoBehaviour
             nextChord = 0;
         }
 
-        if( nextChord != currentChord )
+        if( nextChord != currentChord && shouldUpdateChuck )
         {
             float elapsedTime = Time.time - timeOfPreviousSwitch;
             if( elapsedTime > secondsToChordChange )
@@ -325,7 +342,6 @@ public class Scene1LookChords : MonoBehaviour
             }
         }
     }
-    // TODO: at end of scene, set scene1GoalLoudness to 0 to turn off sounds. maybe decrease slew, too.
 
     private bool secondSetOfChords = false;
     public void SwitchToSecondSetOfChords()

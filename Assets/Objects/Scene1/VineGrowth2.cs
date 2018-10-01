@@ -18,7 +18,8 @@ public class VineGrowth2 : MonoBehaviour
     // plot: when growthCutoff1 reached, start vibrating
     //       when growthCutoff2 reached, flash the orange sky color to the headset
     //          and add arms and leaves, and switch the chords
-    //       when growthCutoff3 reached, fade to orange sky color and end scene (TODO)
+    //       when growthCutoff3 reached, fade to orange sky color and end scene
+    // TODO: make growth more obvious
 
     // Use this for initialization
     void Start()
@@ -67,10 +68,10 @@ public class VineGrowth2 : MonoBehaviour
         if( !haveEndedScene && growthSoFar > growthCutoff3 )
         {
             SteamVR_Fade.Start( skyFadeColor, duration: 5f );
-            // TODO: fade audio in Scene1LookChords.
-            // TODO: make growth more obvious
+            // fade audio in Scene1LookChords.
+            Scene1LookChords.EndSceneAudio();
             // switch to next scene after duration + N::second
-            Invoke( "SwitchToNextScene", 8f );
+            Invoke( "SwitchToNextScene", 6f );
             haveEndedScene = true;
         }
 

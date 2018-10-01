@@ -269,39 +269,6 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9599d2594f38cfc4aa080a587fc9df33, type: 2}
   m_IsPrefabAsset: 0
---- !u!21 &121027488
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Sprites/Default
-  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _AlphaTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - PixelSnap: 0
-    - _EnableExternalAlpha: 0
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &227172317
 GameObject:
   m_ObjectHideFlags: 0
@@ -5363,7 +5330,7 @@ MonoBehaviour:
   growthCutoff1: 0.1
   growthCutoff2: 0.15
   growthCutoff3: 0.2
-  skyFadeColor: {r: 0.94509804, g: 0.57633984, b: 0.09411764, a: 1}
+  skyFadeColor: {r: 0.87058824, g: 0.5254902, b: 0.078431375, a: 1}
   thingsToDisableAtTransition:
   - {fileID: 990959992}
   thingsToEnableAtTransition:
@@ -5534,7 +5501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae6ccbde78fd8804daecc4c0cf062a55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skyColor: {r: 0.94509804, g: 0.5764706, b: 0.09411765, a: 1}
+  skyColor: {r: 0.87058824, g: 0.5254902, b: 0.078431375, a: 1}
   waitTime: 2
   fadeTime: 5
 --- !u!1001 &1076371388
@@ -5666,7 +5633,7 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b23ced9fec43b049a13221a1784b080, type: 2}
   m_IsPrefabAsset: 0
---- !u!43 &1153474718
+--- !u!43 &1255363854
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6380,11 +6347,11 @@ Prefab:
     - target: {fileID: 3380982, guid: 4d293c8e162f3874b982baadd71153d2, type: 2}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 1153474718}
+      objectReference: {fileID: 1255363854}
     - target: {fileID: 2348914, guid: 4d293c8e162f3874b982baadd71153d2, type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 121027488}
+      objectReference: {fileID: 2096573382}
     - target: {fileID: 420908, guid: 4d293c8e162f3874b982baadd71153d2, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
       value: -185.34698
@@ -6479,6 +6446,39 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d8d09961c266b8489208ef3a09c13e2, type: 2}
   m_IsPrefabAsset: 0
+--- !u!21 &2096573382
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Sprites/Default
+  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - PixelSnap: 0
+    - _EnableExternalAlpha: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &2122231825
 Prefab:
   m_ObjectHideFlags: 0
