@@ -296,7 +296,7 @@ public class Scene1LookChords : MonoBehaviour
             {
                 nextChord = 0;
             }
-            
+
         }
         else
         {
@@ -338,7 +338,7 @@ public class Scene1LookChords : MonoBehaviour
                         myChuck.SetFloat( "scene1GoalLoudness", 1 );
                         break;
                 }
-                
+
             }
         }
     }
