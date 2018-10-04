@@ -264,7 +264,6 @@ public class Scene1LookChords : MonoBehaviour
         " );
         myCurrentLoudnessSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
         myCurrentLoudnessSyncer.SyncFloat( myChuck, "scene1CurrentLoudness" );
-
     }
 
     static private bool shouldUpdateChuck = true;
