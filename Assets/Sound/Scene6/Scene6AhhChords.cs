@@ -185,25 +185,9 @@ public class Scene6AhhChords : MonoBehaviour
 			E4 + 12 => int E5;
 			Gs4 - 12 => int Gs3;
 
-
-			// I am not confident anymore these are the chords from MF18M
-			[ 
-			[A3, Cs4, E4, Gs4],
-			[E4, Gs4, B4-12, Ds5-12],
-			[Gs4, B4-12, Ds5-12, Fs5-12],
-			[Gs4, Cs5-12, Ds5-12, Fs5-12]
-			] @=> int notes[][];
-
-
-			// what I hear / what was in my original notes (oopsie!)
-			// plus a fun suspension on the second chord which I might want to use
-			[ 
-			[A3-12, A3, Cs4, E4, Gs4],
-			[E4-24, E4, Gs4, B4, Ds5-12],
-			[Cs4-24, Cs4, E4, Gs4, B4],
-			[Cs4-24, Cs4, Fs4, Gs4, B4]
-			] @=> notes;
-
+			// beginning of scene notes
+			[[Cs4 - 24, Gs4 - 12, E5 - 12, B5 - 12],
+			[Gs3 - 12, Cs4 - 12, B4 - 12, Fs5 - 12]] @=> int notes[][];
 
 			// the actual notes
 			[ 
@@ -211,8 +195,7 @@ public class Scene6AhhChords : MonoBehaviour
 			[E3, B4, Ds5, Gs5],
 			[Cs4 - 12, Gs4, E5, B5],
 			[Gs3, Cs4, B4, Fs5]
-			] @=> notes;
-
+			] @=> int notes2[][];
 
 			AhhSynth ahhs[ notes[0].size() ];
 			for( int i; i < ahhs.size(); i++ )
@@ -221,8 +204,21 @@ public class Scene6AhhChords : MonoBehaviour
 				ahhs[i] => lpf;
 			}
 
+			global float scene6SwellIntensity;
+			global Event scene6SwellStart;
+			fun void PopulateSwellIntensity()
+			{
+				while( true )
+				{
+					1::ms => now;
+					lpf.gain() => scene6SwellIntensity;
+				}
+			}
+			spork ~ PopulateSwellIntensity();
+
 			fun void DoSwell( dur swellUp, dur sustain, dur swellDown )
 			{
+				scene6SwellStart.broadcast();
 				0 => lpf.gain;
 				now => time startTime;
 				while( now - startTime < swellUp )
@@ -244,9 +240,21 @@ public class Scene6AhhChords : MonoBehaviour
 				0 => lpf.gain;
 			}
 
+			false => global int halfwayThroughScene6Change;
+
+
+
 			global Event ahhChordChange;
+			// wait at start of scene
+			0 => lpf.gain;
+			8::second => now;
 			while( true )
 			{
+				if( halfwayThroughScene6Change )
+				{
+					notes2 @=> notes;
+				}
+
 				for( int i; i < notes.size(); i++ )
 				{
 					for( int j; j < notes[i].size(); j++ )
@@ -254,12 +262,22 @@ public class Scene6AhhChords : MonoBehaviour
 						// TODO: maybe start the scene with some stuff down the octave (-24).... then switch it to this up the octave stuff (-12)!!
 						notes[i][j] - 12 => Std.mtof => ahhs[j].freq;
 					}
-					ahhChordChange.broadcast();
 
 					// 2::second => now;
-					DoSwell( 2::second, 1::second, 3.5::second );
-					// wait / or not!
-					0.1::second => now;
+					if( halfwayThroughScene6Change ) 
+					{
+						// only tell rocks to change colors after halfway through scene change
+						ahhChordChange.broadcast();
+						DoSwell( 2::second, 1::second, 3.5::second );
+						// wait / or not!
+						0.1::second => now;
+					}
+					else
+					{
+						DoSwell( 3.5::second, 0::second, 4.5::second );
+						// wait
+						4::second => now;
+					}
 				}
 			}
 		" );
