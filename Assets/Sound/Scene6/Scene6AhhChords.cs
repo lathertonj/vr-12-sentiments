@@ -253,6 +253,8 @@ public class Scene6AhhChords : MonoBehaviour
 				if( halfwayThroughScene6Change )
 				{
 					notes2 @=> notes;
+					// increment it to 2 so now we know we've heard it! hacky bool --> int
+					1 +=> halfwayThroughScene6Change;
 				}
 
 				for( int i; i < notes.size(); i++ )
@@ -264,7 +266,7 @@ public class Scene6AhhChords : MonoBehaviour
 					}
 
 					// 2::second => now;
-					if( halfwayThroughScene6Change ) 
+					if( halfwayThroughScene6Change > 1 ) 
 					{
 						// only tell rocks to change colors after halfway through scene change
 						ahhChordChange.broadcast();
@@ -283,9 +285,15 @@ public class Scene6AhhChords : MonoBehaviour
 		" );
     }
 
+	bool haveSwitchedToSecondHalf = false;
     // Update is called once per frame
     void Update()
     {
-
+		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 )
+		{
+			// signal that the switch should happen at the next musically relevant place
+			myChuck.SetInt( "halfwayThroughScene6Change", 1 );
+			haveSwitchedToSecondHalf = true;
+		}
     }
 }
