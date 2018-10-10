@@ -10,22 +10,16 @@ public class Scene6RockColorCycler : MonoBehaviour
     private int currentColor, prevColor;
     public float switchTime = 0.5f;
 	public ChuckSubInstance myChuck;
+    private ChuckEventListener myEventListener;
 
     // Use this for initialization
     void Start()
     {
         myRenderer = GetComponent<MeshRenderer>();
-        myRenderer.material.color = colors[startColor];
         currentColor = startColor;
 
-		ChuckEventListener myEventListener = gameObject.AddComponent<ChuckEventListener>();
+		myEventListener = gameObject.AddComponent<ChuckEventListener>();
 		myEventListener.ListenForEvent( myChuck, "ahhChordChange", SwitchToNextColor );
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     void SwitchToNextColor()
@@ -33,7 +27,7 @@ public class Scene6RockColorCycler : MonoBehaviour
         prevColor = currentColor;
         currentColor++;
         currentColor %= colors.Length;
-        StartCoroutine( "DoFade" );
+        StartCoroutine( "DoFade" );        
     }
 
     IEnumerator DoFade()
@@ -55,6 +49,8 @@ public class Scene6RockColorCycler : MonoBehaviour
 		*/
 
         float startTime = Time.time;
+        Color startColor = myRenderer.material.color;
+        Color nextColor = colors[currentColor];
         while( Time.time < startTime + switchTime )
         {
             float normElapsedTime = ( Time.time - startTime ) / switchTime;
@@ -66,13 +62,14 @@ public class Scene6RockColorCycler : MonoBehaviour
 			);*/
 
 			// just straight up interp
-            Color theColor = colors[prevColor] + normElapsedTime * ( colors[currentColor] - colors[prevColor] );
+            Color theColor = startColor + normElapsedTime * ( nextColor - startColor );
             myRenderer.material.color = theColor;
 
             yield return null;
 
         }
+
         // finally, make sure it ends on the correct color
-        myRenderer.material.color = colors[currentColor];
+        myRenderer.material.color = nextColor;
     }
 }
