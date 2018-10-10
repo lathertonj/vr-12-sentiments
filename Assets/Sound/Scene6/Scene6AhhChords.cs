@@ -186,8 +186,8 @@ public class Scene6AhhChords : MonoBehaviour
 			Gs4 - 12 => int Gs3;
 
 			// beginning of scene notes
-			[[Cs4 - 24, Gs4 - 12, E5 - 12, B5 - 12],
-			[Gs3 - 12, Cs4 - 12, B4 - 12, Fs5 - 12]] @=> int notes[][];
+			[[Cs4 - 24, Gs4 - 12, E5 - 12, Cs4 - 12],
+			[Gs3 - 12, Cs4 - 12, Fs5 - 12, Cs4 - 12]] @=> int notes[][];
 
 			// the actual notes
 			[ 
@@ -216,14 +216,16 @@ public class Scene6AhhChords : MonoBehaviour
 			}
 			spork ~ PopulateSwellIntensity();
 
-			fun void DoSwell( dur swellUp, dur sustain, dur swellDown )
+			fun void DoSwell( dur swellUp, dur sustain, dur swellDown, float max, float end )
 			{
 				scene6SwellStart.broadcast();
-				0 => lpf.gain;
+				lpf.gain() => float start;
+
 				now => time startTime;
 				while( now - startTime < swellUp )
 				{
-					( now - startTime ) / swellUp => float elapsed => lpf.gain;
+					( now - startTime ) / swellUp => float elapsed;
+					start + ( max - start ) * elapsed => lpf.gain;
 					1::ms => now;
 				}	
 
@@ -234,10 +236,10 @@ public class Scene6AhhChords : MonoBehaviour
 				while( now - startTime < swellDown )
 				{
 					( now - startTime ) / swellDown => float elapsed;
-					1 - elapsed => lpf.gain;
+					max + ( end - max ) * elapsed => lpf.gain;
 					1::ms => now;
 				}
-				0 => lpf.gain;
+				end => lpf.gain;
 			}
 
 			false => global int halfwayThroughScene6Change;
@@ -270,13 +272,13 @@ public class Scene6AhhChords : MonoBehaviour
 					{
 						// only tell rocks to change colors after halfway through scene change
 						ahhChordChange.broadcast();
-						DoSwell( 2::second, 1::second, 3.5::second );
+						DoSwell( 2::second, 1::second, 3.5::second, 1, 0.0 );
 						// wait / or not!
-						0.1::second => now;
+						1::second => now;
 					}
 					else
 					{
-						DoSwell( 3.5::second, 0::second, 4.5::second );
+						DoSwell( 3.5::second, 0::second, 4.5::second, 0.5, 0.01 );
 						// wait
 						4::second => now;
 					}
