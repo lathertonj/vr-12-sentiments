@@ -245,8 +245,8 @@ public class Scene6AhhChords : MonoBehaviour
 			false => global int halfwayThroughScene6Change;
 
 
-
 			global Event ahhChordChange;
+			global Event ahhChordFadeOut;
 			// wait at start of scene
 			0 => lpf.gain;
 			8::second => now;
@@ -272,9 +272,16 @@ public class Scene6AhhChords : MonoBehaviour
 					{
 						// only tell rocks to change colors after halfway through scene change
 						ahhChordChange.broadcast();
-						DoSwell( 2::second, 1::second, 3.5::second, 1, 0.0 );
+						2::second => dur upTime;
+						1::second => dur sustainTime;
+						3.5::second => dur downTime;
+						1::second => dur waitTime;
+						spork ~ DoSwell( upTime, sustainTime, downTime, 1, 0.0 );
+						upTime + sustainTime => now;
+						downTime => now;
+						ahhChordFadeOut.broadcast();
 						// wait / or not!
-						1::second => now;
+						waitTime => now;
 					}
 					else
 					{

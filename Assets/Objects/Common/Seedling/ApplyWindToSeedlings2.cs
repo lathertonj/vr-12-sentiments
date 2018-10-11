@@ -5,6 +5,7 @@ using UnityEngine;
 public class ApplyWindToSeedlings2 : MonoBehaviour
 {
     Rigidbody[] seedlings;
+    float[] maxSeedlingHeights;
     Vector3 currentWindDirection;
     public float maxWindIntensity = 1f;
     public float maxAngleChange = 120;
@@ -17,20 +18,26 @@ public class ApplyWindToSeedlings2 : MonoBehaviour
     void Start()
     {
         ChuckEventListener myChangeDirectionListener = gameObject.AddComponent<ChuckEventListener>();
-        myChangeDirectionListener.ListenForEvent( myChuck, "scene6SwellStart", ChangeWindDirection );
+        myChangeDirectionListener.ListenForEvent( myChuck, "scene6SwellStart", RespondToSwell );
 
         myIntensitySyncer = gameObject.AddComponent<ChuckFloatSyncer>();
         myIntensitySyncer.SyncFloat( myChuck, "scene6SwellIntensity" );
 
         mySecondHalfListener = gameObject.AddComponent<ChuckEventListener>();
-        mySecondHalfListener.ListenForEvent( myChuck, "ahhChordChange", AdvanceToSecondHalf );
+        mySecondHalfListener.ListenForEvent( myChuck, "ahhChordChange", StartSecondHalfSwell );
+
+        ChuckEventListener mySecondHalfListener2 = gameObject.AddComponent<ChuckEventListener>();
+        mySecondHalfListener2.ListenForEvent( myChuck, "ahhChordFadeOut", EndSecondHalfSustain );
 
         seedlings = GetComponentsInChildren<Rigidbody>();
+        maxSeedlingHeights = new float[seedlings.Length];
+        PickNewMaxHeights();
         currentWindDirection = Vector3.right;
     }
 
-    void ChangeWindDirection()
+    void RespondToSwell()
     {
+        // change wind direction
         // rotate by somewhere between -120 and 120 degrees
         currentWindDirection = Quaternion.AngleAxis(
             Random.Range( -maxAngleChange, maxAngleChange ), Vector3.up
@@ -38,41 +45,82 @@ public class ApplyWindToSeedlings2 : MonoBehaviour
     }
 
     private bool inSecondHalf = false;
-    private void AdvanceToSecondHalf()
+    private float numSecondHalfSwells = 0;
+    private void StartSecondHalfSwell()
     {
         inSecondHalf = true;
-        // only listen to the first one
-        mySecondHalfListener.StopListening();
+        PickNewMaxHeights();
+        SetGravity( false );
+        currentRotationSpeed = numSecondHalfSwells.MapClamp( 0, 16, minRotationSpeed, maxRotationSpeed );
+        currentUpForce = numSecondHalfSwells.MapClamp( 0, 16, minUpForce, maxUpForce );
+
+        numSecondHalfSwells++;
+    }
+
+    private void EndSecondHalfSustain()
+    {
+        SetGravity( true );
+    }
+
+    private void PickNewMaxHeights()
+    {
+        for( int i = 0; i < maxSeedlingHeights.Length; i++ )
+        {
+            maxSeedlingHeights[i] = Random.Range( 0.15f, 1f ) * currentUpForce;
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         float currentWindIntensity = maxWindIntensity * 0.0005f * myIntensitySyncer.GetCurrentValue();
-        
+
         Vector3 forceDirection = Vector3.zero;
-        Vector3 forceTorque = Vector3.zero;
-        // in second half, mostly go up; otherwise, go sideways
-        if( inSecondHalf )
-        {
-            forceDirection = currentWindIntensity * Random.Range( 0.8f, 1.8f ) * Vector3.up;
-            forceDirection += currentWindDirection * 0.01f * currentWindIntensity;
-            forceTorque = new Vector3(
-                Random.Range( -1f, 1f ),
-                Random.Range( -1f, 1f ),
-                Random.Range( -1f, 1f )
-            );
-        }
-        else
+        if( !inSecondHalf )
         {
             forceDirection = currentWindDirection * currentWindIntensity;
         }
 
         // apply the force
+        for( int i = 0; i < seedlings.Length; i++ )
+        {
+            Rigidbody seedling = seedlings[i];
+            if( inSecondHalf )
+            {
+                forceDirection = Vector3.up * currentWindIntensity * maxSeedlingHeights[i];
+            }
+            seedling.AddForce( forceDirection );
+        }
+    }
+
+    public float minRotationSpeed = 30, maxRotationSpeed = 120;
+    private float currentRotationSpeed;
+    public float minUpForce = 0.01f, maxUpForce = 0.05f;
+    private float currentUpForce;
+    void Update()
+    {
+        float currentWindIntensity = myIntensitySyncer.GetCurrentValue();
+        if( inSecondHalf )
+        {
+            //transform.Rotate( Vector3.up, rotationSpeed * currentWindIntensity * Time.deltaTime );
+            for( int i = 0; i < seedlings.Length; i++ )
+            {
+                Rigidbody seedling = seedlings[i];
+
+                // galaxy rotation (according to how far from center)
+                // TODO make based on currentWindIntensity
+                Vector3 rotationConsideration = seedling.transform.localPosition; rotationConsideration.y = 0;
+                float rotationAmount = currentWindIntensity * rotationConsideration.magnitude.MapClamp( 0.1f, 1f, 1f, 0.3f );
+                seedling.transform.parent.Rotate( Vector3.up, currentRotationSpeed * rotationAmount * Time.deltaTime );
+            }
+        }
+    }
+
+    private void SetGravity( bool g )
+    {
         foreach( Rigidbody seedling in seedlings )
         {
-            seedling.AddForce( forceDirection );
-            //seedling.AddTorque( forceTorque );
+            seedling.useGravity = g;
         }
     }
 }
