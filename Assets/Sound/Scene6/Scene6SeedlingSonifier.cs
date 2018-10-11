@@ -25,7 +25,7 @@ public class Scene6SeedlingSonifier : MonoBehaviour
 			68 => int Gs;
 			73 => int Cs;
 			[Fs, Gs, Cs] @=> int notes[];
-			10::ms => dur minWaitTime;
+			100::ms => dur minWaitTime;
 
             true => int playStrong;
 
@@ -52,7 +52,7 @@ public class Scene6SeedlingSonifier : MonoBehaviour
 
 
                         // wait for next note
-                        minWaitTime => now;
+                        minWaitTime * Math.random2f( 1, 1.2 ) => now;
                     }
                 }
             }
