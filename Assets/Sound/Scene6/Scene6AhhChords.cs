@@ -244,7 +244,7 @@ public class Scene6AhhChords : MonoBehaviour
 
 			false => global int halfwayThroughScene6Change;
 
-
+			global Event scene6TimesWhenWeMightDoSceneChange;
 			global Event ahhChordChange;
 			global Event ahhChordFadeOut;
 			// wait at start of scene
@@ -287,22 +287,35 @@ public class Scene6AhhChords : MonoBehaviour
 					{
 						DoSwell( 3.5::second, 0::second, 4.5::second, 0.5, 0.01 );
 						// wait
-						4::second => now;
+						3.5::second => now;
+						
+						// check
+						if( i == notes.size() - 1 )
+						{
+							scene6TimesWhenWeMightDoSceneChange.broadcast();
+						}
+							
+						// finish waiting
+						0.5::second => now;
 					}
 				}
 			}
 		" );
+
+		ChuckEventListener mySecondHalfAdvancer = gameObject.AddComponent<ChuckEventListener>();
+		mySecondHalfAdvancer.ListenForEvent( myChuck, "scene6TimesWhenWeMightDoSceneChange", CheckIfWeShouldDoSceneChange );
     }
 
 	bool haveSwitchedToSecondHalf = false;
-    // Update is called once per frame
-    void Update()
-    {
-		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 )
+	void CheckIfWeShouldDoSceneChange()
+	{
+		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 && Scene6DetectSunLook.currentlyLookingAtSun )
 		{
 			// signal that the switch should happen at the next musically relevant place
 			myChuck.SetInt( "halfwayThroughScene6Change", 1 );
 			haveSwitchedToSecondHalf = true;
 		}
-    }
+	}
+
+
 }
