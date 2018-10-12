@@ -6,7 +6,7 @@ public class Scene6DeepenSkyColors : MonoBehaviour
 {
 
 
-    public Color firstColor, secondColor;
+    public Color firstColor, secondColor, fadeOutColor;
     public float switchTime = 3f;
     private ChuckEventListener myListener;
 	public ParticleSystem myFascinator;
@@ -20,6 +20,11 @@ public class Scene6DeepenSkyColors : MonoBehaviour
 
 		// set it to begin with
 		SetSkyboxColor( firstColor );
+    }
+
+    public void DoEnd()
+    {
+        SteamVR_Fade.Start( fadeOutColor, 12f );
     }
 
     void DeepenSkyColors()

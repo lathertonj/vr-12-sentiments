@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Scene6AhhChords : MonoBehaviour
 {
@@ -254,79 +255,92 @@ public class Scene6AhhChords : MonoBehaviour
 			global Event scene6TimesWhenWeMightDoSceneChange;
 			global Event ahhChordChange;
 			global Event ahhChordFadeOut;
+			global Event scene6StopMakingSound;
 			// wait at start of scene
 			0 => lpf.gain;
 			8::second => now;
-			while( true )
+
+			fun void MakeSound()
 			{
-				if( halfwayThroughScene6Change == 1 )
+				while( true )
 				{
-					notes2 @=> notes;
-					// increment it to 2 so now we know we've heard it! hacky bool --> int
-					1 +=> halfwayThroughScene6Change;
-				}
-
-				if( halfwayThroughScene6Change == 3 )
-				{
-					notes3 @=> notes;
-					// increment it to 4 so we know we've heard it
-					1 +=> halfwayThroughScene6Change;
-				}
-
-
-				for( int i; i < notes.size(); i++ )
-				{
-					for( int j; j < notes[i].size(); j++ )
+					if( halfwayThroughScene6Change == 1 )
 					{
-						// TODO: maybe start the scene with some stuff down the octave (-24).... then switch it to this up the octave stuff (-12)!!
-						notes[i][j] - 12 => Std.mtof => ahhs[j].freq;
+						notes2 @=> notes;
+						// increment it to 2 so now we know we've heard it! hacky bool --> int
+						1 +=> halfwayThroughScene6Change;
 					}
 
-					// 2::second => now;
-					if( halfwayThroughScene6Change > 1 ) 
+					if( halfwayThroughScene6Change == 3 )
 					{
-						// only tell rocks to change colors after halfway through scene change
-						ahhChordChange.broadcast();
-						2::second => dur upTime;
-						1::second => dur sustainTime;
-						3.5::second => dur downTime;
-						1::second => dur waitTime;
-						spork ~ DoSwell( upTime, sustainTime, downTime, 1, 0.0 );
-						upTime + sustainTime => now;
-						downTime => now;
-						ahhChordFadeOut.broadcast();
-
-						// check
-						if( i == notes.size() - 1 )
-						{
-							scene6TimesWhenWeMightDoSceneChange.broadcast();
-						}
-
-						// wait / or not!
-						waitTime => now;
-						if( halfwayThroughScene6Change > 3 ) 
-						{
-							// wait extra at end
-							i * 1::second => now;
-						}
+						notes3 @=> notes;
+						// increment it to 4 so we know we've heard it
+						1 +=> halfwayThroughScene6Change;
 					}
-					else
+
+
+					for( int i; i < notes.size(); i++ )
 					{
-						DoSwell( 3.5::second, 0::second, 4.5::second, 0.5, 0.01 );
-						// wait
-						3.5::second => now;
-						
-						// check
-						if( i == notes.size() - 1 )
+						for( int j; j < notes[i].size(); j++ )
 						{
-							scene6TimesWhenWeMightDoSceneChange.broadcast();
+							// TODO: maybe start the scene with some stuff down the octave (-24).... then switch it to this up the octave stuff (-12)!!
+							notes[i][j] - 12 => Std.mtof => ahhs[j].freq;
 						}
+
+						// 2::second => now;
+						if( halfwayThroughScene6Change > 1 ) 
+						{
+							// only tell rocks to change colors after halfway through scene change
+							ahhChordChange.broadcast();
+							2::second => dur upTime;
+							1::second => dur sustainTime;
+							3.5::second => dur downTime;
+							1::second => dur waitTime;
+							spork ~ DoSwell( upTime, sustainTime, downTime, 1, 0.0 );
+							upTime + sustainTime => now;
+							downTime => now;
+							ahhChordFadeOut.broadcast();
+
+							// wait
+							waitTime - 0.5::second => now;
 							
-						// finish waiting
-						0.5::second => now;
+							// check: do a scene change on the second to last one so that the last one has no gravity drop
+							if( i == notes.size() - 2 )
+							{
+								scene6TimesWhenWeMightDoSceneChange.broadcast();
+							}
+
+							// rest of wait
+							0.5::second => now;
+							if( halfwayThroughScene6Change > 3 ) 
+							{
+								// wait extra at end
+								i * 0.5	::second => now;
+							}
+						}
+						else
+						{
+							DoSwell( 3.5::second, 0::second, 4.5::second, 0.5, 0.01 );
+							// wait
+							3.5::second => now;
+							
+							// check
+							if( i == notes.size() - 1 )
+							{
+								scene6TimesWhenWeMightDoSceneChange.broadcast();
+							}
+								
+							// finish waiting
+							0.5::second => now;
+						}
 					}
 				}
 			}
+			spork ~ MakeSound() @=> Shred soundMaker;
+			scene6StopMakingSound => now;
+			soundMaker.exit();
+			// reverb tail
+			10::second => now;
 		" );
 
 		ChuckEventListener mySecondHalfAdvancer = gameObject.AddComponent<ChuckEventListener>();
@@ -338,11 +352,37 @@ public class Scene6AhhChords : MonoBehaviour
 	bool haveSwitchedToSecondHalf = false;
 	bool haveSwitchedToEnding = false;
 	int numSecondHalfSwells = 0;
+	int numEndSwells = 0;
 
 	void CountSwells()
 	{
 		numSecondHalfSwells++;
+		if( haveSwitchedToEnding )
+		{
+			numEndSwells++;
+			// 4 and 5 cus we count the last one of the last cycle as #1
+			if( numEndSwells == 4 )
+			{
+				// fade visuals in 3 seconds (DoEnd has a 12 second fade; overall time 15)
+				GetComponent<Scene6DeepenSkyColors>().Invoke( "DoEnd", 3f );
+			}
+			else if( numEndSwells == 5 )
+			{
+				// turn off audio
+				myChuck.BroadcastEvent( "scene6StopMakingSound" );
+
+				// in 5 seconds, switch to next scene
+				Invoke( "SwitchToNextScene", time: 2.5f );
+			}
+		}
 	}
+
+	void SwitchToNextScene()
+	{
+		// TODO change to scene 7 when it exists.
+		SceneManager.LoadScene( "1_TimidExplorationExhilaration" );
+	}
+
 	void CheckIfWeShouldDoSceneChange()
 	{
 		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 && Scene6DetectSunLook.currentlyLookingAtSun )

@@ -46,17 +46,26 @@ public class Scene6Seedling : MonoBehaviour
             global int scene6NoteIndex;
             global float timeOfLastNoteSeconds;
 
-            while( true )
+            fun void RespondToEvents()
             {{
-                {0} => now;
-                if( ( now / 1::second ) > timeOfLastNoteSeconds + ( minWaitTime * Math.random2f( 1, 1.2 ) / 1::second ) )
+                while( true )
                 {{
-                    spork ~ PlayANote( notes[scene6NoteIndex] );
-                    scene6NoteIndex++; if( scene6NoteIndex >= notes.size() ) {{ 0 => scene6NoteIndex; }}
-                    now / 1::second => timeOfLastNoteSeconds;
-                    {1}.broadcast();
+                    {0} => now;
+                    if( ( now / 1::second ) > timeOfLastNoteSeconds + ( minWaitTime * Math.random2f( 1, 1.2 ) / 1::second ) )
+                    {{
+                        spork ~ PlayANote( notes[scene6NoteIndex] );
+                        scene6NoteIndex++; if( scene6NoteIndex >= notes.size() ) {{ 0 => scene6NoteIndex; }}
+                        now / 1::second => timeOfLastNoteSeconds;
+                        {1}.broadcast();
+                    }}
                 }}
             }}
+            spork ~ RespondToEvents() @=> Shred eventResponder;
+            global Event scene6StopMakingSound;
+            scene6StopMakingSound => now;
+            eventResponder.exit();
+            // reverb tail
+            10::second => now;
         ", myTryToPlayEvent, myDidPlayEvent ) );
 
         ChuckEventListener animateSuccessfulNotes = gameObject.AddComponent<ChuckEventListener>();
