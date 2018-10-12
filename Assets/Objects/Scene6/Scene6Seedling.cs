@@ -6,10 +6,12 @@ public class Scene6Seedling : MonoBehaviour
 {
     private string myTryToPlayEvent, myDidPlayEvent;
     private ChuckSubInstance myChuck;
+    private ParticleSystem mySharedParticleSystem;
 
     // Use this for initialization
     void Start()
     {
+        mySharedParticleSystem = GetComponentInParent<ParticleSystem>();
         // only start sound after seedlings move around a bit
         Invoke( "InitChuck", 3 );
     }
@@ -61,16 +63,22 @@ public class Scene6Seedling : MonoBehaviour
         animateSuccessfulNotes.ListenForEvent( myChuck, myDidPlayEvent, AnimateHavingPlayedEvent );
     }
 
+    private Vector3 lastContactPoint = Vector3.zero;
     void OnCollisionEnter( Collision collision )
     {
         if( myChuck != null )
         {
             myChuck.BroadcastEvent( myTryToPlayEvent );
-        }    
+        }
+        lastContactPoint = collision.contacts[0].point;
     }
 
     void AnimateHavingPlayedEvent()
     {
-        // TODO play a flare if I sounded my note
+        // show a flare if I sounded my note
+        ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+        emitParams.position = mySharedParticleSystem.transform.InverseTransformPoint( lastContactPoint );
+        emitParams.velocity = 0.15f * Vector3.up;
+        mySharedParticleSystem.Emit( emitParams, count: 1 );
     }
 }
