@@ -21,6 +21,7 @@ public class Scene6SeedlingSonifier : MonoBehaviour
         myChuck.RunCode( @"
 			ModalBar modey => JCRev reverb => dac;
             global Event scene6PlayASeedling;
+            global Event scene6SignalSeedlingToPlay;
 			66 => int Fs;
 			68 => int Gs;
 			73 => int Cs;
@@ -78,10 +79,26 @@ public class Scene6SeedlingSonifier : MonoBehaviour
             while( true ) 
 			{ 
 				scene6PlayASeedling => now;
+                scene6SignalSeedlingToPlay.signal();
 				spork ~ PlayANote();
-				minWaitTime => now;
+				minWaitTime * Math.random2f( 1, 1.2 )  => now;
 			}
             
+            // NOTE: Having ChucK access this caused crashes! Investigate later.
+            public class Scene6SeedlingPermissionGiver
+            {
+                now => time timeOfLastPlay;
+
+                public static bool CanIPlay()
+                {
+                    if( now > timeOfLastPlay + minWaitTime * Math.random2f( 1, 1.2 ) )
+                    {
+                        now => timeOfLastPlay;
+                        return true;
+                    }
+                    return false;
+                }
+            }
 		" );
 
         hasChuckInit = true;

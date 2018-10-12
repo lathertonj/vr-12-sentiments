@@ -6,6 +6,7 @@ public class Scene6DetectSunLook : MonoBehaviour
 {
 
     public static float sunLookAmount = 0;
+    public static float sunContinuousLookAmount = 0;
     public static bool currentlyLookingAtSun = false;
     public Transform theHead;
 
@@ -19,8 +20,14 @@ public class Scene6DetectSunLook : MonoBehaviour
             if( hit.collider.gameObject == gameObject )
             {
                 sunLookAmount += Time.deltaTime;
+                sunContinuousLookAmount += Time.deltaTime;
                 currentlyLookingAtSun = true;
             }
+        }
+        
+        if( !currentlyLookingAtSun )
+        {
+            sunContinuousLookAmount = 0;
         }
     }
 }
