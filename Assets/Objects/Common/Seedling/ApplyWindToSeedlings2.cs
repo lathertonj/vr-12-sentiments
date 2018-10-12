@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class ApplyWindToSeedlings2 : MonoBehaviour
 {
+    private static bool inEnding = false;
+    public static void DoEnding()
+    {
+        inEnding = true;
+    }
+
     Rigidbody[] seedlings;
     float[] maxSeedlingHeights;
     Vector3 currentWindDirection;
@@ -50,6 +56,7 @@ public class ApplyWindToSeedlings2 : MonoBehaviour
     {
         inSecondHalf = true;
         PickNewMaxHeights();
+        // turn off gravity
         SetGravity( false );
         currentRotationSpeed = numSecondHalfSwells.MapClamp( 0, 16, minRotationSpeed, maxRotationSpeed );
         currentUpForce = numSecondHalfSwells.MapClamp( 0, 16, minUpForce, maxUpForce );
@@ -59,7 +66,8 @@ public class ApplyWindToSeedlings2 : MonoBehaviour
 
     private void EndSecondHalfSustain()
     {
-        SetGravity( true );
+        // only set gravity back down if we are not in the ending
+        SetGravity( !inEnding );
     }
 
     private void PickNewMaxHeights()

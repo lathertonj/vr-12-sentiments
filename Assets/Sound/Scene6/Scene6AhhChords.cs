@@ -197,6 +197,13 @@ public class Scene6AhhChords : MonoBehaviour
 			[Gs3, Cs4, B4, Fs5]
 			] @=> int notes2[][];
 
+			[ 
+			[A3, E4, Cs5, B5],
+			[E3, B4, Ds5+12, Gs5],
+			[Cs4 - 12, Gs4, E5+12, B5],
+			[Gs3, Cs4, B4+12, Fs5+12]
+			] @=> int notes3[][];
+
 			AhhSynth ahhs[ notes[0].size() ];
 			for( int i; i < ahhs.size(); i++ )
 			{
@@ -242,7 +249,7 @@ public class Scene6AhhChords : MonoBehaviour
 				end => lpf.gain;
 			}
 
-			false => global int halfwayThroughScene6Change;
+			0 => global int halfwayThroughScene6Change;
 
 			global Event scene6TimesWhenWeMightDoSceneChange;
 			global Event ahhChordChange;
@@ -252,12 +259,20 @@ public class Scene6AhhChords : MonoBehaviour
 			8::second => now;
 			while( true )
 			{
-				if( halfwayThroughScene6Change )
+				if( halfwayThroughScene6Change == 1 )
 				{
 					notes2 @=> notes;
 					// increment it to 2 so now we know we've heard it! hacky bool --> int
 					1 +=> halfwayThroughScene6Change;
 				}
+
+				if( halfwayThroughScene6Change == 3 )
+				{
+					notes3 @=> notes;
+					// increment it to 4 so we know we've heard it
+					1 +=> halfwayThroughScene6Change;
+				}
+
 
 				for( int i; i < notes.size(); i++ )
 				{
@@ -280,8 +295,20 @@ public class Scene6AhhChords : MonoBehaviour
 						upTime + sustainTime => now;
 						downTime => now;
 						ahhChordFadeOut.broadcast();
+
+						// check
+						if( i == notes.size() - 1 )
+						{
+							scene6TimesWhenWeMightDoSceneChange.broadcast();
+						}
+
 						// wait / or not!
 						waitTime => now;
+						if( halfwayThroughScene6Change > 3 ) 
+						{
+							// wait extra at end
+							i * 1::second => now;
+						}
 					}
 					else
 					{
@@ -304,9 +331,18 @@ public class Scene6AhhChords : MonoBehaviour
 
 		ChuckEventListener mySecondHalfAdvancer = gameObject.AddComponent<ChuckEventListener>();
 		mySecondHalfAdvancer.ListenForEvent( myChuck, "scene6TimesWhenWeMightDoSceneChange", CheckIfWeShouldDoSceneChange );
+		ChuckEventListener mySwellCounter = gameObject.AddComponent<ChuckEventListener>();
+		mySwellCounter.ListenForEvent( myChuck, "ahhChordFadeOut", CountSwells );
     }
 
 	bool haveSwitchedToSecondHalf = false;
+	bool haveSwitchedToEnding = false;
+	int numSecondHalfSwells = 0;
+
+	void CountSwells()
+	{
+		numSecondHalfSwells++;
+	}
 	void CheckIfWeShouldDoSceneChange()
 	{
 		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 && Scene6DetectSunLook.currentlyLookingAtSun )
@@ -314,6 +350,14 @@ public class Scene6AhhChords : MonoBehaviour
 			// signal that the switch should happen at the next musically relevant place
 			myChuck.SetInt( "halfwayThroughScene6Change", 1 );
 			haveSwitchedToSecondHalf = true;
+		}
+
+		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && Scene6DetectSunLook.sunContinuousLookAmount > 5 && numSecondHalfSwells >= 15 )
+		{
+			// switch to ending
+			ApplyWindToSeedlings2.DoEnding();
+			myChuck.SetInt( "halfwayThroughScene6Change", 3 );
+			haveSwitchedToEnding = true;
 		}
 	}
 
