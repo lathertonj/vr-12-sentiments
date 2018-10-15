@@ -36,7 +36,7 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
             global int {3};
             global Event {1}, {4};
             {0}::second => dur noteLength;
-            0.08::second => dur jumpDelay;
+            0.05::second => dur jumpDelay;
 
             true => int playStrong;
 
