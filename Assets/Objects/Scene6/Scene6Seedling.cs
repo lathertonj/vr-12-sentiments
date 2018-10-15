@@ -37,7 +37,7 @@ public class Scene6Seedling : MonoBehaviour
 
                 me.yield();
 
-                Math.random2f( 0.3, 0.5 ) => modey.strike;
+                Math.random2f( 0.2, 0.4 ) => modey.strike;
 
                 3::second => now;
             }}
