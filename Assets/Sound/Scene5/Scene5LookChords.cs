@@ -263,8 +263,8 @@ public class Scene5LookChords : MonoBehaviour
         }
 
         // do angle calculation and setting if we aren't at end of scene yet
-        float angle = transform.localEulerAngles.x;
-        if( angle > 180 ) { angle -= 360; }
+        float angle = transform.localEulerAngles.y;
+        if( angle > 270 ) { angle -= 360; }
 
         float normElapsedTime = Mathf.Clamp01( ( Time.timeSinceLevelLoad - cutoffTransitionStartTime ) / cutoffTransitionTime );
         for( int i = 0; i < currentCutoffs.Length; i++ )
@@ -275,11 +275,27 @@ public class Scene5LookChords : MonoBehaviour
         float amount = 0;
         if( angle < currentCutoffs[1] )
         {
-            amount = -1 * angle.MapClamp( currentCutoffs[1], currentCutoffs[0], 0, 1 );
+            float midpoint = 0.5f * ( currentCutoffs[0] + currentCutoffs[1] );
+            if( angle < midpoint )
+            {
+                amount = -1 * angle.MapClamp( currentCutoffs[0], midpoint, 0, 1 );
+            }
+            else
+            {
+                amount = -1 * angle.MapClamp( currentCutoffs[1], midpoint, 0, 1 );
+            }
         }
         else if( angle > currentCutoffs[2] )
         {
-            amount = angle.MapClamp( currentCutoffs[2], currentCutoffs[3], 0, 1 );
+            float midpoint = 0.5f * ( currentCutoffs[2] + currentCutoffs[3] );
+            if( angle < midpoint )
+            {
+                amount = angle.MapClamp( currentCutoffs[2], midpoint, 0, 1 );
+            }
+            else
+            {
+                amount = angle.MapClamp( currentCutoffs[3], midpoint, 0, 1 );
+            }
         }
 
         TheChuck.instance.SetFloat( "scene5LookAmount", amount ); 
