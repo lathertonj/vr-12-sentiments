@@ -13,12 +13,13 @@ public class EncourageSqueezing : MonoBehaviour
 	public float longCycleRest = 1.1f;
 	public int numShortCycles = 2;
 	public ushort maxVibrateIntensity = 5;
+	public float encouragementWaitTime = 10f;
 
     // Use this for initialization
     void Start()
     {
 		myController = GetComponent<ControllerAccessors>();
-		StartCoroutine( "SqueezeIntensity" );
+		Invoke( "LaunchCoroutine", encouragementWaitTime );
     }
 
     // Update is called once per frame
@@ -40,6 +41,11 @@ public class EncourageSqueezing : MonoBehaviour
 			Destroy( this );
 		}
     }
+
+	void LaunchCoroutine()
+	{
+		StartCoroutine( "SqueezeIntensity" );
+	}
 
 	IEnumerator SqueezeIntensity() 
 	{
