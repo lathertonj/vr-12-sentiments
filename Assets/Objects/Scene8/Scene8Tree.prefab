@@ -61,15 +61,15 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpSpecMap:
-        m_Texture: {fileID: 2800000, guid: 20e81922302a2884b850c323c68dcef8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0641d91822bdd514294cbaf159fc82bb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e050b5a48fab47748847be19b4b672c9, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9b8904bea94a82149b277c71cdbe6962, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TranslucencyMap:
-        m_Texture: {fileID: 2800000, guid: 651e0f092f4ae124aafb8ab06a93df52, type: 3}
+        m_Texture: {fileID: 2800000, guid: e544547db2d51f943b398727e144cacb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -99,19 +99,19 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpSpecMap:
-        m_Texture: {fileID: 2800000, guid: 20e81922302a2884b850c323c68dcef8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0641d91822bdd514294cbaf159fc82bb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e050b5a48fab47748847be19b4b672c9, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9b8904bea94a82149b277c71cdbe6962, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShadowTex:
-        m_Texture: {fileID: 2800000, guid: 702bf6c769b18004e9455251844a7d9c, type: 3}
+        m_Texture: {fileID: 2800000, guid: a1816842f83680646816d288e95ae7bd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TranslucencyMap:
-        m_Texture: {fileID: 2800000, guid: 651e0f092f4ae124aafb8ab06a93df52, type: 3}
+        m_Texture: {fileID: 2800000, guid: e544547db2d51f943b398727e144cacb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Name: Tree Data
   m_EditorClassIdentifier: 
   _uniqueID: 8457
-  materialHash: 8e9f54818f1ea990c9fa047c681256106291456
+  materialHash: 3f638ece75b49c7397802fd3a94e46896291456
   root:
     _uniqueID: 1
     seed: 5501370
@@ -557,7 +557,7 @@ MonoBehaviour:
     childGroupIDs: 05000000
     lodQualityMultiplier: 1
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: a9e7675dd1b1dfa48916f7d5ed22e627, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 10.631645, y: 15.631644}
@@ -795,7 +795,7 @@ MonoBehaviour:
     childGroupIDs: 0a000000
     lodQualityMultiplier: 0.93
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: a9e7675dd1b1dfa48916f7d5ed22e627, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 1.1569622, y: 6.1569643}
@@ -1033,7 +1033,7 @@ MonoBehaviour:
     childGroupIDs: d5000000
     lodQualityMultiplier: 1
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: a9e7675dd1b1dfa48916f7d5ed22e627, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 3.051899, y: 8.051899}
@@ -1271,7 +1271,7 @@ MonoBehaviour:
     parentGroupID: 10
     childGroupIDs: 
     geometryMode: 0
-    materialLeaf: {fileID: 2100000, guid: c7e1f55e7dcc8fb41b695ecc8f5754a1, type: 2}
+    materialLeaf: {fileID: 2100000, guid: 36de01194a671414ebe25f6c3380c82c, type: 2}
     instanceMesh: {fileID: 0}
     size: {x: 0.8654867, y: 1.0336282}
     perpendicularAlign: 0
