@@ -25,4 +25,9 @@ public class ConstantDirectionMover : MonoBehaviour
 		currentDirection = direction;
 		currentSpeed = speed;
 	}
+
+	public Vector3 GetDirection()
+	{
+		return currentDirection;
+	}
 }
