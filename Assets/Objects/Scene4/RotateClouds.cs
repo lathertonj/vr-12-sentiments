@@ -6,15 +6,13 @@ public class RotateClouds : MonoBehaviour
 {
     public Vector3 rotationAmounts;
     private ControllerAccessors myController;
-    private float maxSqueezeTime;
+    public float maxSqueezeTime = 5f;
     private float currentMultiplier;
     private float multiplierSlew;
 
     private void Start()
     {
         myController = GetComponentInParent<ControllerAccessors>();
-        // I am lazy
-        maxSqueezeTime = ( (Scene4SeedlingController) FindObjectOfType( typeof( Scene4SeedlingController ) ) ).maxSqueezeTime;
         currentMultiplier = 1;
     }
 

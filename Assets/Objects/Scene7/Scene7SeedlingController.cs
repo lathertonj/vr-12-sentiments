@@ -13,6 +13,7 @@ public class Scene7SeedlingController : MonoBehaviour
     private ParticleSystem leftHand, rightHand;
     private ParticleSystem myParticleEmitter;
 	private ConstantDirectionMover room;
+	private float maxSqueezeTime = 5f;
 
 
     private Scene7SonifyFlowerSeedlings mySonifier;
@@ -73,8 +74,20 @@ public class Scene7SeedlingController : MonoBehaviour
 
     void Update()
     {
-
+		
     }
+
+	void ProcessController( ControllerAccessors controller )
+	{
+		if( controller.IsSqueezed() )
+        {
+            float timeElapsed = controller.ElapsedSqueezeTime();
+            
+            // map within low intensity values. this movement is not intense so vibration is not strong.
+            ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
+            controller.Vibrate( intensity );
+        }
+	}
 
 	Vector3 RandomVector3()
 	{
