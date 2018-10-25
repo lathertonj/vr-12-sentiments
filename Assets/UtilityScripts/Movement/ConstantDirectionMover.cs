@@ -30,4 +30,9 @@ public class ConstantDirectionMover : MonoBehaviour
 	{
 		return currentDirection;
 	}
+
+    public float GetSpeed()
+    {
+        return currentSpeed;
+    }
 }

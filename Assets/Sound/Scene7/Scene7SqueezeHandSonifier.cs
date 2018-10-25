@@ -176,7 +176,7 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
                 {{
                     gainSlew * ( goalGain - currentGain ) +=> currentGain;
                     currentGain * 1.3 => lpf.gain;
-                    50 + 4000 * currentGain => lpf.freq;
+                    400 + 8000 * currentGain => lpf.freq;
                     1::ms => now;
                 }}
             }}
