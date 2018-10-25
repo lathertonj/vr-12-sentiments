@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ConstantDirectionMover : MonoBehaviour
 {
+    public float minSpeedWithoutStopping = 0.1f;
 
     private Vector3 currentDirection;
     private float currentSpeed;
@@ -23,7 +24,7 @@ public class ConstantDirectionMover : MonoBehaviour
 	public void SetDirection( Vector3 direction, float speed )
 	{
 		currentDirection = direction;
-		currentSpeed = speed;
+		currentSpeed = ( speed > minSpeedWithoutStopping ) ? speed : 0;
 	}
 
 	public Vector3 GetDirection()
