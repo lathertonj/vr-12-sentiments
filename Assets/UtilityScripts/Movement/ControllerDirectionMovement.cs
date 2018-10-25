@@ -21,7 +21,7 @@ public class ControllerDirectionMovement : MonoBehaviour
         if( controller.IsUnSqueezed() )
         {
             Vector3 v = controller.Velocity();
-            room.SetDirection( v.normalized, v.magnitude.MapClamp( 0, 4, 0, maxSpeed ) );
+            room.SetDirection( v.normalized, v.magnitude.MapClamp( 0, 3, 0, maxSpeed ) );
         }
 
     }
