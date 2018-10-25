@@ -8,6 +8,7 @@ TagManager:
   - Chord1
   - Chord2
   - Seedling
+  - Ground
   layers:
   - Default
   - TransparentFX
