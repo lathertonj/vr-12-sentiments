@@ -55,7 +55,7 @@ public class Scene7SeedlingController : MonoBehaviour
     {
 		Rigidbody seedling = mySeedlings[currentSeedling];
 
-		Vector3 seedlingVelocity = 0.3f * room.GetDirection() + 0.05f * RandomVector3();
+		Vector3 seedlingVelocity = 0.15f * room.GetDirection() + 0.02f * RandomVector3();
 		seedling.AddForce( seedlingVelocity, ForceMode.VelocityChange );
 
 		Vector3 randomAngularVelocity = RandomVector3();
@@ -74,11 +74,17 @@ public class Scene7SeedlingController : MonoBehaviour
 
     void Update()
     {
-		
+		ProcessController( leftController );
+        ProcessController( rightController );
     }
 
 	void ProcessController( ControllerAccessors controller )
 	{
+        if( controller.IsFirstSqueezed() )
+        {
+            controller.RecordSqueezeStartTime();
+        }
+
 		if( controller.IsSqueezed() )
         {
             float timeElapsed = controller.ElapsedSqueezeTime();

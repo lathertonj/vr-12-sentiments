@@ -208,7 +208,6 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
                 1::second => now;
             }} 
         ", mySqueezedEvent, myUnsqueezedEvent, myChordString ) );
-		Debug.Log( myChordString );
     }
 
     // Update is called once per frame
