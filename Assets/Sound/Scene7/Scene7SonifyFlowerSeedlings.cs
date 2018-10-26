@@ -128,8 +128,63 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
             spork ~ PlayNotes() @=> Shred playNotesShred;
 
 
+
+            Shakers s => JCRev rev2 => dac;
+            0.05 => rev2.mix;
+
+            // params
+            0.7 => s.decay; // 0 to 1
+            50 => s.objects; // 0 to 128
+            11 => s.preset; // 0 to 22.  0 is good for galloping. 
+            // 11 is good for eighths
+
+            fun void OnBeats()
+            {{
+                while( true )
+                {{
+                    if( scene7HappyMode || maybe )
+                    {{
+                        Math.random2f( 0.7, 0.9 ) => s.energy;
+                        1 => s.noteOn;
+                    }}
+                    noteLength => now;
+    
+                    if( scene7HappyMode || maybe )
+                    {{
+                        Math.random2f( 0.3, 0.5 ) => s.energy;
+                        1 => s.noteOn;
+                    }}
+                    noteLength => now;
+                }}
+            }}
+            spork ~ OnBeats() @=> Shred playShakersShred;
+
+            fun void ShakersGain()
+            {{
+                float currentGain;
+                0.001 => float upSlew;
+                0.0003 => float downSlew;
+                while( true ) 
+                {{
+                    if( scene7HappyMode > currentGain )
+                    {{
+                        upSlew * ( scene7HappyMode - currentGain ) +=> currentGain;
+                    }}
+                    else
+                    {{
+                        downSlew * ( scene7HappyMode - currentGain ) +=> currentGain;
+                    }}
+                    currentGain * 0.3 => s.gain;
+                    1::ms => now;
+                }}
+            }}
+            spork ~ ShakersGain();
+
+
+
             while( true ) {{ 1::second => now; }}
             playNotesShred.exit();
+            playShakersShred.exit();
             
 
         ", jumpDelay, myJumpEvent, notesString, myIncreaseSpeedEvent, myDecreaseSpeedEvent ) );
