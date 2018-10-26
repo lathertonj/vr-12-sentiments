@@ -35,7 +35,7 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
         // ========================================================================================
         //                                     Supersaw
         // ========================================================================================
-		TheChuck.instance.RunCode( string.Format( @"
+		myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
             // where the filter cutoff frequency is usually 
@@ -177,11 +177,17 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
             0 => float goalGain;
             0 => float currentGain;
             0.0006 => float gainSlew;
+            global int scene7HappyMode;
             fun void ApplyGain()
             {{
                 while( true )
                 {{
-                    gainSlew * ( goalGain - currentGain ) +=> currentGain;
+                    goalGain => float theGoal;
+                    if( scene7HappyMode )
+                    {{
+                        1 => theGoal;
+                    }}
+                    gainSlew * ( theGoal - currentGain ) +=> currentGain;
                     currentGain * 1.2 => lpf.gain;
                     400 + 8000 * currentGain => lpf.freq;
                     1::ms => now;
