@@ -27,7 +27,12 @@ public class SunbeamInteractors : MonoBehaviour
             vibrateIntensity *= 0.96f;
         }
 
-        if( currentSunbeam != null )
+        if( SunbeamController.haveExpanded )
+        {
+            currentStrength = 3999;
+            myController.Vibrate( (ushort) ( currentStrength * vibrateIntensity ) );
+        }
+        else if( currentSunbeam != null )
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse

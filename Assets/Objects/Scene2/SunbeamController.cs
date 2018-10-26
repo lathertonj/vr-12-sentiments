@@ -19,6 +19,7 @@ public class SunbeamController : MonoBehaviour
     private bool shouldFade = true;
     public static bool shouldStopFading = false;
     public static bool shouldIncreaseSize = false;
+    public static bool haveExpanded = false;
 
     private void Start()
     {
@@ -49,7 +50,13 @@ public class SunbeamController : MonoBehaviour
         if( shouldIncreaseSize )
         {
             visualPart.localScale *= 1 + 0.5f * Time.deltaTime;
-
+            
+            // partway there, turn on this flag for other places
+            if( visualPart.localScale.x > 5 )
+            {
+                haveExpanded = true;
+            }
+            
             // if get too big, turn off for everyone
             if( visualPart.localScale.x > 25 )
             {
