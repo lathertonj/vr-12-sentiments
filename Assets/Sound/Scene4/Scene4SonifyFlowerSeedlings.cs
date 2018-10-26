@@ -323,6 +323,9 @@ public class Scene4SonifyFlowerSeedlings : MonoBehaviour
 
     public float[] PlayArpeggio( int numNotes )
     {
+        // enforce max to prevent arpeggio from going on too long 
+        numNotes = (int) Mathf.Min( numNotes, 18 );
+        
         // fill array with PART OF one copy, then random notes
         string[] newArpeggio = new string[numNotes];
         float[] toReturn = new float[numNotes];
@@ -351,7 +354,8 @@ public class Scene4SonifyFlowerSeedlings : MonoBehaviour
         myChuck.RunCode( string.Format( @"
             {1} @=> float {0}[]; 
 
-            global ModalBar {2};
+            // make non global so it's not overwriting itself
+            ModalBar {2} => JCRev reverb => dac;
 
             0.10::second => dur noteLength;
             true => int hardPick;
