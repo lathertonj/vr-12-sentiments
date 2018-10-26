@@ -181,10 +181,14 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
             spork ~ ShakersGain();
 
 
-
-            while( true ) {{ 1::second => now; }}
+            global Event scene7EndScene;
+            scene7EndScene => now; 
+            
             playNotesShred.exit();
             playShakersShred.exit();
+
+            // reverb tails
+            10::second => now;
             
 
         ", jumpDelay, myJumpEvent, notesString, myIncreaseSpeedEvent, myDecreaseSpeedEvent ) );

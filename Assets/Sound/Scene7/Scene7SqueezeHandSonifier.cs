@@ -178,12 +178,17 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
             0 => float currentGain;
             0.0006 => float gainSlew;
             global int scene7HappyMode;
+            false => global int sceneIsOver;
             fun void ApplyGain()
             {{
                 while( true )
                 {{
                     goalGain => float theGoal;
-                    if( scene7HappyMode )
+                    if( sceneIsOver )
+                    {{
+                        0 => theGoal;
+                    }}
+                    else if( scene7HappyMode )
                     {{
                         1 => theGoal;
                     }}
@@ -208,18 +213,15 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
             }}
             spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
             
-			while( true ) {{ 1::second => now; }}
             // turn off chord at end of movement
+            global Event scene7EndScene;
+            scene7EndScene => now;
 
             squeezeResponseShred.exit();
-            0 => goalGain;
+            true => sceneIsOver;
             
             // let it die out
-            while( true ) 
-            {{ 
-                0 => goalGain;
-                1::second => now;
-            }} 
+            10::second => now;
         ", mySqueezedEvent, myUnsqueezedEvent, myChordString ) );
 
 
@@ -375,6 +377,7 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
 
             {0} => Std.mtof => myAhh.freq;
             global float {1};
+            false => int sceneIsOver;
             fun void SetVolume()
             {{
                 0.01 => float volumeUpSlew;
@@ -382,13 +385,18 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
                 float currentVolume;
                 while( true )
                 {{
-                    if( {1} > currentVolume )
+                    {1} => float goalVolume;
+                    if( sceneIsOver )
                     {{
-                        volumeUpSlew * ({1} - currentVolume) +=> currentVolume;
+                        0 => goalVolume;
+                    }}
+                    if( goalVolume > currentVolume )
+                    {{
+                        volumeUpSlew * ( goalVolume - currentVolume ) +=> currentVolume;
                     }}
                     else
                     {{
-                        volumeDownSlew * ({1} - currentVolume) +=> currentVolume;
+                        volumeDownSlew * ( goalVolume - currentVolume ) +=> currentVolume;
                     }}
                     currentVolume * 0.08 => myAhh.gain;
                     1::ms => now;
@@ -396,8 +404,12 @@ public class Scene7SqueezeHandSonifier : MonoBehaviour
 
             }}
             spork ~ SetVolume();
+
+            // let it die out
+            global Event scene7EndScene;
+            scene7EndScene => now;
+            true => sceneIsOver;
 			
-			while( true ) {{ 1::second => now; }}
 			// reverb tail
 			10::second => now;
         
