@@ -6,7 +6,7 @@ using UnityEngine;
 public class Scene5SeedlingController : MonoBehaviour
 {
     public Transform seedlingPrefab;
-    public Transform room, head;
+    public ConstantDirectionMover room;
     public int numSeedlings = 40;
     private int numSeedlingsReleased = 0;
     public Vector3 spawnRadius = 3f * Vector3.one;
@@ -20,11 +20,18 @@ public class Scene5SeedlingController : MonoBehaviour
     public float loseSeedTime = 20f;
     public float loseManySeedTime = 90f;
 
+    public float maxSqueezeTime = 5f;
+
     private Scene5SonifyFlowerSeedlings mySonifier;
 
     // Use this for initialization
     void Start()
     {
+        // initialize movement then set to ignore future requests
+        room.SetDirection( room.transform.forward, moveSpeed );
+        room.mostlyIgnoreMovementRequests = true;
+        
+        // other setup
         myParticleEmitter = GetComponentInChildren<ParticleSystem>();
 
         for( int i = 0; i < numSeedlings; i++ )
@@ -52,6 +59,12 @@ public class Scene5SeedlingController : MonoBehaviour
         leftHand = leftController.GetComponentInChildren<ParticleSystem>();
         rightHand = rightController.GetComponentInChildren<ParticleSystem>();
 
+    }
+
+    void Update()
+    {
+        ProcessControllerInput( leftController );
+        ProcessControllerInput( rightController );
     }
 
     float GetLossChance()
@@ -120,10 +133,22 @@ public class Scene5SeedlingController : MonoBehaviour
 
         currentSeedling++; currentSeedling %= mySeedlings.Length;
     }
-    
-    void Update()
+
+    void ProcessControllerInput( ControllerAccessors controller )
     {
-        room.position += moveSpeed * Time.deltaTime * room.forward;
+        if( controller.IsFirstSqueezed() )
+        {
+            controller.RecordSqueezeStartTime();
+        }
+
+        if( controller.IsSqueezed() )
+        {
+            float timeElapsed = controller.ElapsedSqueezeTime();
+            
+            // map within low intensity values. this movement is not intense so vibration is not strong.
+            ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 3, 100 );
+            controller.Vibrate( intensity );
+        }
     }
 
 }
