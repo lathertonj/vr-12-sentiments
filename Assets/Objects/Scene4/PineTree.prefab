@@ -36,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640990155449942}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 53.1, y: 12, z: 54.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Name: Tree Data
   m_EditorClassIdentifier: 
   _uniqueID: 8457
-  materialHash: 8e9f54818f1ea990c9fa047c681256106291456
+  materialHash: 2fe797401dd98f675eb44a1d26af27c86291456
   root:
     _uniqueID: 1
     seed: 5501370
@@ -557,7 +557,7 @@ MonoBehaviour:
     childGroupIDs: 05000000
     lodQualityMultiplier: 1
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: 1cfc990fb11f584468f7c4fbd6ee6895, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 10.631645, y: 15.631644}
@@ -795,7 +795,7 @@ MonoBehaviour:
     childGroupIDs: 0a000000
     lodQualityMultiplier: 0.93
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: 1cfc990fb11f584468f7c4fbd6ee6895, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 1.1569622, y: 6.1569643}
@@ -1033,7 +1033,7 @@ MonoBehaviour:
     childGroupIDs: d5000000
     lodQualityMultiplier: 1
     geometryMode: 0
-    materialBranch: {fileID: 0}
+    materialBranch: {fileID: 2100000, guid: 1cfc990fb11f584468f7c4fbd6ee6895, type: 2}
     materialBreak: {fileID: 0}
     materialFrond: {fileID: 0}
     height: {x: 3.051899, y: 8.051899}
