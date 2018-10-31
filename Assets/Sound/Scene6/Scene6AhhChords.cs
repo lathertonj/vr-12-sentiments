@@ -379,8 +379,7 @@ public class Scene6AhhChords : MonoBehaviour
 
 	void SwitchToNextScene()
 	{
-		// TODO change to scene 7 when it exists.
-		SceneManager.LoadScene( "1_TimidExplorationExhilaration" );
+		SceneManager.LoadScene( "7_ResolvedStrong" );
 	}
 
 	void CheckIfWeShouldDoSceneChange()
