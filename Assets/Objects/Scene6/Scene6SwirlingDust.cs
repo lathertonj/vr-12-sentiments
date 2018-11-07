@@ -6,9 +6,15 @@ public class Scene6SwirlingDust : MonoBehaviour
 {
 	private static Scene6SwirlingDust theDust;
 	
-    static void SetDustIntensity( float intensity )
+    public static void SetDustIntensity( float intensity )
 	{
 		theDust.goalIntensity = intensity;
+	}
+
+	public static void TurnOffDustVisualsButLeaveSwirl()
+	{
+		theDust.goalIntensity = 0;
+		theDust.overrideSwirlIntensity = theDust.currentIntensity;
 	}
 
 	private ParticleSystem myParticles;
@@ -18,6 +24,7 @@ public class Scene6SwirlingDust : MonoBehaviour
 	public float maxRotatePerSecond = 10;
 
 	private float currentIntensity, goalIntensity, intensitySlew;
+	private float overrideSwirlIntensity = -1f;
 
 	void Awake()
 	{
@@ -33,7 +40,16 @@ public class Scene6SwirlingDust : MonoBehaviour
 
 	void Update()
 	{
+		// compute interpolation
 		currentIntensity += Time.deltaTime * intensitySlew * ( goalIntensity - currentIntensity );
+		
+		// stop overriding once we turn it all the way down
+		if( currentIntensity < 0.001f )
+		{
+			overrideSwirlIntensity = -1f;
+		}
+
+		// set
 		SetIntensity( currentIntensity );
 	}
 
@@ -43,10 +59,24 @@ public class Scene6SwirlingDust : MonoBehaviour
 		intensity = Mathf.Clamp01( intensity );
 
 		// color
-		baseColor.a = intensity * maxAlpha;
-		myRenderer.material.SetColor( "_TintColor", baseColor );
+		SetVisualIntensity( intensity );
 
 		// swirl
-		transform.rotation *= Quaternion.AngleAxis( intensity * maxRotatePerSecond * Time.deltaTime, Vector3.up );
+		SetSwirlIntensity( intensity );
+	}
+
+	void SetVisualIntensity( float intensity )
+	{
+		baseColor.a = intensity * maxAlpha;
+		myRenderer.material.SetColor( "_TintColor", baseColor );
+	}
+
+	void SetSwirlIntensity( float intensity )
+	{
+		if( overrideSwirlIntensity > 0 )
+		{
+			intensity = overrideSwirlIntensity;
+		}
+		transform.rotation *= Quaternion.AngleAxis( -intensity * maxRotatePerSecond * Time.deltaTime, Vector3.up );
 	}
 }

@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class Scene6AhhChords : MonoBehaviour
 {
 	private ChuckSubInstance myChuck;
+	private ChuckEventListener myAhhListener;
+	public float firstSunLookAmount = 5f;
+	public float secondContinuousSunLookAmount = 5f;
 
     // Use this for initialization
     void Start()
@@ -347,6 +350,7 @@ public class Scene6AhhChords : MonoBehaviour
 		mySecondHalfAdvancer.ListenForEvent( myChuck, "scene6TimesWhenWeMightDoSceneChange", CheckIfWeShouldDoSceneChange );
 		ChuckEventListener mySwellCounter = gameObject.AddComponent<ChuckEventListener>();
 		mySwellCounter.ListenForEvent( myChuck, "ahhChordFadeOut", CountSwells );
+		myAhhListener = gameObject.AddComponent<ChuckEventListener>();
     }
 
 	bool haveSwitchedToSecondHalf = false;
@@ -382,21 +386,55 @@ public class Scene6AhhChords : MonoBehaviour
 		SceneManager.LoadScene( "7_ResolvedStrong" );
 	}
 
+	void Update()
+	{
+		if( !haveSwitchedToSecondHalf )
+		{
+			// swirl up 
+			Scene6SwirlingDust.SetDustIntensity( Scene6DetectSunLook.sunLookAmount.PowMapClamp( 0, firstSunLookAmount, 0, 0.5f, 5 ) );
+		}
+
+		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && numSecondHalfSwells >= 11 )
+		{
+			// swirl up
+			Scene6SwirlingDust.SetDustIntensity( Scene6DetectSunLook.sunContinuousLookAmount.PowMapClamp( 0, secondContinuousSunLookAmount, 0, 1, 5 ) );
+		}		
+	}
+
+	void TurnOffDust()
+	{
+		Scene6SwirlingDust.TurnOffDustVisualsButLeaveSwirl();
+		myAhhListener.StopListening();
+	}
+
 	void CheckIfWeShouldDoSceneChange()
 	{
-		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > 5 && Scene6DetectSunLook.currentlyLookingAtSun )
+		if( !haveSwitchedToSecondHalf && Scene6DetectSunLook.sunLookAmount > firstSunLookAmount ) //  && Scene6DetectSunLook.currentlyLookingAtSun )
 		{
 			// signal that the switch should happen at the next musically relevant place
 			myChuck.SetInt( "halfwayThroughScene6Change", 1 );
 			haveSwitchedToSecondHalf = true;
+			// turn off the dust on the next chord change
+			myAhhListener.ListenForEvent( myChuck, "ahhChordChange", TurnOffDust );
 		}
 
-		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && Scene6DetectSunLook.sunContinuousLookAmount > 5 && numSecondHalfSwells >= 15 )
+		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && numSecondHalfSwells >= 11 )
+		{
+			Scene6DetectSunLook.startCountingLongContinuousLooks = true;
+		}
+
+		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf 
+			&& ( Scene6DetectSunLook.sunContinuousLookAmount > secondContinuousSunLookAmount ||
+				Scene6DetectSunLook.numLongContinuousLooks > 3 ) 
+			&& numSecondHalfSwells >= 15 )
 		{
 			// switch to ending
 			ApplyWindToSeedlings2.DoEnding();
 			myChuck.SetInt( "halfwayThroughScene6Change", 3 );
 			haveSwitchedToEnding = true;
+
+			// turn on swirl forever
+			Scene6SwirlingDust.SetDustIntensity( 1 );
 		}
 	}
 
