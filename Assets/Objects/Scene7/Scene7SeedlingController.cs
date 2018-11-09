@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Scene7SeedlingController : MonoBehaviour
+public class Scene7SeedlingController : MonoBehaviour , CollisionResponder
 {
 
     public Transform seedlingPrefab;
@@ -103,4 +103,10 @@ public class Scene7SeedlingController : MonoBehaviour
 			Random.Range( -1f, 1f )
 		);
 	}
+
+    public void RespondToCollision()
+    {
+        // when we hit the ground, stop the happiness
+        mySonifier.SlowMovementHappened();
+    }
 }
