@@ -3665,7 +3665,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToFollow: {fileID: 4285891091707724}
-  slew: 40
+  slew: 0.95
+  oscillateAmount: {x: 0.0015, y: 0.0015, z: 0.0015}
+  oscillateRate: {x: 1, y: 1.5, z: 2}
 --- !u!114 &114792982337826672
 MonoBehaviour:
   m_ObjectHideFlags: 1
