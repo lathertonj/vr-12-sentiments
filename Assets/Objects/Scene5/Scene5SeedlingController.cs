@@ -93,7 +93,7 @@ public class Scene5SeedlingController : MonoBehaviour
         if( mySeedlingsActive[currentSeedling] )
         {
             Rigidbody seedling = mySeedlings[currentSeedling];
-            seedling.AddForce( 0.15f * Vector3.up + 0.45f * transform.forward, ForceMode.VelocityChange );
+            seedling.AddForce( 0.1f * Vector3.up + 0.3f * transform.forward, ForceMode.VelocityChange );
             Vector3 randomAngularVelocity = new Vector3(
                 Random.Range( -1f, 1f ),
                 Random.Range( -1f, 1f ),
