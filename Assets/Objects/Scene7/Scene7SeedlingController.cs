@@ -14,6 +14,7 @@ public class Scene7SeedlingController : MonoBehaviour , CollisionResponder
     private ParticleSystem myParticleEmitter;
 	private ConstantDirectionMover room;
 	private float maxSqueezeTime = 5f;
+    public Transform audioListenerPosition;
 
 
     private Scene7SonifyFlowerSeedlings mySonifier;
@@ -70,6 +71,8 @@ public class Scene7SeedlingController : MonoBehaviour , CollisionResponder
 
         currentSeedling++; currentSeedling %= mySeedlings.Length;
 		
+        // tell chuck what the next distance will be
+        mySonifier.InformOfNextDistance( ( audioListenerPosition.position - mySeedlings[currentSeedling].transform.position ).magnitude );
     }
 
     void Update()

@@ -16,13 +16,14 @@ public class Scene5SeedlingController : MonoBehaviour
     private ParticleSystem leftHand, rightHand;
     public float moveSpeed = 5f;
     private ParticleSystem myParticleEmitter;
-    
     public float loseSeedTime = 20f;
     public float loseManySeedTime = 90f;
 
     public float maxSqueezeTime = 5f;
 
     private Scene5SonifyFlowerSeedlings mySonifier;
+
+    public Transform audioListenerPosition;
 
     // Use this for initialization
     void Start()
@@ -131,7 +132,11 @@ public class Scene5SeedlingController : MonoBehaviour
             // do nothing
         }
 
+        // compute next seedling
         currentSeedling++; currentSeedling %= mySeedlings.Length;
+
+        // tell chuck what the next distance will be
+        mySonifier.InformOfNextDistance( ( audioListenerPosition.position - mySeedlings[currentSeedling].transform.position ).magnitude );
     }
 
     void ProcessControllerInput( ControllerAccessors controller )

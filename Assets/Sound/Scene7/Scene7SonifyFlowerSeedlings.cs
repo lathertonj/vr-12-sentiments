@@ -7,13 +7,14 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
 	private ChuckSubInstance myChuck;
     public double[] myChord;
 
-    private string myJumpEvent, myIncreaseSpeedEvent, myDecreaseSpeedEvent;
+    private string myJumpEvent, myIncreaseSpeedEvent, myDecreaseSpeedEvent, myNextLoudness;
     public void StartChuck( float jumpDelay, System.Action launchASeedling, int numSeedlings )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myJumpEvent = myChuck.GetUniqueVariableName();
         myIncreaseSpeedEvent = myChuck.GetUniqueVariableName();
         myDecreaseSpeedEvent = myChuck.GetUniqueVariableName();
+        myNextLoudness = myChuck.GetUniqueVariableName();
 
         // copy my chord into longer version that just repeats it
         string[] expandedChord = new string[numSeedlings];
@@ -36,6 +37,7 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
             0.29::second => dur happyModeCutoff;
             global int scene7HappyMode;
             0.05::second => dur jumpDelay;
+            global float {5};
 
             true => int playStrong;
 
@@ -62,6 +64,9 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
 
                             Math.random2f( 0.3, 0.4 ) + playStrong * 0.17 => modey.strike;
                             !playStrong => playStrong;
+
+                            {5} => modey.gain;
+
                             jumpDelay => now;
                         
                             // signal a jump should happen
@@ -191,7 +196,7 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
             10::second => now;
             
 
-        ", jumpDelay, myJumpEvent, notesString, myIncreaseSpeedEvent, myDecreaseSpeedEvent ) );
+        ", jumpDelay, myJumpEvent, notesString, myIncreaseSpeedEvent, myDecreaseSpeedEvent, myNextLoudness ) );
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myJumpEvent, launchASeedling );
     }
 
@@ -203,5 +208,10 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
     public void SlowMovementHappened()
     {
         myChuck.BroadcastEvent( myDecreaseSpeedEvent );
+    }
+
+    public void InformOfNextDistance( float distance )
+    {
+        myChuck.SetFloat( myNextLoudness, distance.PowMapClamp( 0, 1, 1, 0.3f, 2 ) );
     }
 }

@@ -9,13 +9,14 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
     public double[] myChord;
 
     private string myJumpEvent;
-    private string myMuteNoteNumber, myMuteNoteEvent;
+    private string myMuteNoteNumber, myMuteNoteEvent, myNextLoudness;
     public void StartChuck( float jumpDelay, System.Action launchASeedling, int numSeedlings )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myJumpEvent = myChuck.GetUniqueVariableName();
         myMuteNoteEvent = myChuck.GetUniqueVariableName();
         myMuteNoteNumber = myChuck.GetUniqueVariableName();
+        myNextLoudness = myChuck.GetUniqueVariableName();
 
         // copy my chord into longer version that just repeats it
         string[] expandedChord = new string[numSeedlings];
@@ -37,6 +38,7 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
             global Event {1}, {4};
             {0}::second => dur noteLength;
             0.05::second => dur jumpDelay;
+            global float {5};
 
             true => int playStrong;
 
@@ -56,6 +58,9 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
 
                             Math.random2f( 0.3, 0.4 ) + playStrong * 0.17 => modey.strike;
                             !playStrong => playStrong;
+
+                            {5} => modey.gain;
+
                             jumpDelay => now;
                         
                             // signal a jump should happen
@@ -120,7 +125,7 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
                 1::ms => now;
             }}*/
 
-        ", jumpDelay, myJumpEvent, notesString, myMuteNoteNumber, myMuteNoteEvent ) );
+        ", jumpDelay, myJumpEvent, notesString, myMuteNoteNumber, myMuteNoteEvent, myNextLoudness ) );
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myJumpEvent, launchASeedling );
     }
 
@@ -128,5 +133,17 @@ public class Scene5SonifyFlowerSeedlings : MonoBehaviour
     {
         myChuck.SetInt( myMuteNoteNumber, seedlingNumber );
         myChuck.BroadcastEvent( myMuteNoteEvent );
+    }
+
+    public void InformOfNextDistance( float distance )
+    {
+        if( distance > 10 )
+        {
+            myChuck.SetFloat( myNextLoudness, 0 );
+        }
+        else
+        {
+            myChuck.SetFloat( myNextLoudness, distance.PowMapClamp( 0, 1, 1, 0.3f, 2 ) );
+        }
     }
 }
