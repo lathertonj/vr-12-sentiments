@@ -278,6 +278,9 @@ public class Scene8SeedlingController : MonoBehaviour
         SteamVR_Fade.Start( skyColor, 6f );
         // fade audio
         TheChuck.instance.BroadcastEvent( "scene8EndScene" );
+        // fade vibration
+        leftController.StopVibrating();
+        rightController.StopVibrating();
         // in 9 seconds, switch to next scene
         Invoke( "SwitchToNextScene", 8f );
     }

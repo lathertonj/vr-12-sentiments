@@ -14,12 +14,30 @@ public class ControllerAccessors : MonoBehaviour
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
+        goalVibrationEffectiveness = 1f;
+        currentVibrationEffectiveness = goalVibrationEffectiveness;
+        vibrationSlew = 0.02f;
     }
 
+    private float currentVibrationEffectiveness;
+    private float vibrationSlew;
+    private float goalVibrationEffectiveness;
     private float squeezeStartTime;
+
+
+    void Update()
+    {
+        currentVibrationEffectiveness += vibrationSlew * ( goalVibrationEffectiveness - currentVibrationEffectiveness );
+    }
+
+    public void StopVibrating()
+    {
+        goalVibrationEffectiveness = 0;
+    }
 
     public void Vibrate( ushort amount )
     {
+        amount = (ushort) ( currentVibrationEffectiveness * (float) amount );
         Controller.TriggerHapticPulse( amount );
     }
 
