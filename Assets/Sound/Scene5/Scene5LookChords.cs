@@ -257,7 +257,7 @@ public class Scene5LookChords : MonoBehaviour
             TheChuck.instance.BroadcastEvent( "scene5AdvanceToEnd" );
             
             // we should fade in time with it
-            Invoke( "FadeVisuals", 25 );
+            Invoke( "FadeScene", 25 );
             
             return;
         }
@@ -301,9 +301,21 @@ public class Scene5LookChords : MonoBehaviour
         TheChuck.instance.SetFloat( "scene5LookAmount", amount ); 
     }
 
-    void FadeVisuals()
+    public ControllerAccessors leftHand, rightHand;
+
+    void FadeScene()
     {
+        // visuals
         SteamVR_Fade.Start( skyColor, duration: 6 );
+        
+        // also fade vibration
+        leftHand.StopVibrating();
+        rightHand.StopVibrating();
+
+        // also fade some sounds
+        TheChuck.instance.BroadcastEvent( "scene5EndEvent" );
+        
+        // launch the next scene in 10 seconds
         Invoke( "LaunchNextScene", 10 );
     }
 

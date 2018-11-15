@@ -196,8 +196,8 @@ public class Scene5AhhSqueeze : MonoBehaviour
             spork ~ SetVolume();
 
             // let it die out
-            global Event scene4EndEvent;
-            scene4EndEvent => now;
+            global Event scene5EndEvent;
+            scene5EndEvent => now;
             true => sceneIsOver;
 			
 			// reverb tail
