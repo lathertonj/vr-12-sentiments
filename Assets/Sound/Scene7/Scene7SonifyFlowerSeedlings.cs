@@ -36,6 +36,7 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
             {0}::second => dur noteLength;
             0.29::second => dur happyModeCutoff;
             global int scene7HappyMode;
+            false => global int scene7HappyFinishMode;
             0.05::second => dur jumpDelay;
             global float {5};
 
@@ -184,6 +185,19 @@ public class Scene7SonifyFlowerSeedlings : MonoBehaviour {
                 }}
             }}
             spork ~ ShakersGain();
+
+            fun void OverrideHappyMode()
+            {{
+                while( true )
+                {{
+                    if( scene7HappyFinishMode )
+                    {{
+                        true => scene7HappyMode;
+                    }}
+                    1::ms => now;
+                }}
+            }}
+            spork ~ OverrideHappyMode();
 
 
             global Event scene7EndScene;
