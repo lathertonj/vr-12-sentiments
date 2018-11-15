@@ -13,7 +13,6 @@ public class Scene5SeedlingController : MonoBehaviour
     private Rigidbody[] mySeedlings;
     private bool[] mySeedlingsActive;
     public ControllerAccessors leftController, rightController;
-    private ParticleSystem leftHand, rightHand;
     public float moveSpeed = 5f;
     private ParticleSystem myParticleEmitter;
     public float loseSeedTime = 20f;
@@ -56,10 +55,6 @@ public class Scene5SeedlingController : MonoBehaviour
 
         mySonifier = GetComponent<Scene5SonifyFlowerSeedlings>();
         mySonifier.StartChuck( jumpDelay: 0.25f, launchASeedling: LaunchASeedling, numSeedlings: numSeedlings );
-
-        leftHand = leftController.GetComponentInChildren<ParticleSystem>();
-        rightHand = rightController.GetComponentInChildren<ParticleSystem>();
-
     }
 
     void Update()
