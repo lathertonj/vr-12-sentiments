@@ -29,13 +29,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/8_MelancholyWeak.unity
     guid: 1d0061250a6c8994b902d29a4b7f4601
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/9_CalmStasis.unity
     guid: 0206f75bbaeef734ab6ce8f36ebf04ac
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/10_Frenetic_11_SublimeEmptiness.unity
     guid: e77eeb2f99105d94e865811d42adb9b0
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/12_JoyfulFulfilled.unity
     guid: 018e7f5ead3c21a468304a24687725b8
   m_configObjects: {}

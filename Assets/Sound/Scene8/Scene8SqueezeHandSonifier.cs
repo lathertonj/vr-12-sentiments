@@ -11,6 +11,7 @@ public class Scene8SqueezeHandSonifier : MonoBehaviour
 	private string mySqueezedEvent, myUnsqueezedEvent, myAhhGoalVolume;
     private static string myAnySqueezedEvent = "";
     private static int numCurrentlySqueezed = 0;
+    public static int numChordChanges = 0;
 	private ControllerAccessors myController;
     // Use this for initialization
     void Start()
@@ -282,8 +283,8 @@ public class Scene8SqueezeHandSonifier : MonoBehaviour
             spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
             
             // turn off chord at end of movement
-            global Event scene7EndScene;
-            scene7EndScene => now;
+            global Event scene8EndScene;
+            scene8EndScene => now;
 
             squeezeResponseShred.exit();
             true => sceneIsOver;
@@ -514,15 +515,13 @@ public class Scene8SqueezeHandSonifier : MonoBehaviour
             }}
             spork ~ SetVolume();
 
-            while( true ) {{ 1::second => now; }}
-
             // let it die out
-            /*global Event scene7EndScene;
-            scene7EndScene => now;
+            global Event scene8EndScene;
+            scene8EndScene => now;
             true => sceneIsOver;
 			
 			// reverb tail
-			10::second => now;*/
+			10::second => now;
         
         ", myIndex, myAhhGoalVolume, myAnySqueezedEvent ));
     }
@@ -536,6 +535,7 @@ public class Scene8SqueezeHandSonifier : MonoBehaviour
             {
                 // tell things to update their note
                 myChuck.BroadcastEvent( myAnySqueezedEvent );
+                numChordChanges++;
             }
 			myChuck.BroadcastEvent( mySqueezedEvent );
             numCurrentlySqueezed++;

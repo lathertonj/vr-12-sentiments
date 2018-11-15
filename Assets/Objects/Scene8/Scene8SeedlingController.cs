@@ -21,7 +21,11 @@ public class Scene8SeedlingController : MonoBehaviour
     public static bool shouldPlayArpeggios = true;
     private List<Transform> arpeggioSeedlings;
     private int currentArpeggioSeedling;
+    private bool haveEndedScene = false;
 
+    // END SCENE
+    public int numGustsToFinish = 12;
+    public Color skyColor;
     // TIME
     float originalTimeScale, originalDeltaTime;
     bool currentlySlowingTime = false;
@@ -78,6 +82,16 @@ public class Scene8SeedlingController : MonoBehaviour
     {
         ProcessControllerInput( leftController );
         ProcessControllerInput( rightController );
+
+        // end scene if enough gusts + look up for 2+ seconds
+        if( !haveEndedScene && Scene8SqueezeHandSonifier.numChordChanges >= numGustsToFinish && Scene6DetectSunLook.sunContinuousLookAmount > 2 )
+        {
+            // fade out visuals starting in 2 seconds
+            Invoke( "FadeOutScene", 2f );
+
+            // done
+            haveEndedScene = true;
+        }
     }
 
     void FixedUpdate()
@@ -88,7 +102,7 @@ public class Scene8SeedlingController : MonoBehaviour
 
     void FixedProcessControllerInput( ControllerAccessors controller )
     {
-        if( !controller.IsSqueezed() ) { return; }
+        if( !controller.IsSqueezed() || haveEndedScene ) { return; }
 
         Vector3 velocity = controller.Velocity();
         // local space to world space, I hope?
@@ -137,7 +151,7 @@ public class Scene8SeedlingController : MonoBehaviour
             controller.Vibrate( intensity );
         }
 
-        if( controller.IsUnSqueezed() )
+        if( controller.IsUnSqueezed() && !haveEndedScene )
         {
             // try to slow time
             SlowTime();
@@ -256,6 +270,21 @@ public class Scene8SeedlingController : MonoBehaviour
         }
         // done
         currentlySlowingTime = false;
+    }
+
+    void FadeOutScene()
+    {
+        // fade visuals
+        SteamVR_Fade.Start( skyColor, 6f );
+        // fade audio
+        TheChuck.instance.BroadcastEvent( "scene8EndScene" );
+        // in 9 seconds, switch to next scene
+        Invoke( "SwitchToNextScene", 8f );
+    }
+
+    void SwitchToNextScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene( "9_CalmStasis" );
     }
 
 }

@@ -101,13 +101,13 @@ public class Scene8SonifySeedlings : MonoBehaviour
                     {2} => now; // when squeezed, stop jumping and playing
                     playNotesShred.exit();
                     {3} => now;
-                    5::noteLength => now; // wait 3 notes after unsqueezed to resume
+                    8::noteLength => now; // wait 8 seconds after unsqueezed
                 }}
             }}
             spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
 
-            global Event scene4EndEvent;
-            scene4EndEvent => now;
+            global Event scene8EndScene;
+            scene8EndScene => now;
             squeezeResponseShred.exit();
             
             // let it die out
