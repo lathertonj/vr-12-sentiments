@@ -11,7 +11,6 @@ public class Scene8SeedlingController : MonoBehaviour
     private Rigidbody[] mySeedlings;
     public ControllerAccessors leftController, rightController;
     public Transform room;
-    private ParticleSystem leftHand, rightHand;
     public float maxSqueezeTime = 5f;
 
     private Scene8SonifySeedlings mySonifier;
@@ -54,9 +53,6 @@ public class Scene8SeedlingController : MonoBehaviour
         mySeedlings = GetComponentsInChildren<Rigidbody>();
         mySonifier = GetComponent<Scene8SonifySeedlings>();
         mySonifier.StartChuck( jumpDelay: 0.8f, launchASeedling: LaunchASeedling, animateArpeggioSeedling: AnimateArpeggioSeedling );
-
-        leftHand = leftController.GetComponentInChildren<ParticleSystem>();
-        rightHand = rightController.GetComponentInChildren<ParticleSystem>();
     }
 
     void LaunchASeedling()
@@ -73,20 +69,55 @@ public class Scene8SeedlingController : MonoBehaviour
         // animate particle
         ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
         emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.transform.TransformPoint( 0.2f * Vector3.up ) );
-        emitParams.velocity = 0.15f * Vector3.up + 0.45f * transform.forward; // match to seedling?
-            //seedling.velocity;//seedling.velocity.y * Vector3.up;  // take only the y velocity?
+        emitParams.velocity = 0.15f * Vector3.up;
         myParticleEmitter.Emit( emitParams, count: 1 );
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessControllerInput( leftController, leftHand );
-        ProcessControllerInput( rightController, rightHand );
+        ProcessControllerInput( leftController );
+        ProcessControllerInput( rightController );
     }
 
-    void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
+    void FixedUpdate()
     {
+        FixedProcessControllerInput( leftController );
+        FixedProcessControllerInput( rightController );
+    }
+
+    void FixedProcessControllerInput( ControllerAccessors controller )
+    {
+        if( !controller.IsSqueezed() ) { return; }
+
+        Vector3 velocity = controller.Velocity();
+        // local space to world space, I hope?
+        velocity = room.TransformDirection( velocity );
+
+        Vector3 angularVelocity = controller.AngularVelocity();
+        // local space to world space, I hope?
+        angularVelocity = room.TransformDirection( angularVelocity );
+
+        // give all seedlings a small amount of force in this direction
+        foreach( Rigidbody seedling in mySeedlings )
+        {
+            float randomSmallMultiplier1 = Random.Range( 0.05f, 0.2f );
+            float randomSmallMultiplier2 = Random.Range( 0.0005f, 0.005f );
+            seedling.AddForce( randomSmallMultiplier1 * velocity, ForceMode.Force );
+            seedling.AddTorque( randomSmallMultiplier2 * angularVelocity, ForceMode.Force );
+        }
+    }
+
+    void ProcessControllerInput( ControllerAccessors controller )
+    {
+        Vector3 velocity = controller.Velocity();
+        // local space to world space, I hope?
+        velocity = room.TransformDirection( velocity );
+
+        Vector3 angularVelocity = controller.AngularVelocity();
+        // local space to world space, I hope?
+        angularVelocity = room.TransformDirection( angularVelocity );
+
         if( controller.IsFirstSqueezed() )
         {
             controller.RecordSqueezeStartTime();
@@ -100,9 +131,9 @@ public class Scene8SeedlingController : MonoBehaviour
         if( controller.IsSqueezed() )
         {
             float timeElapsed = controller.ElapsedSqueezeTime();
-            
+
             // map within low intensity values. this movement is not intense so vibration is not strong.
-            ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
+            ushort intensity = (ushort)timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
             controller.Vibrate( intensity );
         }
 
@@ -119,16 +150,9 @@ public class Scene8SeedlingController : MonoBehaviour
             }
 
             float squeezeTime = controller.ElapsedSqueezeTime();
-            Vector3 velocity = controller.Velocity();
-            // local space to world space, I hope?
-            velocity = room.TransformDirection( velocity );
-
-            Vector3 angularVelocity = controller.AngularVelocity();
-            // local space to world space, I hope?
-            angularVelocity = room.TransformDirection( angularVelocity );
 
             // map time to number of seedlings affected
-            int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
+            int numSeedlingsToAffect = (int)squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
             // pick which ones by traversing in a random order;
             // the first numSeedlingsToAffect are affected in a primary way
             // and the remaining seedlings are affected in a secondary way
@@ -153,7 +177,7 @@ public class Scene8SeedlingController : MonoBehaviour
 
                     // animate for primary action
                     arpeggioSeedlings.Add( seedling.transform );
-                    
+
                 }
                 else
                 {
@@ -178,8 +202,8 @@ public class Scene8SeedlingController : MonoBehaviour
     {
         // animate
         ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
-        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( 
-            arpeggioSeedlings[currentArpeggioSeedling].TransformPoint( 0.2f * Vector3.up ) 
+        emitParams.position = myParticleEmitter.transform.InverseTransformPoint(
+            arpeggioSeedlings[currentArpeggioSeedling].TransformPoint( 0.2f * Vector3.up )
         );
         emitParams.velocity = 0.15f * Vector3.up;
         myParticleEmitter.Emit( emitParams, count: 1 );
@@ -224,7 +248,7 @@ public class Scene8SeedlingController : MonoBehaviour
         endTime = startTime + timeToIncreaseTimeScale;
         while( Time.unscaledTime < endTime )
         {
-            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, minimumTimeScale, 1, 0.1f );
+            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, minimumTimeScale, 1, 1.5f );
             Time.timeScale = originalTimeScale * timeScalar;
             Time.fixedDeltaTime = originalDeltaTime * timeScalar;
             // wait for one frame
