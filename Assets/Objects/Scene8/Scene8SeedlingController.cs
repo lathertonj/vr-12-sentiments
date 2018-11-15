@@ -10,6 +10,7 @@ public class Scene8SeedlingController : MonoBehaviour
     public Vector3 spawnRadius = 1f * Vector3.one;
     private Rigidbody[] mySeedlings;
     public ControllerAccessors leftController, rightController;
+    public Transform room;
     private ParticleSystem leftHand, rightHand;
     public float maxSqueezeTime = 5f;
 
@@ -103,11 +104,12 @@ public class Scene8SeedlingController : MonoBehaviour
 
             float squeezeTime = controller.ElapsedSqueezeTime();
             Vector3 velocity = controller.Velocity();
-            // x and z are reversed for some reason
-            // ACTUALLY I need to solve this by using the transform, TODO
-            velocity.x *= -1;
-            velocity.z *= -1;
+            // local space to world space, I hope?
+            velocity = room.TransformDirection( velocity );
+
             Vector3 angularVelocity = controller.AngularVelocity();
+            // local space to world space, I hope?
+            angularVelocity = room.TransformDirection( angularVelocity );
 
             // map time to number of seedlings affected
             int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
