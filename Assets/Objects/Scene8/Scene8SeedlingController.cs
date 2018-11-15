@@ -20,6 +20,15 @@ public class Scene8SeedlingController : MonoBehaviour
 
     public static bool shouldPlayArpeggios = true;
 
+    // TIME
+    float originalTimeScale, originalDeltaTime;
+    bool currentlySlowingTime = false;
+    public float minimumTimeScale = 0.5f;
+    public float timeBeforeDecrease = 0.5f;
+    public float timeToDecreaseTimeScale = 0.3f;
+    public float realTimeSpentAtSlowTimeScale = 2f;
+    public float timeToIncreaseTimeScale = 3f;
+
     // Use this for initialization
     void Start()
     {
@@ -45,6 +54,9 @@ public class Scene8SeedlingController : MonoBehaviour
 
         leftHand = leftController.GetComponentInChildren<ParticleSystem>();
         rightHand = rightController.GetComponentInChildren<ParticleSystem>();
+
+        Debug.Log( "time scale is " + Time.timeScale.ToString() );
+        Debug.Log( "fixed delta time is " + Time.fixedDeltaTime.ToString() );
     }
 
     void LaunchASeedling()
@@ -96,6 +108,10 @@ public class Scene8SeedlingController : MonoBehaviour
 
         if( controller.IsUnSqueezed() )
         {
+            // try to slow time
+            SlowTime();
+
+            // process seedlings
             numSqueezed--;
             if( numSqueezed == 0 )
             {
@@ -157,6 +173,51 @@ public class Scene8SeedlingController : MonoBehaviour
                 mySonifier.PlayArpeggio( numSeedlingsToAffect );
             }
         }
+    }
+
+    void SlowTime()
+    {
+        if( currentlySlowingTime ) return;
+        currentlySlowingTime = true;
+        StartCoroutine( "ChangeTimeScale" );
+    }
+
+    IEnumerator ChangeTimeScale()
+    {
+        originalTimeScale = Time.timeScale;
+        originalDeltaTime = Time.fixedDeltaTime;
+
+        // wait
+        yield return new WaitForSecondsRealtime( timeBeforeDecrease );
+
+        // decrease time speed
+        float startTime = Time.unscaledTime;
+        float endTime = startTime + timeToDecreaseTimeScale;
+        while( Time.unscaledTime < endTime )
+        {
+            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, 1, minimumTimeScale, 2f );
+            Time.timeScale = originalTimeScale * timeScalar;
+            Time.fixedDeltaTime = originalDeltaTime * timeScalar;
+            // wait for one frame
+            yield return null;
+        }
+
+        // wait
+        yield return new WaitForSecondsRealtime( realTimeSpentAtSlowTimeScale );
+
+        // increase time
+        startTime = Time.unscaledTime;
+        endTime = startTime + timeToIncreaseTimeScale;
+        while( Time.unscaledTime < endTime )
+        {
+            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, minimumTimeScale, 1, 0.1f );
+            Time.timeScale = originalTimeScale * timeScalar;
+            Time.fixedDeltaTime = originalDeltaTime * timeScalar;
+            // wait for one frame
+            yield return null;
+        }
+        // done
+        currentlySlowingTime = false;
     }
 
 }
