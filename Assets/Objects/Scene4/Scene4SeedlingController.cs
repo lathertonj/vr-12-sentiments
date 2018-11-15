@@ -10,6 +10,7 @@ public class Scene4SeedlingController : MonoBehaviour
     public Vector3 spawnRadius = 3f * Vector3.one;
     private Rigidbody[] mySeedlings;
     public ControllerAccessors leftController, rightController;
+    public Transform room;
     private ParticleSystem leftHand, rightHand;
     public float maxSqueezeTime = 5f;
     public Color handPinkColor;
@@ -75,6 +76,50 @@ public class Scene4SeedlingController : MonoBehaviour
         ProcessControllerInput( rightController, rightHand );
     }
 
+    void FixedUpdate()
+    {
+        FixedProcessControllerInput( leftController );
+        FixedProcessControllerInput( rightController );
+    }
+
+
+    void FixedProcessControllerInput( ControllerAccessors controller )
+    {
+        if( !controller.IsSqueezed() ) { return; }
+
+        Vector3 velocity = controller.Velocity();
+        // local space to world space, I hope?
+        velocity = room.TransformDirection( velocity );
+
+        Vector3 angularVelocity = controller.AngularVelocity();
+        // local space to world space, I hope?
+        angularVelocity = room.TransformDirection( angularVelocity );
+
+        float squeezeTime = controller.ElapsedSqueezeTime();
+        int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
+        // pick which ones by traversing in a random order;
+        // the first numSeedlingsToAffect are affected in a primary way
+        // and the remaining seedlings are affected in a secondary way
+        System.Random random = new System.Random();
+        int numSeedlingsProcessed = 0;
+        // give some seedlings a small amount of force in this direction
+        foreach( int i in Enumerable.Range( 0, mySeedlings.Length ).OrderBy( x => random.Next() ) )
+        {
+            if( numSeedlingsProcessed >= numSeedlingsToAffect )
+            {
+                return;
+            }
+            
+            Rigidbody seedling = mySeedlings[i];
+            float randomSmallMultiplier1 = 0.0008f * Random.Range( 0.05f, 0.2f );
+            float randomSmallMultiplier2 = 0.0003f * Random.Range( 0.001f, 0.2f );
+            seedling.AddForce( randomSmallMultiplier1 * velocity, ForceMode.Force );
+            
+            numSeedlingsProcessed++;
+        }
+    }
+
+
     void ProcessControllerInput( ControllerAccessors controller, ParticleSystem hand )
     {
         if( controller.IsFirstSqueezed() )
@@ -117,10 +162,12 @@ public class Scene4SeedlingController : MonoBehaviour
 
             float squeezeTime = controller.ElapsedSqueezeTime();
             Vector3 velocity = controller.Velocity();
-            // x and z are reversed for some reason
-            velocity.x *= -1;
-            velocity.z *= -1;
+            // local space to world space, I hope?
+            velocity = room.TransformDirection( velocity );
+
             Vector3 angularVelocity = controller.AngularVelocity();
+            // local space to world space, I hope?
+            angularVelocity = room.TransformDirection( angularVelocity );
 
             // map time to number of seedlings affected
             int numSeedlingsToAffect = (int) squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
