@@ -18,7 +18,10 @@ public class Scene8SeedlingController : MonoBehaviour
     private ParticleSystem myParticleEmitter;
     private int numSqueezed = 0;
 
+    // arpeggios
     public static bool shouldPlayArpeggios = true;
+    private List<Transform> arpeggioSeedlings;
+    private int currentArpeggioSeedling;
 
     // TIME
     float originalTimeScale, originalDeltaTime;
@@ -50,13 +53,10 @@ public class Scene8SeedlingController : MonoBehaviour
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
         mySonifier = GetComponent<Scene8SonifySeedlings>();
-        mySonifier.StartChuck( jumpDelay: 0.8f, launchASeedling: LaunchASeedling );
+        mySonifier.StartChuck( jumpDelay: 0.8f, launchASeedling: LaunchASeedling, animateArpeggioSeedling: AnimateArpeggioSeedling );
 
         leftHand = leftController.GetComponentInChildren<ParticleSystem>();
         rightHand = rightController.GetComponentInChildren<ParticleSystem>();
-
-        Debug.Log( "time scale is " + Time.timeScale.ToString() );
-        Debug.Log( "fixed delta time is " + Time.fixedDeltaTime.ToString() );
     }
 
     void LaunchASeedling()
@@ -134,6 +134,8 @@ public class Scene8SeedlingController : MonoBehaviour
             // and the remaining seedlings are affected in a secondary way
             System.Random random = new System.Random();
             int numSeedlingsProcessed = 0;
+            arpeggioSeedlings = new List<Transform>();
+            currentArpeggioSeedling = 0;
             foreach( int i in Enumerable.Range( 0, mySeedlings.Length ).OrderBy( x => random.Next() ) )
             {
                 Rigidbody seedling = mySeedlings[i];
@@ -150,11 +152,8 @@ public class Scene8SeedlingController : MonoBehaviour
                     seedling.AddTorque( angularVelocity * 0.05f + randomAngularVelocity, ForceMode.VelocityChange );
 
                     // animate for primary action
-                    ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
-                    emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.transform.TransformPoint( 0.2f * Vector3.up ) );
-                    emitParams.velocity = 0.15f * Vector3.up + 0.45f * transform.forward; // match to seedling?
-                        //seedling.velocity;//seedling.velocity.y * Vector3.up;  // take only the y velocity?
-                    myParticleEmitter.Emit( emitParams, count: 1 );
+                    arpeggioSeedlings.Add( seedling.transform );
+                    
                 }
                 else
                 {
@@ -173,6 +172,21 @@ public class Scene8SeedlingController : MonoBehaviour
                 mySonifier.PlayArpeggio( numSeedlingsToAffect );
             }
         }
+    }
+
+    void AnimateArpeggioSeedling()
+    {
+        // animate
+        ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( 
+            arpeggioSeedlings[currentArpeggioSeedling].TransformPoint( 0.2f * Vector3.up ) 
+        );
+        emitParams.velocity = 0.15f * Vector3.up;
+        myParticleEmitter.Emit( emitParams, count: 1 );
+
+        // choose next one
+        currentArpeggioSeedling++;
+        currentArpeggioSeedling %= arpeggioSeedlings.Count;
     }
 
     void SlowTime()
@@ -195,7 +209,7 @@ public class Scene8SeedlingController : MonoBehaviour
         float endTime = startTime + timeToDecreaseTimeScale;
         while( Time.unscaledTime < endTime )
         {
-            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, 1, minimumTimeScale, 2f );
+            float timeScalar = Time.unscaledTime.PowMapClamp( startTime, endTime, 1, minimumTimeScale, 0.5f );
             Time.timeScale = originalTimeScale * timeScalar;
             Time.fixedDeltaTime = originalDeltaTime * timeScalar;
             // wait for one frame

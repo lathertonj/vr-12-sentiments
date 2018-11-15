@@ -12,7 +12,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
     private string myChordNotesVar, myArpeggioNotesVar, myModey;
     private string mySqueezedEvent, myUnsqueezedEvent;
     private string myJumpEvent;
-    public void StartChuck( float jumpDelay, System.Action launchASeedling )
+    public void StartChuck( float jumpDelay, System.Action launchASeedling, System.Action animateArpeggioSeedling )
     {
         myChuck = GetComponent<ChuckSubInstance>();
         myChordNotesVar = myChuck.GetUniqueVariableName();
@@ -30,6 +30,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
             global Event {2}, {3}, {5};
             {4}::second => dur noteLength;
             0.08::second => dur jumpDelay;
+            global Event scene8PlayedArpeggioNote;
 
             true => int playStrong;
 
@@ -119,6 +120,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
         ", myModey, myChordNotesVar, mySqueezedEvent, myUnsqueezedEvent, jumpDelay, myJumpEvent ) );
         myChuck.SetFloatArray( myChordNotesVar, myChord );
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myJumpEvent, launchASeedling );
+        gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, "scene8PlayedArpeggioNote", animateArpeggioSeedling );
     }
 
     public void InformSqueezed()
@@ -166,6 +168,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
 
             // make non global so it's not overwriting itself
             ModalBar {2} => JCRev reverb => dac;
+            global Event scene8PlayedArpeggioNote;
 
             0.20::second => dur noteLength;
             true => int hardPick;
@@ -182,6 +185,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
                         {0}[i] => Std.mtof => {2}.freq;
                         // strike it!
                         Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => {2}.strike;
+                        scene8PlayedArpeggioNote.broadcast();
                         // next pick in opposite direction
                         !hardPick => hardPick;
                     }}
