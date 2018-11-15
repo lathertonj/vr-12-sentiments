@@ -74,16 +74,14 @@ public class Scene8SonifySeedlings : MonoBehaviour
 
             fun void ChangeNoteSpeed()
             {{
-                jumpDelay + 0.03::second => dur maxSpeed;
-                // actually let's make it longer min speed
-                0.75::second => maxSpeed;
+                1.5::second => dur maxSpeed;
                 while( true )
                 {{
                     // unsqueezed
                     {3} => now;
 
                     // --> make the jumps slow
-                    1.05 *=> noteLength;
+                    1.1 *=> noteLength;
                     if( noteLength > maxSpeed )
                     {{
                         maxSpeed => noteLength;
@@ -169,7 +167,7 @@ public class Scene8SonifySeedlings : MonoBehaviour
             // make non global so it's not overwriting itself
             ModalBar {2} => JCRev reverb => dac;
 
-            0.10::second => dur noteLength;
+            0.20::second => dur noteLength;
             true => int hardPick;
 
             fun void PlayArray()

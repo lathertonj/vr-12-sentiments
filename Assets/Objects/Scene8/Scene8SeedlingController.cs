@@ -40,7 +40,7 @@ public class Scene8SeedlingController : MonoBehaviour
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
         mySonifier = GetComponent<Scene8SonifySeedlings>();
-        mySonifier.StartChuck( jumpDelay: 1.0f, launchASeedling: LaunchASeedling );
+        mySonifier.StartChuck( jumpDelay: 0.8f, launchASeedling: LaunchASeedling );
 
         leftHand = leftController.GetComponentInChildren<ParticleSystem>();
         rightHand = rightController.GetComponentInChildren<ParticleSystem>();
