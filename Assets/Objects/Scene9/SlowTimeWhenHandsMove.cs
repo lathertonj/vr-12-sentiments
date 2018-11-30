@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class SlowTimeWhenHandsMove : MonoBehaviour
 {
-	
+
     ControllerAccessors[] controllers;
     SetTime timeManager;
     public float minSpeed = 0.05f;
-    public float maxSpeed = 0.5f;
+    public float maxSpeed = 0.25f;
 
-    private float goalTime, currentTime, timeSlew;
+    private float goalTime, currentTime, timeSlewDown, timeSlewUp;
 
     // Use this for initialization
     void Start()
@@ -18,7 +18,8 @@ public class SlowTimeWhenHandsMove : MonoBehaviour
         controllers = transform.parent.GetComponentsInChildren<ControllerAccessors>();
         timeManager = GetComponent<SetTime>();
         goalTime = currentTime = 1;
-        timeSlew = 0.1f;
+        timeSlewDown = 0.1f;
+        timeSlewUp = 0.01f;
     }
 
     // Update is called once per frame
@@ -26,8 +27,15 @@ public class SlowTimeWhenHandsMove : MonoBehaviour
     {
         float speed = 0;
         foreach( ControllerAccessors c in controllers ) { speed += c.Velocity().magnitude; }
-        goalTime = speed.PowMapClamp( 0, 10, minSpeed, maxSpeed, pow: 1f );
-        currentTime += timeSlew * ( goalTime - currentTime );
+        goalTime = speed.PowMapClamp( 0, 2, maxSpeed, minSpeed, pow: 1f );
+        if( goalTime < currentTime )
+        {
+            currentTime += timeSlewDown * ( goalTime - currentTime );
+        }
+        else
+        {
+            currentTime += timeSlewUp * ( goalTime - currentTime );
+        }
         timeManager.Scale( currentTime );
     }
 }
