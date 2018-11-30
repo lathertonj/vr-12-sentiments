@@ -23,4 +23,9 @@ public class Raindrop : MonoBehaviour
 	{
 		myDeformer.AddDeformingForce( worldPoint, force );
 	}
+
+	void OnCollisionEnter( Collision c )
+	{
+		myDeformer.AddDeformingForce( c.contacts[0].point, c.relativeVelocity.magnitude );
+	}
 }
