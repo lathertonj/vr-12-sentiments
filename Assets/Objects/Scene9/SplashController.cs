@@ -49,8 +49,11 @@ public class SplashController : MonoBehaviour
             // TODO: check if collidedWith is a hand rock and if so, inform that hand
             if( collision.colliderComponent != null )
             {
-                GameObject collidedWith = collision.colliderComponent.gameObject;
-
+				Scene9HandRockController maybeHand = collision.colliderComponent.GetComponentInParent<Scene9HandRockController>();
+				if( maybeHand != null )
+				{
+					maybeHand.InformHit();
+				}
             }
         }
     }
