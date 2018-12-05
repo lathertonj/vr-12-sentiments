@@ -10,7 +10,7 @@ public class VineGrowth2 : MonoBehaviour
     public ControllerAccessors leftController, rightController;
     public float growthCutoff1 = 0.3f, growthCutoff2 = 0.45f, growthCutoff3 = 0.6f;
     public Color skyFadeColor;
-    
+
     public Transform[] thingsToDisableAtTransition, thingsToEnableAtTransition;
 
     private float growthSoFar = 0;
@@ -36,7 +36,7 @@ public class VineGrowth2 : MonoBehaviour
         // controllers vibrate only when growing a significant amount
         if( growthSoFar > growthCutoff1 && growthSoFar <= growthCutoff2 )
         {
-            ushort intensity = (ushort) growthSoFar.MapClamp( growthCutoff1, growthCutoff2, 0, 300 );
+            ushort intensity = (ushort)growthSoFar.MapClamp( growthCutoff1, growthCutoff2, 0, 300 );
             leftController.Vibrate( intensity );
             rightController.Vibrate( intensity );
         }
@@ -45,7 +45,7 @@ public class VineGrowth2 : MonoBehaviour
         {
             // change sound 
             mySonifier.SwitchToSecondSetOfChords();
-            
+
             // visual flash
             SteamVR_Fade.Start( skyFadeColor, duration: 0f );
             SteamVR_Fade.Start( Color.clear, duration: 3f );
@@ -55,7 +55,7 @@ public class VineGrowth2 : MonoBehaviour
             {
                 t.gameObject.SetActive( false );
             }
-            
+
             foreach( Transform t in thingsToEnableAtTransition )
             {
                 t.gameObject.SetActive( true );
@@ -80,16 +80,33 @@ public class VineGrowth2 : MonoBehaviour
         // vrRoom.localScale *= scaleMultiplier;
         float scaleIncrease = currentIntensity.MapClamp( 0, 1, 0, 0.0001f );
         growthSoFar += scaleIncrease;
-        vrRoom.localScale = new Vector3( 
+        vrRoom.localScale = new Vector3(
             vrRoom.localScale.x + scaleIncrease,
-            vrRoom.localScale.y + scaleIncrease, 
-            vrRoom.localScale.z + scaleIncrease 
+            vrRoom.localScale.y + scaleIncrease,
+            vrRoom.localScale.z + scaleIncrease
         );
 
     }
 
     void SwitchToNextScene()
     {
-        SceneManager.LoadScene( "2_ExcitementLonging" );
+        // SceneManager.LoadScene( "2_ExcitementLonging" );
+        StartCoroutine( "LoadSceneAsync" );
+    }
+
+    IEnumerator LoadSceneAsync()
+    {
+        // The Application loads the Scene in the background as the current Scene runs.
+        // This is particularly good for creating loading screens.
+        // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
+        // a sceneBuildIndex of 1 as shown in Build Settings.
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync( "2_ExcitementLonging" );
+
+        // Wait until the asynchronous scene fully loads
+        while( !asyncLoad.isDone )
+        {
+            yield return null;
+        }
     }
 }
