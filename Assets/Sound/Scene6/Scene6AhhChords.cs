@@ -8,7 +8,8 @@ public class Scene6AhhChords : MonoBehaviour
 	private ChuckSubInstance myChuck;
 	private ChuckEventListener myAhhListener;
 	public float firstSunLookAmount = 5f;
-	public float secondContinuousSunLookAmount = 5f;
+	public float secondSunLookAmount = 10f;
+	private float startSecondSunLookAmount = 0f;
 
     // Use this for initialization
     void Start()
@@ -358,9 +359,16 @@ public class Scene6AhhChords : MonoBehaviour
 	int numSecondHalfSwells = 0;
 	int numEndSwells = 0;
 
+	int secondHalfSwitchPoint = 11;
 	void CountSwells()
 	{
 		numSecondHalfSwells++;
+		// remember starting point
+		if( numSecondHalfSwells <= secondHalfSwitchPoint )
+		{
+			startSecondSunLookAmount = Scene6DetectSunLook.sunLookAmount;
+		}
+
 		if( haveSwitchedToEnding )
 		{
 			numEndSwells++;
@@ -394,10 +402,11 @@ public class Scene6AhhChords : MonoBehaviour
 			Scene6SwirlingDust.SetDustIntensity( Scene6DetectSunLook.sunLookAmount.PowMapClamp( 0, firstSunLookAmount, 0, 0.5f, 5 ) );
 		}
 
-		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && numSecondHalfSwells >= 11 )
+		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf && numSecondHalfSwells >= secondHalfSwitchPoint )
 		{
 			// swirl up
-			Scene6SwirlingDust.SetDustIntensity( Scene6DetectSunLook.sunContinuousLookAmount.PowMapClamp( 0, secondContinuousSunLookAmount, 0, 1, 5 ) );
+			Scene6SwirlingDust.SetDustIntensity( ( Scene6DetectSunLook.sunLookAmount - startSecondSunLookAmount )
+				.PowMapClamp( 0, secondSunLookAmount, 0, 1, 5 ) );
 		}		
 	}
 
@@ -424,7 +433,7 @@ public class Scene6AhhChords : MonoBehaviour
 		}
 
 		if( !haveSwitchedToEnding && haveSwitchedToSecondHalf 
-			&& ( Scene6DetectSunLook.sunContinuousLookAmount > secondContinuousSunLookAmount ||
+			&& ( Scene6DetectSunLook.sunLookAmount - startSecondSunLookAmount > secondSunLookAmount ||
 				Scene6DetectSunLook.numLongContinuousLooks > 3 ) 
 			&& numSecondHalfSwells >= 15 )
 		{

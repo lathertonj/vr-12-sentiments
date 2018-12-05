@@ -46,13 +46,13 @@ public class SplashController : MonoBehaviour
             emitParams.position = splashEmitter.transform.InverseTransformPoint( worldPos + splashVerticleOffset * Vector3.up );
             splashEmitter.Emit( emitParams, count: 1 );
 
-            // TODO: check if collidedWith is a hand rock and if so, inform that hand
+            // check if collidedWith is a hand rock and if so, inform that hand
             if( collision.colliderComponent != null )
             {
 				Scene9HandRockController maybeHand = collision.colliderComponent.GetComponentInParent<Scene9HandRockController>();
 				if( maybeHand != null )
 				{
-					maybeHand.InformHit();
+					maybeHand.InformHit();  
 				}
             }
         }
