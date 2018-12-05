@@ -8,7 +8,7 @@ public class Scene8SeedlingController : MonoBehaviour
     public Transform seedlingPrefab;
     public int numSeedlings = 12;
     public Vector3 spawnRadius = 1f * Vector3.one;
-    private Rigidbody[] mySeedlings;
+    private List<Rigidbody> mySeedlings;
     public ControllerAccessors leftController, rightController;
     public Transform room;
     public float maxSqueezeTime = 5f;
@@ -25,6 +25,8 @@ public class Scene8SeedlingController : MonoBehaviour
 
     // END SCENE
     public int numGustsToFinish = 12;
+    public int numForgottenSeedlingsToFinish = 6;
+    private int numForgottenSeedlings = 0;
     public Color skyColor;
     // TIME
     float originalTimeScale, originalDeltaTime;
@@ -54,14 +56,18 @@ public class Scene8SeedlingController : MonoBehaviour
 
         }
 
-        mySeedlings = GetComponentsInChildren<Rigidbody>();
+        mySeedlings = new List<Rigidbody>();
+        foreach( Rigidbody child in  GetComponentsInChildren<Rigidbody>() )
+        {
+            mySeedlings.Add( child );
+        }
         mySonifier = GetComponent<Scene8SonifySeedlings>();
         mySonifier.StartChuck( jumpDelay: 0.8f, launchASeedling: LaunchASeedling, animateArpeggioSeedling: AnimateArpeggioSeedling );
     }
 
     void LaunchASeedling()
     {
-        Rigidbody seedling = mySeedlings[Random.Range( 0, mySeedlings.Length - 1 )];
+        Rigidbody seedling = mySeedlings[Random.Range( 0, mySeedlings.Count - 1 )];
         seedling.AddForce( 0.5f * Vector3.up, ForceMode.VelocityChange );
         Vector3 randomAngularVelocity = new Vector3(
             Random.Range( -1f, 1f ),
@@ -83,8 +89,10 @@ public class Scene8SeedlingController : MonoBehaviour
         ProcessControllerInput( leftController );
         ProcessControllerInput( rightController );
 
-        // end scene if enough gusts + look up for 2+ seconds
-        if( !haveEndedScene && Scene8SqueezeHandSonifier.numChordChanges >= numGustsToFinish && Scene6DetectSunLook.sunContinuousLookAmount > 2 )
+        // end scene if enough gusts + look up for 2+ seconds OR if enough seedlings stuck
+        if( !haveEndedScene && (
+            ( Scene8SqueezeHandSonifier.numChordChanges >= numGustsToFinish && Scene6DetectSunLook.sunContinuousLookAmount > 2 )
+            || numForgottenSeedlings >= numForgottenSeedlingsToFinish ) )
         {
             // fade out visuals starting in 2 seconds
             Invoke( "FadeOutScene", 2f );
@@ -166,7 +174,7 @@ public class Scene8SeedlingController : MonoBehaviour
             float squeezeTime = controller.ElapsedSqueezeTime();
 
             // map time to number of seedlings affected
-            int numSeedlingsToAffect = (int)squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Length - 0.01f );
+            int numSeedlingsToAffect = (int)squeezeTime.MapClamp( 0, maxSqueezeTime, 0, mySeedlings.Count - 0.01f );
             // pick which ones by traversing in a random order;
             // the first numSeedlingsToAffect are affected in a primary way
             // and the remaining seedlings are affected in a secondary way
@@ -174,7 +182,8 @@ public class Scene8SeedlingController : MonoBehaviour
             int numSeedlingsProcessed = 0;
             arpeggioSeedlings = new List<Transform>();
             currentArpeggioSeedling = 0;
-            foreach( int i in Enumerable.Range( 0, mySeedlings.Length ).OrderBy( x => random.Next() ) )
+            Rigidbody seedlingToForget = null;
+            foreach( int i in Enumerable.Range( 0, mySeedlings.Count ).OrderBy( x => random.Next() ) )
             {
                 Rigidbody seedling = mySeedlings[i];
                 Vector3 randomAngularVelocity = new Vector3(
@@ -199,9 +208,22 @@ public class Scene8SeedlingController : MonoBehaviour
                     float randomSmallMultiplier = Random.Range( 0.001f, 0.2f );
                     seedling.AddForce( randomSmallMultiplier * velocity, ForceMode.VelocityChange );
                     seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
+
+                    // SMALL CHANCE TO GET STUCK
+                    if( Random.Range( 0f, 1f ) < 0.05f )
+                    {
+                        seedlingToForget = seedling;
+                    }
                 }
                 numSeedlingsProcessed++;
 
+            }
+
+            if( seedlingToForget != null )
+            {
+                mySeedlings.Remove( seedlingToForget );
+                numForgottenSeedlings++;
+                seedlingToForget.gameObject.AddComponent<Scene8ForgottenSeedling>();
             }
 
             // sonify arpeggio by num seedlings affected
