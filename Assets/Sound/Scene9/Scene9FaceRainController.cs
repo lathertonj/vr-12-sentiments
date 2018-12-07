@@ -1,37 +1,44 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Scene9FaceRainController : MonoBehaviour
 {
 
     public ControllerAccessors[] myControllers;
 
-	private SphereCollider myCollider;
-	public float colliderBaseRadius = 0.2f;
+    private SphereCollider myCollider;
+    public float colliderBaseRadius = 0.2f;
 
-	private ChuckSubInstance myChuck;
-	public long[] myModalNotes;
-	public string[] myChordNotes;
-	private string myNotesVar;
-	private string myGoalGainVar;
-	private string myPlayNoteVar;
+    private ChuckSubInstance myChuck;
+    public long[] myModalNotes;
+    public string[] myChordNotes;
+    private string myNotesVar;
+    private string myGoalGainVar;
+    private string myPlayNoteVar;
 
-	private float numRecentHits = 0;
+    private float numRecentHits = 0;
+    private int numTotalHits = 0;
+    public int numHitsToFinish = 100;
 
     // Use this for initialization
     void Start()
     {
-		myCollider = GetComponent<SphereCollider>();
-		myChuck = GetComponent<ChuckSubInstance>();
-		myNotesVar = myChuck.GetUniqueVariableName();
-		myPlayNoteVar = myChuck.GetUniqueVariableName();
-		myGoalGainVar = myChuck.GetUniqueVariableName();
+        myCollider = GetComponent<SphereCollider>();
+        myChuck = GetComponent<ChuckSubInstance>();
+        myNotesVar = myChuck.GetUniqueVariableName();
+        myPlayNoteVar = myChuck.GetUniqueVariableName();
+        myGoalGainVar = myChuck.GetUniqueVariableName();
 
-		// =================================================================
-		// =                          MODALBAR                             =
-		// =================================================================
-		myChuck.RunCode( string.Format( @"
+		// start with some sound
+		numRecentHits = 1.5f;
+
+        // =================================================================
+        // =                          MODALBAR                             =
+        // =================================================================
+        myChuck.RunCode( string.Format( @"
 			global int {0}[1];
             global Event {1};
 			global ModalBar modey => JCRev reverb => dac;
@@ -71,15 +78,20 @@ public class Scene9FaceRainController : MonoBehaviour
 					minNoteLength => now;
                 }}
             }}
-			spork ~ PlayNotes();
+			spork ~ PlayNotes() @=> Shred playNotesShred;
 
-			while( true ) {{ 1::second => now; }}
+			global Event scene9EndEvent;
+			scene9EndEvent => now;
+
+			playNotesShred.exit();
+
+			10::second => now;
 		
 		", myNotesVar, myPlayNoteVar ) );
-		myChuck.SetIntArray( myNotesVar, myModalNotes );
+        myChuck.SetIntArray( myNotesVar, myModalNotes );
 
 
-		myChuck.RunCode( string.Format( @"
+        myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
             // where the filter cutoff frequency is usually 
@@ -263,46 +275,74 @@ public class Scene9FaceRainController : MonoBehaviour
         ", string.Join( ",", myChordNotes ), myGoalGainVar ) );
     }
 
-	void Update()
-	{
-		// decay
-		numRecentHits *= 0.995f;
+    void Update()
+    {
+        // decay
+        numRecentHits *= 0.995f;
 
-		// sound
+        // sound
         myChuck.SetFloat( myGoalGainVar, numRecentHits.MapClamp( 0, 5, 0, 1 ) );
 
-		// size of collider
-		float multiplier = 1;
-		foreach( ControllerAccessors controller in myControllers )
-		{
-			multiplier *= ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 1, 2, pow: 1 );
-		}
-		float radius = colliderBaseRadius * multiplier;
-		myCollider.radius = radius;
-		myCollider.center = -0.75f * radius * Vector3.up;
-	}
+        // size of collider
+        float multiplier = 1;
+        foreach( ControllerAccessors controller in myControllers )
+        {
+            multiplier *= ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 1, 2, pow: 1 );
+        }
+        float radius = colliderBaseRadius * multiplier;
+        myCollider.radius = radius;
+        myCollider.center = -0.75f * radius * Vector3.up;
+    }
 
-	private float ControllerHeight( Transform controller )
-	{
-		return controller.position.y - transform.position.y;
-	}
+    private float ControllerHeight( Transform controller )
+    {
+        return controller.position.y - transform.position.y;
+    }
+
+    private bool sceneIsOver = false;
 
     public void InformHit()
+    {
+		// ignore
+        if( sceneIsOver ) { return; }
+
+        // remember
+        numRecentHits += 1;
+		numTotalHits += 1;
+
+        // vibrate
+        foreach( ControllerAccessors controller in myControllers )
+        {
+            if( ControllerHeight( controller.transform ) > 0 )
+            {
+                controller.Vibrate( 500 );
+            }
+            float vibrateIntensity = ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 0, 500, pow: 2 );
+        }
+
+        // sound
+        myChuck.BroadcastEvent( myPlayNoteVar );
+
+        if( !sceneIsOver && numTotalHits >= numHitsToFinish )
+        {
+            sceneIsOver = true;
+
+			// mute audio
+			myChuck.BroadcastEvent( "scene9EndEvent" );
+
+			// fade visuals
+			Invoke( "EndScene", 4f );
+        }
+    }
+
+	private void EndScene()
 	{
-		// remember
-		numRecentHits += 1;
+		SteamVR_Fade.Start( GetComponent<FadeInScene>().skyColor, duration: 5f );
+		Invoke( "SwitchToNextScene", 8f );
+	}
 
-		// vibrate
-		foreach( ControllerAccessors controller in myControllers )
-		{
-			if( ControllerHeight( controller.transform ) > 0 )
-			{
-				controller.Vibrate( 500 );
-			}
-			float vibrateIntensity = ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 0, 500, pow: 2 );
-		}
-
-		// sound
-		myChuck.BroadcastEvent( myPlayNoteVar );
+	private void SwitchToNextScene()
+	{
+		SceneManager.LoadScene( "10_Frenetic_11_SublimeEmptiness" );
 	}
 }
