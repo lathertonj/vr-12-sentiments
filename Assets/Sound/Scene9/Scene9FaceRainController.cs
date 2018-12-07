@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Scene9HandRockController : MonoBehaviour
+public class Scene9FaceRainController : MonoBehaviour
 {
-	private ControllerAccessors myController;
+
+    public ControllerAccessors[] myControllers;
+
+	private SphereCollider myCollider;
+	public float colliderBaseRadius = 0.2f;
+
 	private ChuckSubInstance myChuck;
 	public long[] myModalNotes;
 	public string[] myChordNotes;
@@ -12,10 +17,12 @@ public class Scene9HandRockController : MonoBehaviour
 	private string myGoalGainVar;
 	private string myPlayNoteVar;
 
+	private float numRecentHits = 0;
+
     // Use this for initialization
     void Start()
     {
-		myController = GetComponent<FollowObject>().objectToFollow.GetComponent<ControllerAccessors>();
+		myCollider = GetComponent<SphereCollider>();
 		myChuck = GetComponent<ChuckSubInstance>();
 		myNotesVar = myChuck.GetUniqueVariableName();
 		myPlayNoteVar = myChuck.GetUniqueVariableName();
@@ -56,7 +63,7 @@ public class Scene9HandRockController : MonoBehaviour
 
 						me.yield();
 
-						Math.random2f( 0.3, 0.4 ) + playStrong * 0.17 => modey.strike;
+						Math.random2f( 0.1, 0.2 ) + playStrong * 0.05 => modey.strike;
 						!playStrong => playStrong;
 					}}
 
@@ -258,13 +265,44 @@ public class Scene9HandRockController : MonoBehaviour
 
 	void Update()
 	{
-		float handSpeed = myController.Velocity().magnitude;
-        myChuck.SetFloat( myGoalGainVar, handSpeed.MapClamp( 0, 0.7f, 0, 1 ) );
+		// decay
+		numRecentHits *= 0.995f;
+
+		// sound
+        myChuck.SetFloat( myGoalGainVar, numRecentHits.MapClamp( 0, 5, 0, 1 ) );
+
+		// size of collider
+		float multiplier = 1;
+		foreach( ControllerAccessors controller in myControllers )
+		{
+			multiplier *= ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 1, 2, pow: 1 );
+		}
+		float radius = colliderBaseRadius * multiplier;
+		myCollider.radius = radius;
+		myCollider.center = -0.75f * radius * Vector3.up;
+	}
+
+	private float ControllerHeight( Transform controller )
+	{
+		return controller.position.y - transform.position.y;
 	}
 
     public void InformHit()
 	{
-		myController.Vibrate( 500 );
+		// remember
+		numRecentHits += 1;
+
+		// vibrate
+		foreach( ControllerAccessors controller in myControllers )
+		{
+			if( ControllerHeight( controller.transform ) > 0 )
+			{
+				controller.Vibrate( 500 );
+			}
+			float vibrateIntensity = ControllerHeight( controller.transform ).PowMapClamp( 0, 0.8f, 0, 500, pow: 2 );
+		}
+
+		// sound
 		myChuck.BroadcastEvent( myPlayNoteVar );
 	}
 }

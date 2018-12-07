@@ -54,6 +54,12 @@ public class SplashController : MonoBehaviour
 				{
 					maybeHand.InformHit();  
 				}
+
+                Scene9FaceRainController maybeFace = collision.colliderComponent.GetComponentInParent<Scene9FaceRainController>();
+				if( maybeFace != null )
+				{
+					maybeFace .InformHit();  
+				}
             }
         }
     }
