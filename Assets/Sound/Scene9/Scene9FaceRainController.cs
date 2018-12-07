@@ -338,7 +338,7 @@ public class Scene9FaceRainController : MonoBehaviour
 	private void EndScene()
 	{
 		SteamVR_Fade.Start( GetComponent<FadeInScene>().skyColor, duration: 5f );
-		Invoke( "SwitchToNextScene", 8f );
+		Invoke( "SwitchToNextScene", 7f );
 	}
 
 	private void SwitchToNextScene()
