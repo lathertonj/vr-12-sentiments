@@ -17,12 +17,12 @@ public class Scene10WiggleSeedling : MonoBehaviour
     {
         wiggleDirection = new Vector3( Random.Range( -1f, 1f ), 0, Random.Range( -1f, 1f ) ).normalized;
         wiggleUpSlew = 0.1f;
-        wiggleDownSlew = 0.01f;
+        wiggleDownSlew = 0.05f;
         wiggleRate = Random.Range( 5f, 13f );
 
         originalLocalPosition = transform.localPosition;
 
-        InvokeRepeating( "AnimateWiggle", 0, 5f );
+        //InvokeRepeating( "AnimateWiggle", 0, 5f );
     }
 
     // Update is called once per frame
@@ -45,6 +45,11 @@ public class Scene10WiggleSeedling : MonoBehaviour
     public void AnimateWiggle()
     {
         StartCoroutine( DoWiggle() );
+    }
+
+    public float GetWiggleAmount()
+    {
+        return currentWiggleAmount;
     }
 
     IEnumerator DoWiggle()
