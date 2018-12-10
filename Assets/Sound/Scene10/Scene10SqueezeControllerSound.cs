@@ -196,10 +196,18 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 
             global Event {0}, {1};
 			global float scene10NoteLengthSeconds;
+			global int scene10NumTimesDoneFirstChord;
 
 			fun void PlayNotes()
 			{{
-				0 => myCurrentChord;
+				if( scene10NumTimesDoneFirstChord < 2 )
+				{{
+					0 => myCurrentChord;
+				}}
+				else
+				{{
+					1 => myCurrentChord;
+				}}
 				0 => int numNotesPlayed;
 				while( true )
 				{{
@@ -215,6 +223,16 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 					{{
 						myCurrentChord++;
 						myCurrentChord % myNotes.size() => myCurrentChord;
+
+						if( myCurrentChord == 1 )
+						{{
+							scene10NumTimesDoneFirstChord++;
+						}}
+
+						if( myCurrentChord == 0 && scene10NumTimesDoneFirstChord >= 2 )
+						{{
+							1 => myCurrentChord;
+						}}
 					}}
 				}}
 			}}
