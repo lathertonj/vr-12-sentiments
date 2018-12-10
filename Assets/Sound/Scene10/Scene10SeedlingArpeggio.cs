@@ -181,6 +181,6 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 		}
 
 		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
-		//myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.24f, 0.12f, pow:1 ) );
+		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:1 ) );
     }
 }
