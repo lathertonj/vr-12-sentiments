@@ -182,43 +182,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             }}
 		", cutoffs[0], cutoffs[1], cutoffs[2], cutoffs[3] ) );
 
-		InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
-    }
-
-	private float vibrationAccumulation = 0;
-	public ControllerAccessors leftHand, rightHand;
-
-
-	private bool haveLaunchedClimaxChords = false;
-    // Update is called once per frame
-    void Update()
-    {
-		if( leftHand.IsSqueezed() || rightHand.IsSqueezed() )
-		{
-			vibrationAccumulation += Time.deltaTime;
-		}
-
-		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
-		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:0.75f ) );
-	    Scene10WiggleSeedling.SetWiggleMultiplier( vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 1.0f, 2.0f, pow:2f ) );
-
-		if( !haveLaunchedClimaxChords && vibrationAccumulation > cutoffs[cutoffs.Length - 1] - 5 )
-		{
-			LaunchClimaxChords();
-		}
-    }
-
-	void DebugSqueezeAmount()
-	{
-		Debug.Log( vibrationAccumulation );
-	}
-
-
-	void LaunchClimaxChords()
-	{
-		haveLaunchedClimaxChords = true;
 		myChuck.RunCode( string.Format( @"
-			global Event scene10BringInTheClimaxChords, scene10ChordChange;
+			global Event scene10BringInTheClimaxChords, scene10ChordChange, scene10StartListeningForClimax;
 
 			// using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -382,6 +347,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             }}
             spork ~ SlewChordFreqs();
 
+
+			scene10StartListeningForClimax => now;
 			scene10BringInTheClimaxChords => now;
 			repeat( 2 + 3 ) {{ scene10ChordChange => now; }}
 			float currentGain;
@@ -590,7 +557,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             }}
             spork ~ SlewChordFreqs();
 
-			global Event scene10BringInTheClimaxChords, scene10ChordChange;
+			global Event scene10BringInTheClimaxChords, scene10ChordChange, scene10StartListeningForClimax;
+			scene10StartListeningForClimax => now;
 			scene10BringInTheClimaxChords => now;
 			float currentGain;
 			1 => float goalGain;
@@ -611,5 +579,42 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			}}
         
         ", string.Join( ",", myAhhChord1 ), string.Join( ",", myAhhChord2 ), string.Join( ",", myAhhChord3 ) ) );
+
+		InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
+    }
+
+	private float vibrationAccumulation = 0;
+	public ControllerAccessors leftHand, rightHand;
+
+
+	private bool haveLaunchedClimaxChords = false;
+    // Update is called once per frame
+    void Update()
+    {
+		if( leftHand.IsSqueezed() || rightHand.IsSqueezed() )
+		{
+			vibrationAccumulation += Time.deltaTime;
+		}
+
+		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
+		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:0.75f ) );
+	    Scene10WiggleSeedling.SetWiggleMultiplier( vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 1.0f, 2.0f, pow:2f ) );
+
+		if( !haveLaunchedClimaxChords && vibrationAccumulation > cutoffs[cutoffs.Length - 1] - 5 )
+		{
+			LaunchClimaxChords();
+		}
+    }
+
+	void DebugSqueezeAmount()
+	{
+		Debug.Log( vibrationAccumulation );
+	}
+
+
+	void LaunchClimaxChords()
+	{
+		haveLaunchedClimaxChords = true;
+		myChuck.BroadcastEvent( "scene10StartListeningForClimax" );
 	}
 }
