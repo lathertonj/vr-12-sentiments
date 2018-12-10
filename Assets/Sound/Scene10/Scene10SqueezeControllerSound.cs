@@ -7,6 +7,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
     ChuckSubInstance myChuck;
     private string mySqueezeEvent, myUnsqueezeEvent;
     public string[] myChord0, myChord1, myChord2, myChord3;
+    public string[] mySecondHalfChord2, mySecondHalfChord3;
 
 	private ControllerAccessors myController;
 
@@ -190,11 +191,12 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 
 			global Event scene10BringInTheClimaxChords, scene10ChordChange;
 
+            1 => int chordToSkipStartOn;
 			fun void PlayNotes()
 			{{
 				if( scene10NumTimesDoneFirstChord >= 2 && myCurrentChord == 0 )
 				{{
-					1 => myCurrentChord;
+					chordToSkipStartOn => myCurrentChord;
 				}}
 
 				while( true )
@@ -219,7 +221,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 
 						if( myCurrentChord == 0 && scene10NumTimesDoneFirstChord >= 2 )
 						{{
-							1 => myCurrentChord;
+							chordToSkipStartOn => myCurrentChord;
 							scene10BringInTheClimaxChords.broadcast();
 						}}
 					}}
@@ -250,8 +252,15 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ RespondToChordEvents();
 
-            global Event scene3FadeOut;
-            scene3FadeOut => now;
+            global Event scene10AdvanceToScene11;
+            scene10AdvanceToScene11 => now;
+
+            [[{2}], [{3}], [{6}], [{7}]] @=> myNotes;
+            2 => chordToSkipStartOn;
+
+            // TODO end scene 11
+            global Event endScene11;
+            endScene11 => now;
             
             while( true )
             {{
@@ -259,7 +268,8 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
                 10::ms => now;
             }}
         ", mySqueezeEvent, myUnsqueezeEvent,
-		string.Join( ",", myChord0 ), string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ) ) );
+		string.Join( ",", myChord0 ), string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ),
+        string.Join( ",", mySecondHalfChord2 ), string.Join( ",", mySecondHalfChord3 ) ) );
 
         // shakers and create modey
         myChuck.RunCode( string.Format( @"
@@ -326,8 +336,8 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ RespondToSqueezeEvents();
 
-            global Event scene3FadeOut;
-            scene3FadeOut => now;
+            global Event scene10AdvanceToScene11;
+            scene10AdvanceToScene11 => now;
             
             // mute shakers
             while( true )
@@ -353,4 +363,5 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 			myChuck.BroadcastEvent( myUnsqueezeEvent );
 		}
     }
+
 }

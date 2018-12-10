@@ -8,7 +8,7 @@ public class Scene10SeedlingController : MonoBehaviour
 	public ControllerAccessors leftHand, rightHand;
 	private int currentSeedling = 0;
 	private ChuckSubInstance myChuck;
-
+	private ChuckEventListener mySeedlingListener;
 	private ParticleSystem myParticleEmitter;
 
     // Use this for initialization
@@ -17,8 +17,8 @@ public class Scene10SeedlingController : MonoBehaviour
 		mySeedlings = GetComponentsInChildren<Scene10WiggleSeedling>();
 		myParticleEmitter = GetComponentInChildren<ParticleSystem>();
 		myChuck = GetComponent<ChuckSubInstance>();
-		ChuckEventListener myListener = gameObject.AddComponent<ChuckEventListener>();
-		myListener.ListenForEvent( myChuck, "scene10NoteHappened", WiggleASeedling );
+		mySeedlingListener = gameObject.AddComponent<ChuckEventListener>();
+		mySeedlingListener.ListenForEvent( myChuck, "scene10NoteHappened", WiggleASeedling );
     }
 
     // Update is called once per frame
@@ -73,5 +73,18 @@ public class Scene10SeedlingController : MonoBehaviour
 		// prepare for next one
 		currentSeedling++;
 		currentSeedling %= mySeedlings.Length;
+	}
+
+	public void SwitchToScene11()
+	{
+		mySeedlingListener.StopListening();
+
+		foreach( Transform seedling in transform )
+		{
+			seedling.gameObject.SetActive( false );
+		}
+
+		// signal chuck event
+		myChuck.BroadcastEvent( "scene10AdvanceToScene11" );
 	}
 }
