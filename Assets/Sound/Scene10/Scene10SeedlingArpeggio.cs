@@ -7,11 +7,13 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 	ChuckSubInstance myChuck;
 	public float[] cutoffs;
 
+	public string[] myChord1, myChord2, myChord3; 
+
     // Use this for initialization
     void Start()
     {
 		myChuck = GetComponent<ChuckSubInstance>();
-
+LaunchClimaxChords();
 		myChuck.RunCode( string.Format( @"
             ModalBar modey => JCRev r => HPF hpf => LPF lpf => dac;
             // disable hpf, lpf
@@ -185,6 +187,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 	private float vibrationAccumulation = 0;
 	public ControllerAccessors leftHand, rightHand;
 
+
+	private bool haveLaunchedClimaxChords = false;
     // Update is called once per frame
     void Update()
     {
@@ -195,10 +199,205 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
 		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
 		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:0.75f ) );
+
+		if( !haveLaunchedClimaxChords && vibrationAccumulation > cutoffs[cutoffs.Length - 1] )
+		{
+			LaunchClimaxChords();
+			haveLaunchedClimaxChords = true;
+		}
     }
 
 	void DebugSqueezeAmount()
 	{
 		Debug.Log( vibrationAccumulation );
+	}
+
+
+	void LaunchClimaxChords()
+	{
+		myChuck.RunCode( string.Format( @"
+			global Event scene10BringInTheClimaxChords, scene10ChordChange;
+
+			// using a carrier wave (saw oscillator for example,) 
+            // and modulating its signal using a comb filter 
+            // where the filter cutoff frequency is usually 
+            // modulated with an LFO, which the LFO's depth (or amplitude) 
+            // is equal to the saw oscillator's current frequency. 
+
+
+            // It can also be done by using a copied signal and 
+            // have the copy run throught a delay which the 
+            // delay's time is modulated again by an LFO where the 
+            // LFO's depth is equal to the saw oscillator's current frequency.
+
+            class Supersaw extends Chubgraph
+            {{
+                SawOsc osc => Gain out => outlet;
+                5 => int numDelays;
+                1.0 / (1 + numDelays) => out.gain;
+                DelayA theDelays[numDelays];
+                SinOsc lfos[numDelays];
+                dur baseDelays[numDelays];
+                float baseFreqs[numDelays];
+                for( int i; i < numDelays; i++ )
+                {{
+                    osc => theDelays[i] => out;
+                    0.15::second => theDelays[i].max;
+                    // crucial to modify!
+                    Math.random2f( 0.001, 0.002 )::second => baseDelays[i];
+                    lfos[i] => blackhole;
+            //        Math.random2f( -0.1, 0.1) => baseFreqs[i];
+                    Math.random2f( 0, pi ) => lfos[i].phase;
+        
+                }}
+                0.05::second => dur baseDelay;
+                0.333 => float baseFreq;
+                1 => float lfoGain;
+    
+                fun void AttachLFOs()
+                {{
+                    while( true )
+                    {{
+                        for( int i; i < numDelays; i++ )
+                        {{
+                            baseFreq + baseFreqs[i] => lfos[i].freq;
+                            lfoGain * lfos[i].last()::second + baseDelay + baseDelays[i] 
+                                => theDelays[i].delay;
+                        }}
+                        1::ms => now;
+                    }}
+                }}
+                spork ~ AttachLFOs();
+    
+    
+                SinOsc pitchLFO => blackhole;
+                0.77 => pitchLFO.freq;
+                1.0 / 300 => float pitchLFODepth;
+                440 => float basePitch;
+    
+                fun void FreqMod()
+                {{
+                    while( true )
+                    {{
+                        // calc freq
+                        basePitch + ( basePitch * pitchLFODepth ) 
+                            * pitchLFO.last() => float f;
+                        // set
+                        f => osc.freq;
+                        1.0 / f => lfoGain; // seconds per cycle == gain amount
+                        // wait
+                        1::ms => now;
+                    }}
+                }}
+                spork ~ FreqMod();
+    
+                fun void freq( float f )
+                {{
+                    f => basePitch;
+                }}
+    
+                fun void delay( dur d )
+                {{
+                    d => baseDelay;
+                }}
+    
+                fun void timbreLFO( float f )
+                {{
+                    f => baseFreq;
+                }}
+    
+                fun void pitchLFORate( float f )
+                {{
+                    f => pitchLFO.freq;
+                }}
+    
+                fun void pitchLFODepthMultiplier( float r )
+                {{
+                    r => pitchLFODepth;
+                }}
+            }}
+
+            HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => Gain turnOn => dac;
+            15000 => lpf.freq; // orig 2000
+            50 => hpf.freq; // possibly 1800
+            0.05 => reverb.mix;
+            0.85 => reverb.gain;
+
+			0 => turnOn.gain;
+
+            fun void AmpMod()
+            {{
+                SinOsc lfo => blackhole;
+                0.13 => lfo.freq;
+                while( true )
+                {{
+                     0.85 + 0.15 * lfo.last() => ampMod.gain;
+                     1::ms => now;
+                }}
+            }}
+            spork ~ AmpMod();
+
+			[[66,66,66,66], [{0}], [{1}], [{2}]] @=> int myNotes[][];
+			global int myCurrentChord;
+            Supersaw mySaws[myNotes[0].size()];
+
+
+            for( int i; i < mySaws.size(); i++ )
+            {{
+                // how much freq waves up and down as a % of current freq
+                1.2 / 300 => mySaws[i].pitchLFODepthMultiplier; 
+                // how quickly the freq lfo moves
+                3.67 => mySaws[i].pitchLFORate;
+                // higher == wider pitch spread
+                0.33 => mySaws[i].timbreLFO; 
+                // basic loudness
+                0.07 => mySaws[i].gain; // should be: 0.035
+    
+				// pitch
+				myNotes[myCurrentChord][i] => Std.mtof => mySaws[i].freq;
+
+                mySaws[i] => hpf;
+            }}
+
+            float currentChordNotes[myNotes[0].size()];
+            for( int i; i < currentChordNotes.size(); i++ )
+            {{
+                myNotes[myCurrentChord][i] => currentChordNotes[i];
+            }}
+            0.05 => float chordSlew;
+            fun void SlewChordFreqs()
+            {{
+                while( true )
+                {{
+                    for( int i; i < mySaws.size(); i++ )
+                    {{
+                        currentChordNotes[i] + chordSlew * 
+                            ( myNotes[myCurrentChord][i] - currentChordNotes[i] ) => currentChordNotes[i];
+                        currentChordNotes[i] - 0 => Std.mtof => mySaws[i].freq;
+                    }}
+                    1::ms => now;
+                }}
+            }}
+            spork ~ SlewChordFreqs();
+
+			scene10BringInTheClimaxChords => now;
+			float currentGain;
+			1 => float goalGain;
+			0.00003 => float gainSlew;
+
+			400 => float currentLPFCutoff;
+			10000 => float goalLPFCutoff;
+			0.00003 => float cutoffSlew;
+
+			while( true )
+			{{
+				gainSlew * ( goalGain - currentGain ) +=> currentGain;
+				currentGain => turnOn.gain;
+
+				cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
+				currentLPFCutoff => lpf.freq;
+				1::ms => now;
+			}}
+		", string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ) ) );
 	}
 }

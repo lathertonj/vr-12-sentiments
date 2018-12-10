@@ -139,8 +139,8 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ AmpMod();
 
-			[[{2}], [{3}], [{4}], [{5}]] @=> global int myNotes[][];
-			0 => int myCurrentChord;
+			[[{2}], [{3}], [{4}], [{5}]] @=> int myNotes[][];
+			0 => global int myCurrentChord;
             Supersaw mySaws[myNotes[0].size()];
 
 
@@ -166,7 +166,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             {{
                 myNotes[myCurrentChord][i] => currentChordNotes[i];
             }}
-            0.5 => float chordSlew;
+            1.0 => float chordSlew;
             fun void SlewChordFreqs()
             {{
                 while( true )
@@ -182,23 +182,13 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ SlewChordFreqs();
 
-            global float scene3TransitionProgress;
-            fun void SetLPFCutoff()
-            {{
-                while( true )
-                {{
-                    250 - 230 * scene3TransitionProgress => hpf.freq;
-                    10::ms => now;
-                }}
-            }}
-            spork ~ SetLPFCutoff();
-
-
             global Event {0}, {1};
 			global float scene10NoteLengthSeconds;
 			global int scene10NumTimesDoneFirstChord;
 			global Event scene10ActualNoteHappened;
-			0 => int numNotesPlayed;
+			0 => global int numNotesPlayed;
+
+			global Event scene10BringInTheClimaxChords, scene10ChordChange;
 
 			fun void PlayNotes()
 			{{
@@ -211,16 +201,13 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 				{{
 					// sync
 					scene10ActualNoteHappened => now;
+					me.yield();
 					
-					1 => adsr.keyOn;
-					numNotesPlayed++;
-
-					// sync
-					scene10ActualNoteHappened => now;
-					1 => adsr.keyOff;
-
+					// update 
 					if( numNotesPlayed >= 8 )
 					{{
+						scene10ChordChange.broadcast();
+
 						0 => numNotesPlayed;
 						myCurrentChord++;
 						myCurrentChord % myNotes.size() => myCurrentChord;
@@ -233,8 +220,19 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 						if( myCurrentChord == 0 && scene10NumTimesDoneFirstChord >= 2 )
 						{{
 							1 => myCurrentChord;
+							scene10BringInTheClimaxChords.broadcast();
 						}}
 					}}
+
+					// play
+					1 => adsr.keyOn;
+					numNotesPlayed++;
+
+					// sync
+					scene10ActualNoteHappened => now;
+					1 => adsr.keyOff;
+
+					
 				}}
 			}}
             
