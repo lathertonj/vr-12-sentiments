@@ -19,7 +19,7 @@ public class Scene10RoofRevealer : MonoBehaviour
 		currentNote = gameObject.AddComponent<ChuckIntSyncer>();
 		currentNote.SyncInt( myChuck, "numNotesPlayed" );
 
-		alphaSlew = 0.03f;
+		alphaSlew = 0.02f;
 		currentAlpha = goalAlpha = 0.7f;
 
 		myRenderer = GetComponent<MeshRenderer>();
