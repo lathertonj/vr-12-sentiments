@@ -139,8 +139,9 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ AmpMod();
 
-			[{0}] @=> global int myNotes[];
-            Supersaw mySaws[myNotes.size()];
+			[[{2}], [{3}], [{4}], [{5}]] @=> global int myNotes[][];
+			0 => int myCurrentChord;
+            Supersaw mySaws[myNotes[0].size()];
 
 
             for( int i; i < mySaws.size(); i++ )
@@ -155,15 +156,15 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
                 0.07 => mySaws[i].gain; // should be: 0.035
     
 				// pitch
-				myNotes[i] => Std.mtof => mySaws[i].freq;
+				myNotes[myCurrentChord][i] => Std.mtof => mySaws[i].freq;
 
                 mySaws[i] => adsr;
             }}
 
-            float currentChordNotes[myNotes.size()];
+            float currentChordNotes[myNotes[0].size()];
             for( int i; i < currentChordNotes.size(); i++ )
             {{
-                myNotes[i] => currentChordNotes[i];
+                myNotes[myCurrentChord][i] => currentChordNotes[i];
             }}
             0.5 => float chordSlew;
             fun void SlewChordFreqs()
@@ -173,7 +174,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
                     for( int i; i < mySaws.size(); i++ )
                     {{
                         currentChordNotes[i] + chordSlew * 
-                            ( myNotes[i] - currentChordNotes[i] ) => currentChordNotes[i];
+                            ( myNotes[myCurrentChord][i] - currentChordNotes[i] ) => currentChordNotes[i];
                         currentChordNotes[i] - 0 => Std.mtof => mySaws[i].freq;
                     }}
                     1::ms => now;
@@ -193,11 +194,13 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             spork ~ SetLPFCutoff();
 
 
-            global Event {1}, {2};
+            global Event {0}, {1};
 			global float scene10NoteLengthSeconds;
 
 			fun void PlayNotes()
 			{{
+				0 => myCurrentChord;
+				0 => int numNotesPlayed;
 				while( true )
 				{{
 					me.yield();
@@ -206,19 +209,26 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 
 					1 => adsr.keyOff;
 					scene10NoteLengthSeconds::second => now;
+
+					numNotesPlayed++;
+					if( numNotesPlayed % 8 == 0 )
+					{{
+						myCurrentChord++;
+						myCurrentChord % myNotes.size() => myCurrentChord;
+					}}
 				}}
 			}}
             
             fun void RespondToChordEvents()
             {{
                 while( true ) {{
-                    {1} => now;
+                    {0} => now;
 					scene10NoteLengthSeconds::second => dur T;
 					// sync
 					T - ( now % T ) => now;
 					// play
                     spork ~ PlayNotes() @=> Shred playNotesShred;
-                    {2} => now;
+                    {1} => now;
 					// turn off
 					playNotesShred.exit();
                     1 => adsr.keyOff;
@@ -234,7 +244,8 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
                 adsr.gain() * 0.99 => adsr.gain;
                 10::ms => now;
             }}
-        ", string.Join( ",", myChord0 ), mySqueezeEvent, myUnsqueezeEvent ) );
+        ", mySqueezeEvent, myUnsqueezeEvent,
+		string.Join( ",", myChord0 ), string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ) ) );
 
         // shakers and create modey
         myChuck.RunCode( string.Format( @"
