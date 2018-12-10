@@ -23,8 +23,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             // set the reverb mix
             .05 => r.mix;
 
-			0.24 => global float scene10NoteLengthSeconds;
-			0.04::second => dur preNoteEventBroadcastTime;
+			0.5 => global float scene10NoteLengthSeconds;
+			0.06::second => dur postNoteEventBroadcastTime;
 			global Event scene10NoteHappened;
             true => int hardPick;
 
@@ -53,11 +53,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                 {{
                     if( notes[i] > 10 )
                     {{
-						// tell listeners a little in advance
-						scene10NoteHappened.broadcast();
-						preNoteEventBroadcastTime => now;
-
-                        // strike position
+						// strike position
                         Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
                         // freq
                         notes[i] => Std.mtof => modey.freq;
@@ -65,16 +61,20 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                         Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => modey.strike;
                         // next pick in opposite direction
                         !hardPick => hardPick;
+
+						// tell listeners a little late
+						postNoteEventBroadcastTime => now;
+						scene10NoteHappened.broadcast();
                     }}
                     else
                     {{
-						preNoteEventBroadcastTime => now;
+						postNoteEventBroadcastTime => now;
 
                         // next pick in stronger direction
                         true => hardPick;
                     }}
         
-                    scene10NoteLengthSeconds::second - preNoteEventBroadcastTime => now;
+                    scene10NoteLengthSeconds::second - postNoteEventBroadcastTime => now;
         
                     // turn off? this isn't it
                     1 => modey.damp;
@@ -181,6 +181,6 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 		}
 
 		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
-		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.24f, 0.12f, pow:1 ) );
+		//myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.24f, 0.12f, pow:1 ) );
     }
 }

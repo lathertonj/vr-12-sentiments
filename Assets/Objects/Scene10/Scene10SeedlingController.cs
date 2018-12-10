@@ -9,10 +9,13 @@ public class Scene10SeedlingController : MonoBehaviour
 	private int currentSeedling = 0;
 	private ChuckSubInstance myChuck;
 
+	private ParticleSystem myParticleEmitter;
+
     // Use this for initialization
     void Start()
     {
 		mySeedlings = GetComponentsInChildren<Scene10WiggleSeedling>();
+		myParticleEmitter = GetComponentInChildren<ParticleSystem>();
 		myChuck = GetComponent<ChuckSubInstance>();
 		ChuckEventListener myListener = gameObject.AddComponent<ChuckEventListener>();
 		myListener.ListenForEvent( myChuck, "scene10NoteHappened", WiggleASeedling );
@@ -21,18 +24,53 @@ public class Scene10SeedlingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		
+    }
+
+	void VibrateTickClosestHand( Vector3 position )
+	{
+		float leftDist = ( leftHand.transform.position - position ).sqrMagnitude;
+		float rightDist = ( rightHand.transform.position - position ).sqrMagnitude;
+		if( leftDist < rightDist )
+		{
+			leftHand.Vibrate( 500 );
+		}
+		else
+		{
+			rightHand.Vibrate( 500 );
+		}
+	}
+
+	void AnimateParticle( Vector3 position )
+	{
+		// animate particle
+        ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( position );
+        emitParams.velocity = 0.15f * Vector3.up;
+        myParticleEmitter.Emit( emitParams, count: 1 );
+	}
+
+	void TooMuchVibration()
+	{
 		// too much vibration!!
 		float wiggleAmount = 0;
 		foreach( Scene10WiggleSeedling seedling in mySeedlings ) { wiggleAmount += seedling.GetWiggleAmount(); }
 		ushort vibrationAmount = (ushort)( wiggleAmount.PowMapClamp( 0, mySeedlings.Length, 0, 500, pow: 0.5f ) );
-		//leftHand.Vibrate( vibrationAmount );
-		//rightHand.Vibrate( vibrationAmount );
-    }
+		leftHand.Vibrate( vibrationAmount );
+		rightHand.Vibrate( vibrationAmount );
+	}
 
 	void WiggleASeedling()
 	{
+		// animate
+		Vector3 position = mySeedlings[currentSeedling].transform.position;
 		mySeedlings[currentSeedling].AnimateWiggle();
+		AnimateParticle( position );
 
+		// haptic feedback
+		VibrateTickClosestHand( position );
+
+		// prepare for next one
 		currentSeedling++;
 		currentSeedling %= mySeedlings.Length;
 	}
