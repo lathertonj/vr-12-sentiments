@@ -26,6 +26,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			0.5 => global float scene10NoteLengthSeconds;
 			0.06::second => dur postNoteEventBroadcastTime;
 			global Event scene10NoteHappened;
+			global Event scene10ActualNoteHappened;
             true => int hardPick;
 
 			64 => int E4;
@@ -44,7 +45,19 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
             [[E4, Fs4], [E4, Fs4, A4], [0, Fs4, A4]] @=> int bases[][];
             [[B4, Cs5], [Gs5], [Fs5], [Fs5, Gs5], [Cs5, E5], [E5, Fs5, Gs5], [B4, E5], [B4, E5, Fs5]] @=> int tops[][];
-            [[B5, Cs6], [Cs6, Ds6], [Ds6], [Ds6, E6]] @=> int supertops[][];
+            [[B5], [B5, Cs6], [Cs6, Ds6], [Ds6], [Ds6, E6]] @=> int supertops[][];
+
+
+			fun void SendOutTatum()
+			{{
+				while( true )
+				{{
+					//  this is used for rhythm and so it happens in any case
+					scene10ActualNoteHappened.broadcast();
+					scene10NoteLengthSeconds::second => now;
+				}}
+			}}
+			spork ~ SendOutTatum();
 
             fun void PlayArray( int notes[] )
             {{
@@ -62,7 +75,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                         // next pick in opposite direction
                         !hardPick => hardPick;
 
-						// tell listeners a little late
+						// tell some listeners a little late
 						postNoteEventBroadcastTime => now;
 						scene10NoteHappened.broadcast();
                     }}
@@ -74,7 +87,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                         true => hardPick;
                     }}
         
-                    scene10NoteLengthSeconds::second - postNoteEventBroadcastTime => now;
+                    scene10ActualNoteHappened => now;
         
                     // turn off? this isn't it
                     1 => modey.damp;
@@ -109,7 +122,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                     // with a medium chance, rest once
                     if( Math.randomf() < 0.45 )
                     {{
-                        scene10NoteLengthSeconds::second => now;
+                        scene10ActualNoteHappened => now;
                     }}
     
                     // play a top
@@ -144,7 +157,10 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                     // with a small chance, rest a while
                     if( Math.randomf() < 0.05 )
                     {{
-                        Math.random2( 1, 3 ) * scene10NoteLengthSeconds::second => now;
+						repeat( Math.random2( 1, 3 ) )
+						{{
+							scene10ActualNoteHappened => now;
+						}}
                     }}
         
                 }}
@@ -162,6 +178,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
                 10::ms => now;
             }}
 		", cutoffs[0], cutoffs[1], cutoffs[2], cutoffs[3] ) );
+
+		InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
     }
 
 	private float vibrationAccumulation = 0;
@@ -170,17 +188,17 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if( leftHand.IsSqueezed() )
-		{
-			vibrationAccumulation += Time.deltaTime;
-		}
-
-		if( rightHand.IsSqueezed() )
+		if( leftHand.IsSqueezed() || rightHand.IsSqueezed() )
 		{
 			vibrationAccumulation += Time.deltaTime;
 		}
 
 		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
-		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:1 ) );
+		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:0.75f ) );
     }
+
+	void DebugSqueezeAmount()
+	{
+		Debug.Log( vibrationAccumulation );
+	}
 }

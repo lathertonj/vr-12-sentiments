@@ -197,30 +197,31 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             global Event {0}, {1};
 			global float scene10NoteLengthSeconds;
 			global int scene10NumTimesDoneFirstChord;
+			global Event scene10ActualNoteHappened;
+			0 => int numNotesPlayed;
 
 			fun void PlayNotes()
 			{{
-				if( scene10NumTimesDoneFirstChord < 2 )
-				{{
-					0 => myCurrentChord;
-				}}
-				else
+				if( scene10NumTimesDoneFirstChord >= 2 && myCurrentChord == 0 )
 				{{
 					1 => myCurrentChord;
 				}}
-				0 => int numNotesPlayed;
+
 				while( true )
 				{{
-					me.yield();
+					// sync
+					scene10ActualNoteHappened => now;
+					
 					1 => adsr.keyOn;
-					scene10NoteLengthSeconds::second => now;
-
-					1 => adsr.keyOff;
-					scene10NoteLengthSeconds::second => now;
-
 					numNotesPlayed++;
-					if( numNotesPlayed % 8 == 0 )
+
+					// sync
+					scene10ActualNoteHappened => now;
+					1 => adsr.keyOff;
+
+					if( numNotesPlayed >= 8 )
 					{{
+						0 => numNotesPlayed;
 						myCurrentChord++;
 						myCurrentChord % myNotes.size() => myCurrentChord;
 
@@ -241,9 +242,6 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             {{
                 while( true ) {{
                     {0} => now;
-					scene10NoteLengthSeconds::second => dur T;
-					// sync
-					T - ( now % T ) => now;
 					// play
                     spork ~ PlayNotes() @=> Shred playNotesShred;
                     {1} => now;
@@ -283,42 +281,45 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             11 => s.preset; // 0 to 22.  0 is good for galloping. 
             // 11 is good for eighths
 
+			global Event scene10ActualNoteHappened;
             fun void Play()
             {{
                 while( true )
                 {{
-                    
+					// sync
+                    scene10ActualNoteHappened => now;
                     me.yield();
                     Math.random2f( 0.7, 0.9 ) => s.energy;
                     1 => s.noteOn;
-                    scene10NoteLengthSeconds::second => now;
+                    // sync
+                    scene10ActualNoteHappened => now;
 
                     me.yield();
                     Math.random2f( 0.1, 0.3 ) => s.energy;
                     1 => s.noteOn;
-                    scene10NoteLengthSeconds::second => now;
+                    // sync
+                    scene10ActualNoteHappened => now;
     
                     me.yield();
                     Math.random2f( 0.3, 0.5 ) => s.energy;
                     1 => s.noteOn;
-                    scene10NoteLengthSeconds::second => now;
+                    // sync
+                    scene10ActualNoteHappened => now;
 
                     me.yield();
                     Math.random2f( 0.1, 0.3 ) => s.energy;
                     1 => s.noteOn;
-                    scene10NoteLengthSeconds::second => now;
+                    
                 }}
 
             }}
 
+			
             fun void RespondToSqueezeEvents()
             {{
                 while( true )
                 {{
                     {0} => now;
-					scene10NoteLengthSeconds::second => dur T;
-					// sync
-					T - ( now % T ) => now;
 					// play
                     spork ~ Play() @=> Shred playShred;
                     {1} => now;
