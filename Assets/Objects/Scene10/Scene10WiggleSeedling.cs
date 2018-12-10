@@ -12,6 +12,13 @@ public class Scene10WiggleSeedling : MonoBehaviour
     private Vector3 originalLocalPosition;
     private float wiggleRate;
 
+    private static float wiggleMultiplier = 1;
+
+    public static void SetWiggleMultiplier( float m )
+    {
+        wiggleMultiplier = m;
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -38,7 +45,7 @@ public class Scene10WiggleSeedling : MonoBehaviour
         }
 
         transform.localPosition = originalLocalPosition +
-            maxWiggleAmount * currentWiggleAmount * Mathf.Sin( 2 * Mathf.PI * Time.time * wiggleRate ) *
+            maxWiggleAmount * currentWiggleAmount * Mathf.Sin( 2 * Mathf.PI * Time.time * wiggleRate ) * wiggleMultiplier *
             wiggleDirection;
     }
 

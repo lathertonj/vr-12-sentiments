@@ -9,11 +9,12 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
 	public string[] myChord1, myChord2, myChord3; 
 
+	public string[] myAhhChord1, myAhhChord2, myAhhChord3;
+
     // Use this for initialization
     void Start()
     {
 		myChuck = GetComponent<ChuckSubInstance>();
-LaunchClimaxChords();
 		myChuck.RunCode( string.Format( @"
             ModalBar modey => JCRev r => HPF hpf => LPF lpf => dac;
             // disable hpf, lpf
@@ -26,7 +27,7 @@ LaunchClimaxChords();
             .05 => r.mix;
 
 			0.5 => global float scene10NoteLengthSeconds;
-			0.06::second => dur postNoteEventBroadcastTime;
+			0.045::second => dur postNoteEventBroadcastTime;
 			global Event scene10NoteHappened;
 			global Event scene10ActualNoteHappened;
             true => int hardPick;
@@ -73,7 +74,7 @@ LaunchClimaxChords();
                         // freq
                         notes[i] => Std.mtof => modey.freq;
                         // strike it!
-                        Math.random2f( 0.3, 0.4 ) + 0.17 * hardPick => modey.strike;
+                        Math.random2f( 0.5, 0.7 ) + 0.17 * hardPick => modey.strike;
                         // next pick in opposite direction
                         !hardPick => hardPick;
 
@@ -199,11 +200,11 @@ LaunchClimaxChords();
 
 		myChuck.SetFloat( "vibrationAccumulation", vibrationAccumulation );
 		myChuck.SetFloat( "scene10NoteLengthSeconds", vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 0.5f, 0.12f, pow:0.75f ) );
+	    Scene10WiggleSeedling.SetWiggleMultiplier( vibrationAccumulation.PowMapClamp( 0, cutoffs[cutoffs.Length - 1], 1.0f, 2.0f, pow:2f ) );
 
-		if( !haveLaunchedClimaxChords && vibrationAccumulation > cutoffs[cutoffs.Length - 1] )
+		if( !haveLaunchedClimaxChords && vibrationAccumulation > cutoffs[cutoffs.Length - 1] - 5 )
 		{
 			LaunchClimaxChords();
-			haveLaunchedClimaxChords = true;
 		}
     }
 
@@ -215,6 +216,7 @@ LaunchClimaxChords();
 
 	void LaunchClimaxChords()
 	{
+		haveLaunchedClimaxChords = true;
 		myChuck.RunCode( string.Format( @"
 			global Event scene10BringInTheClimaxChords, scene10ChordChange;
 
@@ -351,7 +353,7 @@ LaunchClimaxChords();
                 // higher == wider pitch spread
                 0.33 => mySaws[i].timbreLFO; 
                 // basic loudness
-                0.07 => mySaws[i].gain; // should be: 0.035
+                0.09 + 0.01 * i => mySaws[i].gain; // orig 0.07
     
 				// pitch
 				myNotes[myCurrentChord][i] => Std.mtof => mySaws[i].freq;
@@ -381,6 +383,7 @@ LaunchClimaxChords();
             spork ~ SlewChordFreqs();
 
 			scene10BringInTheClimaxChords => now;
+			repeat( 2 + 3 ) {{ scene10ChordChange => now; }}
 			float currentGain;
 			1 => float goalGain;
 			0.00003 => float gainSlew;
@@ -399,5 +402,214 @@ LaunchClimaxChords();
 				1::ms => now;
 			}}
 		", string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ) ) );
+
+
+		// ========================================================================================
+        //                                     AhhSynth
+        // ========================================================================================
+        myChuck.RunCode( string.Format( @"
+            class AhhSynth extends Chubgraph
+			{{
+				LiSa lisa => outlet;
+				
+				// spawn rate: how often a new grain is spawned (ms)
+				25 =>  float grainSpawnRateMS;
+				0 =>  float grainSpawnRateVariationMS;
+				0.0 =>  float grainSpawnRateVariationRateMS;
+				
+				// position: where in the file is a grain (0 to 1)
+				0.61 =>  float grainPosition;
+				0.2 =>  float grainPositionRandomness;
+				
+				// grain length: how long is a grain (ms)
+				300 =>  float grainLengthMS;
+				10 =>  float grainLengthRandomnessMS;
+				
+				// grain rate: how quickly is the grain scanning through the file
+				1.004 =>  float grainRate; // 1.002 == in-tune Ab
+				0.015 =>  float grainRateRandomness;
+				
+				// ramp up/down: how quickly we ramp up / down
+				50 =>  float rampUpMS;
+				200 =>  float rampDownMS;
+				
+				// gain: how loud is everything overall
+				1 =>  float gainMultiplier;
+				
+				float myFreq;
+				fun float freq( float f )
+				{{
+					f => myFreq;
+					61 => Std.mtof => float baseFreq;
+					// 1.002 == in tune for 56 for aah4.wav
+					// 1.004 == in tune for 60 for aah5.wav
+					myFreq / baseFreq * 0.98 => grainRate;
+					
+					return myFreq;
+				}}
+				
+				fun float freq()
+				{{
+					return myFreq;
+				}}
+				
+				fun float gain( float g )
+				{{
+					g => lisa.gain;
+					return g;
+				}}
+				
+				fun float gain()
+				{{
+					return lisa.gain();
+				}}
+				
+				
+				
+				SndBuf buf; 
+				me.dir() + ""aah5.wav"" => buf.read;
+				buf.length() => lisa.duration;
+				// copy samples in
+				for( int i; i < buf.samples(); i++ )
+				{{
+					lisa.valueAt( buf.valueAt( i ), i::samp );
+				}}
+				
+				
+				buf.length() => dur bufferlen;
+				
+				// LiSa params
+				100 => lisa.maxVoices;
+				0.1 => lisa.gain;
+				true => lisa.loop;
+				false => lisa.record;
+				
+				
+				// modulate
+				SinOsc freqmod => blackhole;
+				0.1 => freqmod.freq;
+				
+				
+				
+				0.1 => float maxGain;
+				
+				fun void SetGain()
+				{{
+					while( true )
+					{{
+						maxGain * gainMultiplier => lisa.gain;
+						1::ms => now;
+					}}
+				}}
+				spork ~ SetGain();
+				
+				
+				fun void SpawnGrains()
+				{{
+					// create grains
+					while( true )
+					{{
+						// grain length
+						( grainLengthMS + Math.random2f( -grainLengthRandomnessMS / 2, grainLengthRandomnessMS / 2 ) )
+						* 1::ms => dur grainLength;
+						
+						// grain rate
+						grainRate + Math.random2f( -grainRateRandomness / 2, grainRateRandomness / 2 ) => float grainRate;
+						
+						// grain position
+						( grainPosition + Math.random2f( -grainPositionRandomness / 2, grainPositionRandomness / 2 ) )
+						* bufferlen => dur playPos;
+						
+						// grain: grainlen, rampup, rampdown, rate, playPos
+						spork ~ PlayGrain( grainLength, rampUpMS::ms, rampDownMS::ms, grainRate, playPos);
+						
+						// advance time (time per grain)
+						// PARAM: GRAIN SPAWN RATE
+						grainSpawnRateMS::ms  + freqmod.last() * grainSpawnRateVariationMS::ms => now;
+						grainSpawnRateVariationRateMS => freqmod.freq;
+					}}
+				}}
+				spork ~ SpawnGrains();
+				
+				// sporkee
+				fun void PlayGrain( dur grainlen, dur rampup, dur rampdown, float rate, dur playPos )
+				{{
+					lisa.getVoice() => int newvoice;
+					
+					if(newvoice > -1)
+					{{
+						lisa.rate( newvoice, rate );
+						lisa.playPos( newvoice, playPos );
+						lisa.rampUp( newvoice, rampup );
+						( grainlen - ( rampup + rampdown ) ) => now;
+						lisa.rampDown( newvoice, rampdown) ;
+						rampdown => now;
+					}}
+				}}
+
+
+			}}
+
+			[[66,66,66,66], [{0}], [{1}], [{2}]] @=> int myNotes[][];
+			global int myCurrentChord;
+            AhhSynth myAhhs[myNotes[0].size()];
+
+			LPF lpf => NRev rev => Gain turnOn => dac;
+			rev.mix(0.1);
+
+            for( int i; i < myAhhs.size(); i++ )
+            {{
+                // basic loudness
+                0.035 => myAhhs[i].gain; // should be: 0.035
+				0.07 - 0.01 * i => myAhhs[i].gain;
+    
+				// pitch
+				myNotes[myCurrentChord][i] => Std.mtof => myAhhs[i].freq;
+
+                myAhhs[i] => lpf;
+            }}
+
+            float currentChordNotes[myNotes[0].size()];
+            for( int i; i < currentChordNotes.size(); i++ )
+            {{
+                myNotes[myCurrentChord][i] => currentChordNotes[i];
+            }}
+            0.05 => float chordSlew;
+            fun void SlewChordFreqs()
+            {{
+                while( true )
+                {{
+                    for( int i; i < myAhhs.size(); i++ )
+                    {{
+                        currentChordNotes[i] + chordSlew * 
+                            ( myNotes[myCurrentChord][i] - currentChordNotes[i] ) => currentChordNotes[i];
+                        currentChordNotes[i] - 0 => Std.mtof => myAhhs[i].freq;
+                    }}
+                    1::ms => now;
+                }}
+            }}
+            spork ~ SlewChordFreqs();
+
+			global Event scene10BringInTheClimaxChords, scene10ChordChange;
+			scene10BringInTheClimaxChords => now;
+			float currentGain;
+			1 => float goalGain;
+			0.00003 => float gainSlew;
+
+			300 => float currentLPFCutoff;
+			7000 => float goalLPFCutoff;
+			0.00003 => float cutoffSlew;
+
+			while( true )
+			{{
+				gainSlew * ( goalGain - currentGain ) +=> currentGain;
+				currentGain => turnOn.gain;
+
+				cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
+				currentLPFCutoff => lpf.freq;
+				1::ms => now;
+			}}
+        
+        ", string.Join( ",", myAhhChord1 ), string.Join( ",", myAhhChord2 ), string.Join( ",", myAhhChord3 ) ) );
 	}
 }
