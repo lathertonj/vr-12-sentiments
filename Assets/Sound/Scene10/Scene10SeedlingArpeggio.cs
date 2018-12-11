@@ -43,12 +43,14 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             81 => int A5;
             83 => int B5;
             85 => int Cs6;
+			86 => int D6;
 			87 => int Ds6;
 			88 => int E6;
 
             [[E4, Fs4], [E4, Fs4, A4], [0, Fs4, A4]] @=> int bases[][];
             [[B4, Cs5], [Gs5], [Fs5], [Fs5, Gs5], [Cs5, E5], [E5, Fs5, Gs5], [B4, E5], [B4, E5, Fs5]] @=> int tops[][];
             [[B5], [B5, Cs6], [Cs6, Ds6], [Ds6], [Ds6, E6]] @=> int supertops[][];
+			
 
 
 			fun void SendOutTatum()
@@ -172,6 +174,9 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             
             global Event scene10AdvanceToScene11;
             scene10AdvanceToScene11 => now;
+
+			// new notes for
+			[/*[B5],*/ [B5, Cs6], [Cs6, D6], [D6], [D6, E6]] @=> supertops;
             
             // TODO: do something 
             while( true ) 

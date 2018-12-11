@@ -120,7 +120,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
                 }}
             }}
 
-            HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => dac;
+            HPF hpf => LPF lpf => Gain ampMod => Gain sawAmpMod => JCRev reverb => dac;
 			ADSR adsr => hpf; // should be: hpf
             15000 => lpf.freq; // orig 2000
             50 => hpf.freq; // possibly 1800
@@ -225,6 +225,8 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 							scene10BringInTheClimaxChords.broadcast();
 						}}
 					}}
+
+                    0.9 + 0.045 * numNotesPlayed => sawAmpMod.gain;
 
 					// play
 					1 => adsr.keyOn;

@@ -43,7 +43,7 @@ public class Scene10RoofRevealer : MonoBehaviour
 		// slew
 		currentAlpha += alphaSlew * ( goalAlpha - currentAlpha );
 
-		Debug.Log( "alpha is: " + currentAlpha.ToString() );
+		//Debug.Log( "alpha is: " + currentAlpha.ToString() );
 		myRenderer.material.color = new Color( originalColor.r, originalColor.g, originalColor.b, currentAlpha );
     }
 }
