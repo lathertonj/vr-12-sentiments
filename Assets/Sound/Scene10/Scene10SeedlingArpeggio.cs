@@ -30,9 +30,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             .05 => r.mix;
 
 			0.5 => global float scene10NoteLengthSeconds;
-			// 0.045::second => dur postNoteEventBroadcastTime;
-			0.04
-			::second => dur postNoteEventBroadcastTime;
+			0.045::second => dur postNoteEventBroadcastTime;
+			// 0.04::second => dur postNoteEventBroadcastTime;
 			true => int shouldListenToUnityTatum;
 			global Event scene10NoteHappened;
 			global Event scene10ActualNoteHappened;
@@ -80,13 +79,14 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 					myOwnNoteLength::second => now;
 					<<< myOwnNoteLength >>>;
 					scene10ActualNoteHappened.broadcast();
-					1.03 *=> myOwnNoteLength;
+					1.01 *=> myOwnNoteLength;
 					if( myOwnNoteLength > 0.4 )
 					{{
 						0.4 => myOwnNoteLength;
 					}}
 				}}
 			}}
+			// this does not cause a crash
 			spork ~ SendOutMyOwnTatum();
 
             fun void PlayArray( int notes[] )
@@ -419,7 +419,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
 			
 		", string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ),
-		   string.Join( ",", mySecondHalfChord3 ), string.Join( ",", mySecondHalfChord2 ) ) );
+		   string.Join( ",", mySecondHalfChord2 ), string.Join( ",", mySecondHalfChord3 ) ) );
 
 
 		// ========================================================================================
@@ -639,8 +639,8 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
 			[[66,66,66,66], [{0}], [{3}], [{4}]] @=> myNotes;
 			// reinforce bass notes
-			1.2 * myAhhs[0].gain() => myAhhs[0].gain;
-			1.2 * myAhhs[1].gain() => myAhhs[1].gain;
+			// 1.2 * myAhhs[0].gain() => myAhhs[0].gain;
+			// 1.2 * myAhhs[1].gain() => myAhhs[1].gain;
 
 			while( true )
 			{{
@@ -648,7 +648,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			}}
         
         ", string.Join( ",", myAhhChord1 ), string.Join( ",", myAhhChord2 ), string.Join( ",", myAhhChord3 ),
-		   string.Join( ",", myAhhSecondHalfChord3 ), string.Join( ",", myAhhSecondHalfChord2 ) ) );
+		   string.Join( ",", myAhhSecondHalfChord2 ), string.Join( ",", myAhhSecondHalfChord3 ) ) );
 
 		//InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
     }

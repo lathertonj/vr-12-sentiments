@@ -273,6 +273,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 
             [[{2}], [{3}], [{6}], [{7}]] @=> myNotes;
             2 => chordToSkipStartOn;
+            // this does not cause a crash
             2 => myCurrentChord;
             SetChordFreqs();
 
@@ -287,7 +288,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
         ", mySqueezeEvent, myUnsqueezeEvent,
 		string.Join( ",", myChord0 ), string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ),
-        string.Join( ",", mySecondHalfChord3 ), string.Join( ",", mySecondHalfChord2 ) ) );
+        string.Join( ",", mySecondHalfChord2 ), string.Join( ",", mySecondHalfChord3 ) ) );
 
         // shakers and create modey
         myChuck.RunCode( string.Format( @"
