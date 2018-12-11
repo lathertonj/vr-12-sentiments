@@ -202,6 +202,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 			0 => global int numNotesPlayed;
 
 			global Event scene10BringInTheClimaxChords, scene10ChordChange;
+            global Event scene10AdvanceToScene11;
 
             1 => int chordToSkipStartOn;
 			fun void PlayNotes()
@@ -268,7 +269,6 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             }}
             spork ~ RespondToChordEvents();
 
-            global Event scene10AdvanceToScene11;
             scene10AdvanceToScene11 => now;
 
             [[{2}], [{3}], [{6}], [{7}]] @=> myNotes;

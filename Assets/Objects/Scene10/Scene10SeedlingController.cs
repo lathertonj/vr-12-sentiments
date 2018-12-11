@@ -41,11 +41,11 @@ public class Scene10SeedlingController : MonoBehaviour
 		}
 	}
 
-	void AnimateParticle( Vector3 position )
+	void AnimateParticle( Transform seedling )
 	{
 		// animate particle
         ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
-        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( position );
+        emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.TransformPoint( 0.2f * Vector3.up )  );
         emitParams.velocity = 0.15f * Vector3.up;
         myParticleEmitter.Emit( emitParams, count: 1 );
 	}
@@ -63,12 +63,11 @@ public class Scene10SeedlingController : MonoBehaviour
 	void WiggleASeedling()
 	{
 		// animate
-		Vector3 position = mySeedlings[currentSeedling].transform.position;
 		mySeedlings[currentSeedling].AnimateWiggle();
-		AnimateParticle( position );
+		AnimateParticle( mySeedlings[currentSeedling].transform );
 
 		// haptic feedback
-		VibrateTickClosestHand( position );
+		VibrateTickClosestHand( mySeedlings[currentSeedling].transform.position );
 
 		// prepare for next one
 		currentSeedling++;

@@ -889,7 +889,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4107608092836700}
-  - component: {fileID: 114191768146994160}
   - component: {fileID: 114594133423441562}
   m_Layer: 0
   m_Name: Scene10Seedling
@@ -3392,18 +3391,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1966476385222672}
   m_Mesh: {fileID: 4300000, guid: 083fb8b08f4c3d242a367e839b6f9199, type: 3}
---- !u!114 &114191768146994160
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528675788670268}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7524a14082c2c76448555f620e354669, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerOfMass: {x: 0, y: 0.08, z: 0}
 --- !u!114 &114594133423441562
 MonoBehaviour:
   m_ObjectHideFlags: 1
