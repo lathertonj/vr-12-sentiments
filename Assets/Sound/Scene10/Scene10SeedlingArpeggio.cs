@@ -77,7 +77,6 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 				while( true )
 				{{
 					myOwnNoteLength::second => now;
-					<<< myOwnNoteLength >>>;
 					scene10ActualNoteHappened.broadcast();
 					1.01 *=> myOwnNoteLength;
 					if( myOwnNoteLength > 0.4 )
