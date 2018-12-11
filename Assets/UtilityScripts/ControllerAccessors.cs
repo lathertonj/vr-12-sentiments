@@ -9,7 +9,7 @@ public class ControllerAccessors : MonoBehaviour
     private SteamVR_TrackedObject trackedObj;
     private SteamVR_Controller.Device Controller
     {
-        get { return SteamVR_Controller.Input( (int) trackedObj.index ); }
+        get { return SteamVR_Controller.Input( (int)trackedObj.index ); }
     }
     void Awake()
     {
@@ -24,10 +24,26 @@ public class ControllerAccessors : MonoBehaviour
     private float goalVibrationEffectiveness;
     private float squeezeStartTime;
 
+    private int numButtonsPressed = 0;
+
 
     void Update()
     {
         currentVibrationEffectiveness += vibrationSlew * ( goalVibrationEffectiveness - currentVibrationEffectiveness );
+
+        if( Controller.GetPressDown( SteamVR_Controller.ButtonMask.Grip ) ||
+            Controller.GetPressDown( SteamVR_Controller.ButtonMask.Trigger ) ||
+            Controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad ) )
+        {
+            numButtonsPressed++;
+        }
+
+        if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip ) ||
+            Controller.GetPressUp( SteamVR_Controller.ButtonMask.Trigger ) ||
+            Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) )
+        {
+            numButtonsPressed--;
+        }
     }
 
     public void StopVibrating()
@@ -37,23 +53,31 @@ public class ControllerAccessors : MonoBehaviour
 
     public void Vibrate( ushort amount )
     {
-        amount = (ushort) ( currentVibrationEffectiveness * (float) amount );
+        amount = (ushort)( currentVibrationEffectiveness * (float)amount );
         Controller.TriggerHapticPulse( amount );
     }
 
     public bool IsSqueezed()
     {
-        return Controller.GetPress( SteamVR_Controller.ButtonMask.Grip );
+        return numButtonsPressed > 0;
     }
 
     public bool IsFirstSqueezed()
     {
-        return Controller.GetPressDown( SteamVR_Controller.ButtonMask.Grip );
+        return numButtonsPressed == 1 && (
+            Controller.GetPressDown( SteamVR_Controller.ButtonMask.Grip ) ||
+            Controller.GetPressDown( SteamVR_Controller.ButtonMask.Trigger ) ||
+            Controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad ) 
+        );
     }
-    
+
     public bool IsUnSqueezed()
     {
-        return Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip );
+        return numButtonsPressed == 0 && (
+            Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip ) ||
+            Controller.GetPressUp( SteamVR_Controller.ButtonMask.Trigger ) ||
+            Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad )
+        );
     }
 
     public Vector3 Velocity()
