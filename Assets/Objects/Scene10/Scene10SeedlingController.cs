@@ -83,8 +83,5 @@ public class Scene10SeedlingController : MonoBehaviour
 		{
 			seedling.gameObject.SetActive( false );
 		}
-
-		// signal chuck event
-		myChuck.BroadcastEvent( "scene10AdvanceToScene11" );
 	}
 }

@@ -13,12 +13,16 @@ public class DoScene1011Transition : MonoBehaviour
 
 	public Scene10SeedlingController parentOfSeedlings;
 
+	private ChuckSubInstance myChuck;
+	private ChuckEventListener mySwitchListener;
+
     // Use this for initialization
     void Start()
     {
 		RenderSettings.skybox = firstSkybox;
-
-		Invoke( "DoTransition", 10 );
+		myChuck = GetComponent<ChuckSubInstance>();
+		mySwitchListener = gameObject.AddComponent<ChuckEventListener>();
+		mySwitchListener.ListenForEvent( myChuck, "scene10AdvanceToScene11", DoTransition );
     }
 
     // Update is called once per frame
@@ -27,7 +31,7 @@ public class DoScene1011Transition : MonoBehaviour
 
     }
 
-	public void DoTransition()
+	void DoTransition()
 	{
 		world10.SetActive( false );
 		world11.SetActive( true );
@@ -35,5 +39,7 @@ public class DoScene1011Transition : MonoBehaviour
 		room.localScale *= newRoomRelativeScale;
 		RenderSettings.skybox = secondSkybox;
 		parentOfSeedlings.SwitchToScene11();
+
+		mySwitchListener.StopListening();
 	}
 }

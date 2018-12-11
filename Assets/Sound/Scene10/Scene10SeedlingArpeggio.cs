@@ -11,6 +11,9 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 
 	public string[] myAhhChord1, myAhhChord2, myAhhChord3;
 
+	public string[] mySecondHalfChord2, mySecondHalfChord3;
+	public string[] myAhhSecondHalfChord2, myAhhSecondHalfChord3;
+
     // Use this for initialization
     void Start()
     {
@@ -27,7 +30,10 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             .05 => r.mix;
 
 			0.5 => global float scene10NoteLengthSeconds;
-			0.045::second => dur postNoteEventBroadcastTime;
+			// 0.045::second => dur postNoteEventBroadcastTime;
+			0.04
+			::second => dur postNoteEventBroadcastTime;
+			true => int shouldListenToUnityTatum;
 			global Event scene10NoteHappened;
 			global Event scene10ActualNoteHappened;
             true => int hardPick;
@@ -52,10 +58,10 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             [[B5], [B5, Cs6], [Cs6, Ds6], [Ds6], [Ds6, E6]] @=> int supertops[][];
 			
 
-
+            global Event scene10AdvanceToScene11;
 			fun void SendOutTatum()
 			{{
-				while( true )
+				while( shouldListenToUnityTatum )
 				{{
 					//  this is used for rhythm and so it happens in any case
 					scene10ActualNoteHappened.broadcast();
@@ -63,6 +69,25 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 				}}
 			}}
 			spork ~ SendOutTatum();
+
+			fun void SendOutMyOwnTatum()
+			{{
+				scene10AdvanceToScene11 => now;
+				false => shouldListenToUnityTatum;
+				1.25 * scene10NoteLengthSeconds => float myOwnNoteLength;
+				while( true )
+				{{
+					myOwnNoteLength::second => now;
+					<<< myOwnNoteLength >>>;
+					scene10ActualNoteHappened.broadcast();
+					1.03 *=> myOwnNoteLength;
+					if( myOwnNoteLength > 0.4 )
+					{{
+						0.4 => myOwnNoteLength;
+					}}
+				}}
+			}}
+			spork ~ SendOutMyOwnTatum();
 
             fun void PlayArray( int notes[] )
             {{
@@ -172,7 +197,6 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             }}
             spork ~ PlayMainLoop();
             
-            global Event scene10AdvanceToScene11;
             scene10AdvanceToScene11 => now;
 
 			// new notes for
@@ -364,16 +388,38 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			10000 => float goalLPFCutoff;
 			0.00003 => float cutoffSlew;
 
+			fun void SlewClimaxChords()
+			{{
+				while( true )
+				{{
+					gainSlew * ( goalGain - currentGain ) +=> currentGain;
+					currentGain => turnOn.gain;
+
+					cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
+					currentLPFCutoff => lpf.freq;
+					1::ms => now;
+				}}
+			}}
+			spork ~ SlewClimaxChords();
+
+			global Event scene10AdvanceToScene11;
+
+			// wait for a bit (TODO: 13? something else?)
+			repeat( 10 ) {{ scene10ChordChange => now; }}
+
+			// Tell everyone to DO THE THING
+			scene10AdvanceToScene11.broadcast();
+
+			[[66,66,66,66], [{0}], [{3}], [{4}]] @=> myNotes;
+
 			while( true )
 			{{
-				gainSlew * ( goalGain - currentGain ) +=> currentGain;
-				currentGain => turnOn.gain;
-
-				cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
-				currentLPFCutoff => lpf.freq;
-				1::ms => now;
+				1::second => now;
 			}}
-		", string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ) ) );
+
+			
+		", string.Join( ",", myChord1 ), string.Join( ",", myChord2 ), string.Join( ",", myChord3 ),
+		   string.Join( ",", mySecondHalfChord3 ), string.Join( ",", mySecondHalfChord2 ) ) );
 
 
 		// ========================================================================================
@@ -573,19 +619,38 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			7000 => float goalLPFCutoff;
 			0.00003 => float cutoffSlew;
 
+			fun void SlewClimaxChords()
+			{{
+				while( true )
+				{{
+					gainSlew * ( goalGain - currentGain ) +=> currentGain;
+					currentGain => turnOn.gain;
+
+					cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
+					currentLPFCutoff => lpf.freq;
+					1::ms => now;
+				}}
+			}}
+			spork ~ SlewClimaxChords();
+
+			global Event scene10AdvanceToScene11;
+			scene10AdvanceToScene11 => now;
+			
+
+			[[66,66,66,66], [{0}], [{3}], [{4}]] @=> myNotes;
+			// reinforce bass notes
+			1.2 * myAhhs[0].gain() => myAhhs[0].gain;
+			1.2 * myAhhs[1].gain() => myAhhs[1].gain;
+
 			while( true )
 			{{
-				gainSlew * ( goalGain - currentGain ) +=> currentGain;
-				currentGain => turnOn.gain;
-
-				cutoffSlew * ( goalLPFCutoff - currentLPFCutoff ) +=> currentLPFCutoff;
-				currentLPFCutoff => lpf.freq;
-				1::ms => now;
+				1::second => now;
 			}}
         
-        ", string.Join( ",", myAhhChord1 ), string.Join( ",", myAhhChord2 ), string.Join( ",", myAhhChord3 ) ) );
+        ", string.Join( ",", myAhhChord1 ), string.Join( ",", myAhhChord2 ), string.Join( ",", myAhhChord3 ),
+		   string.Join( ",", myAhhSecondHalfChord3 ), string.Join( ",", myAhhSecondHalfChord2 ) ) );
 
-		InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
+		//InvokeRepeating( "DebugSqueezeAmount", 0, 1 );
     }
 
 	private float vibrationAccumulation = 0;
@@ -596,7 +661,12 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if( leftHand.IsSqueezed() || rightHand.IsSqueezed() )
+		if( leftHand.IsSqueezed() )
+		{
+			vibrationAccumulation += Time.deltaTime;
+		}
+
+		if( rightHand.IsSqueezed() )
 		{
 			vibrationAccumulation += Time.deltaTime;
 		}
