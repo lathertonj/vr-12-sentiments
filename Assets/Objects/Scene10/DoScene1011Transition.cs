@@ -16,6 +16,8 @@ public class DoScene1011Transition : MonoBehaviour
 	private ChuckSubInstance myChuck;
 	private ChuckEventListener mySwitchListener;
 
+	public Color skyColor;
+
     // Use this for initialization
     void Start()
     {
@@ -33,13 +35,21 @@ public class DoScene1011Transition : MonoBehaviour
 
 	void DoTransition()
 	{
+		// change terrain
 		world10.SetActive( false );
 		world11.SetActive( true );
+		// change room
 		room.position = newRoomLocation;
 		room.localScale *= newRoomRelativeScale;
+		// change sky color
 		RenderSettings.skybox = secondSkybox;
+		// turn off scene 10 seedlings
 		parentOfSeedlings.SwitchToScene11();
+		// pop of color overlay
+		SteamVR_Fade.Start( skyColor, 0f );
+		SteamVR_Fade.Start( Color.clear, 10f );
 
+		// don't do this again
 		mySwitchListener.StopListening();
 	}
 }
