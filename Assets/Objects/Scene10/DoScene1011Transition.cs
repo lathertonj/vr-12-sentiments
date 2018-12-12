@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DoScene1011Transition : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class DoScene1011Transition : MonoBehaviour
 
 	private ChuckSubInstance myChuck;
 	private ChuckEventListener mySwitchListener;
+	private ChuckEventListener myAdvanceListener;
 
 	public Color skyColor;
 
@@ -25,6 +27,8 @@ public class DoScene1011Transition : MonoBehaviour
 		myChuck = GetComponent<ChuckSubInstance>();
 		mySwitchListener = gameObject.AddComponent<ChuckEventListener>();
 		mySwitchListener.ListenForEvent( myChuck, "scene10AdvanceToScene11", DoTransition );
+		myAdvanceListener = gameObject.AddComponent<ChuckEventListener>();
+		myAdvanceListener.ListenForEvent( myChuck, "advanceToScene12", AdvanceToScene12 );
     }
 
     // Update is called once per frame
@@ -51,5 +55,16 @@ public class DoScene1011Transition : MonoBehaviour
 
 		// don't do this again
 		mySwitchListener.StopListening();
+	}
+
+	void AdvanceToScene12()
+	{
+		SteamVR_Fade.Start( skyColor, 4f );
+		Invoke( "LoadNextScene", 4.8f );
+	}
+
+	void LoadNextScene()
+	{
+		SceneManager.LoadScene( "12_JoyfulFulfilled" );
 	}
 }

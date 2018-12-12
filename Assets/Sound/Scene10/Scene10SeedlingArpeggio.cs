@@ -194,24 +194,25 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
         
                 }}
             }}
-            spork ~ PlayMainLoop();
+            spork ~ PlayMainLoop() @=> Shred playMainLoopShred;
             
             scene10AdvanceToScene11 => now;
 
 			// new notes for
 			[/*[B5],*/ [B5, Cs6], [Cs6, D6], [D6], [D6, E6]] @=> supertops;
             
-            // TODO: do something 
-            while( true ) 
-            {{ 
-                //if( hpf.freq() > 20000 ) {{ break; }}
-                //hpf.freq() * 1.02 => hpf.freq;
-                10::ms => now;
-            }}
+            global Event endScene11;
+            endScene11 => now;
+            // stop playing
+            playMainLoopShred.exit();
+
+            // reverb tail
+            10::second => now;
 		", cutoffs[0], cutoffs[1], cutoffs[2], cutoffs[3] ) );
 
 		myChuck.RunCode( string.Format( @"
 			global Event scene10BringInTheClimaxChords, scene10ChordChange, scene10StartListeningForClimax;
+            global Event advanceToScene12;
 
 			// using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -410,6 +411,23 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			scene10AdvanceToScene11.broadcast();
 
 			[[66,66,66,66], [{0}], [{3}], [{4}]] @=> myNotes;
+
+            global Event endScene11;
+            endScene11 => now;
+
+            // hold for 3 seconds
+            2.7::second => now;
+
+            // turn off slowly
+			0 => goalGain;
+			0.0003 => gainSlew;
+
+			20 => goalLPFCutoff;
+			0.0002 => cutoffSlew;
+
+            // in 12 seconds, tell the outside world to move on
+            12::second => now;
+            advanceToScene12.broadcast();
 
 			while( true )
 			{{
@@ -640,6 +658,19 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 			// reinforce bass notes
 			// 1.2 * myAhhs[0].gain() => myAhhs[0].gain;
 			// 1.2 * myAhhs[1].gain() => myAhhs[1].gain;
+
+            global Event endScene11;
+            endScene11 => now;
+
+            // hold for 3 seconds
+            2.7::second => now;
+
+            // turn off slowly
+			0 => goalGain;
+			0.0003 => gainSlew;
+
+			20 => goalLPFCutoff;
+			0.0002 => cutoffSlew;
 
 			while( true )
 			{{

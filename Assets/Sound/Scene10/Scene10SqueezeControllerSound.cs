@@ -255,19 +255,20 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
 				}}
 			}}
             
+            Shred playNotesShred;
             fun void RespondToChordEvents()
             {{
                 while( true ) {{
                     {0} => now;
 					// play
-                    spork ~ PlayNotes() @=> Shred playNotesShred;
+                    spork ~ PlayNotes() @=> playNotesShred;
                     {1} => now;
 					// turn off
 					playNotesShred.exit();
                     1 => adsr.keyOff;
                 }}
             }}
-            spork ~ RespondToChordEvents();
+            spork ~ RespondToChordEvents() @=> Shred respondToChordEventsShred;
 
             scene10AdvanceToScene11 => now;
 
@@ -280,7 +281,16 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             // TODO end scene 11
             global Event endScene11;
             endScene11 => now;
-            
+
+            // turn off responsiveness and turn on
+            respondToChordEventsShred.exit();
+            playNotesShred.exit();
+            1 => adsr.keyOn;
+
+            // hold for 3 seconds
+            2.7::second => now;
+
+            // fade out forever
             while( true )
             {{
                 adsr.gain() * 0.99 => adsr.gain;

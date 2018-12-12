@@ -25,6 +25,7 @@ public class GrowSproutlings : MonoBehaviour
         myChuck = GetComponent<ChuckSubInstance>();
         myChuck.RunCode( @"
 			global Event scene11GrowSproutlings, scene10ChordChange;
+			global Event endScene11;
             fun void SendGrowSproutlingsEvent()
             {{
 				// this script is being run as a result of this script broadcasting:
@@ -45,6 +46,11 @@ public class GrowSproutlings : MonoBehaviour
                     // grow!
                     scene11GrowSproutlings.broadcast();
                 }}
+
+				// wait til second chord change and then send the signal for everyone to end
+				repeat( 2 ) {{ scene10ChordChange => now; }}
+				endScene11.broadcast();
+
             }}
             SendGrowSproutlingsEvent();
 		" );
