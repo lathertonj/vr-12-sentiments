@@ -57,6 +57,11 @@ public class ControllerAccessors : MonoBehaviour
         Controller.TriggerHapticPulse( amount );
     }
 
+    public bool IsAppButtonPressed()
+    {
+        return Controller.GetPressDown( SteamVR_Controller.ButtonMask.ApplicationMenu );
+    }
+
     public bool IsSqueezed()
     {
         return numButtonsPressed > 0;
