@@ -13,4 +13,12 @@ public class TheChuck : MonoBehaviour
             instance = GetComponent<ChuckMainInstance>();
         }
     }
+
+    void OnDestroy()
+    {
+        if( instance == GetComponent<ChuckMainInstance>() )
+        {
+            instance = null;
+        }
+    }
 }
