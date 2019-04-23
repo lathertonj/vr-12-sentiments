@@ -14,7 +14,7 @@ public class Scene12AhhSqueeze : MonoBehaviour
     void Start()
     {
 		currentVibration = goalVibration = 0;
-		vibrationSlew = 0.035f;
+		vibrationSlew = 0.35f;
 
 		myController = GetComponent<ControllerAccessors>();
 		myChuck = GetComponent<ChuckSubInstance>();
@@ -398,7 +398,7 @@ public class Scene12AhhSqueeze : MonoBehaviour
     public void InformSqueezed()
     {
         myChuck.BroadcastEvent( mySqueezedEvent );
-		goalVibration = 200;
+		goalVibration = 100;
     }
 
     public void InformUnsqueezed()
