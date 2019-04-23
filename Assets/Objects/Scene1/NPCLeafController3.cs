@@ -17,6 +17,8 @@ public class NPCLeafController3 : MonoBehaviour
     private float lastUpTime, lastDownTime;
     private bool goingUp = false;
 
+    [HideInInspector] public float myHeight;
+
     // Use this for initialization
     void Start()
     {
@@ -69,5 +71,8 @@ public class NPCLeafController3 : MonoBehaviour
         Vector3 localEulerAngles = myHeadLeaf.localEulerAngles;
         localEulerAngles.z = headAngle;
         myHeadLeaf.localEulerAngles = localEulerAngles;
+
+        // store for chuck script to access
+        myHeight = height;
     }
 }
