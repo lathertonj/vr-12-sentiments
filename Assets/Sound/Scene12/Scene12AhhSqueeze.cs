@@ -203,8 +203,8 @@ public class Scene12AhhSqueeze : MonoBehaviour
             spork ~ SetVolume();
 
             // let it die out
-            global Event scene4EndEvent;
-            scene4EndEvent => now;
+            global Event scene12Finish;
+            scene12Finish => now;
             true => sceneIsOver;
 			
 			// reverb tail
@@ -312,9 +312,11 @@ public class Scene12AhhSqueeze : MonoBehaviour
                 }}
             }}
 
-            HPF hpf => LPF lpf => Gain ampMod => JCRev reverb => dac;
-            1800 => hpf.freq;
-            1000 => lpf.freq; // orig 6000
+            HPF hpf => LPF lpf => Gain ampMod => Gain volumeAdjust => JCRev reverb => dac;
+			1.7 => volumeAdjust.gain; 
+
+            400 => hpf.freq;
+            16000 => lpf.freq; // orig 6000
             0.05 => reverb.mix;
 
             fun void AmpMod()
@@ -352,6 +354,7 @@ public class Scene12AhhSqueeze : MonoBehaviour
                 mySaws[i] => lpf; // SKIP hpf
             }}
 
+
             0 => float goalGain;
             0 => float currentGain;
             0.0006 => float gainSlew;
@@ -361,7 +364,7 @@ public class Scene12AhhSqueeze : MonoBehaviour
                 {{
                     gainSlew * ( goalGain - currentGain ) +=> currentGain;
                     currentGain => lpf.gain;
-                    50 + 1000 * currentGain => lpf.freq;
+                    5000 + 13000 * currentGain => lpf.freq;
                     1::ms => now;
                 }}
             }}
@@ -381,8 +384,8 @@ public class Scene12AhhSqueeze : MonoBehaviour
             spork ~ RespondToSqueezes() @=> Shred squeezeResponseShred;
             
             // turn off chord at end of movement
-            global Event scene4EndEvent;
-            scene4EndEvent => now;
+            global Event scene12Finish;
+            scene12Finish => now;
             squeezeResponseShred.exit();
             0 => goalGain;
             
