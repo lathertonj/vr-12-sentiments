@@ -138,14 +138,6 @@ public class Scene12SproutlingChords : MonoBehaviour
             [{1}] @=> int chordNotes[];
             Supersaw mySaws[chordNotes.size()];
 
-            69 => int A4;
-            71 => int B4;
-            74 => int D5;
-            76 => int E5;
-            78 => int Fs5;
-            79 => int G5;
-
-
             for( int i; i < mySaws.size(); i++ )
             {{
                 // how much freq waves up and down as a % of current freq
@@ -158,6 +150,7 @@ public class Scene12SproutlingChords : MonoBehaviour
                 0.035 => mySaws[i].gain;
                 // freq
                 chordNotes[i] => Std.mtof => mySaws[i].freq;
+                //<<< chordNotes[i]>>>;
     
                 mySaws[i] => hpf;
             }}
@@ -183,6 +176,6 @@ public class Scene12SproutlingChords : MonoBehaviour
     void Update()
     {
         // set loudness
-        myChuck.SetFloat( myLoudness, myLeaf.myHeight );
+        myChuck.SetFloat( myLoudness, myLeaf.myHeight.Map( -1, 1, 0, 1 ) );
     }
 }
