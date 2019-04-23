@@ -185,9 +185,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4352946031366676}
   - component: {fileID: 114222892482438944}
-  - component: {fileID: 114640130901067622}
   - component: {fileID: 198860861713094850}
   - component: {fileID: 199814064407263920}
+  - component: {fileID: 370537950259592085}
   m_Layer: 0
   m_Name: HeadFollow
   m_TagString: Untagged
@@ -222,22 +222,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentToEmbiggen: {fileID: 4177650115857870}
---- !u!114 &114640130901067622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1167321614658368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1deeee43aaf43de4aae0a24df3c3c5d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myHeadLeaf: {fileID: 4262837115984994}
-  cycleRange: {x: 2, y: 3.5}
-  effectRange: {x: 0.2, y: 0.3}
-  effectDamping: {x: 0.1, y: 1, z: 0.1}
 --- !u!198 &198860861713094850
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4904,6 +4888,26 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &370537950259592085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167321614658368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1372b4baddaa3d24ab63c3951f50f5f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myHeadLeaf: {fileID: 4262837115984994}
+  effectRange: {x: 0.2, y: 0.3}
+  effectDamping: {x: 0.1, y: 1, z: 0.1}
+  xCycle: 2.5
+  zCycle: 3.5
+  xPhase: 0
+  zPhase: 0
+  upTime: 3
 --- !u!1 &1236121040980012
 GameObject:
   m_ObjectHideFlags: 0
