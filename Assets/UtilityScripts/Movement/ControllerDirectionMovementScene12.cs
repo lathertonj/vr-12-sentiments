@@ -31,11 +31,11 @@ public class ControllerDirectionMovementScene12 : MonoBehaviour
 
             if( speed < slowSpeedCutoff )
             {
-                sonifier.SlowMovementHappened();
+                sonifier.DecreaseNoteSpeed();
             }
             else if( speed > fastSpeedCutoff )
             {
-                sonifier.FastMovementHappened();
+                sonifier.IncreaseNoteSpeed();
             }
         }
 

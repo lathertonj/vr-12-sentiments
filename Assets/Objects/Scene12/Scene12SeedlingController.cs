@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Scene12SeedlingController : MonoBehaviour , CollisionResponder
+public class Scene12SeedlingController : MonoBehaviour
 {
 
     public Transform seedlingPrefab;
     public int numSeedlings = 20;
     public Vector3 spawnRadius = 3f * Vector3.one;
     private Rigidbody[] mySeedlings;
-    public ControllerAccessors leftController, rightController;
-    private ParticleSystem leftHand, rightHand;
+    private bool[] mySeedlingsEncountered;
+    private Dictionary<Rigidbody, int> mySeedlingIndices;
     private ParticleSystem myParticleEmitter;
-	private ConstantDirectionMover room;
-	private float maxSqueezeTime = 5f;
+    private float maxSqueezeTime = 5f;
     public Transform audioListenerPosition;
 
 
@@ -23,7 +22,6 @@ public class Scene12SeedlingController : MonoBehaviour , CollisionResponder
     void Start()
     {
         myParticleEmitter = GetComponentInChildren<ParticleSystem>();
-		room = GetComponentInParent<ConstantDirectionMover>();
 
         for( int i = 0; i < numSeedlings; i++ )
         {
@@ -41,12 +39,16 @@ public class Scene12SeedlingController : MonoBehaviour , CollisionResponder
         }
 
         mySeedlings = GetComponentsInChildren<Rigidbody>();
+        mySeedlingIndices = new Dictionary<Rigidbody, int>();
+        mySeedlingsEncountered = new bool[mySeedlings.Length];
+        for( int i = 0; i < mySeedlings.Length; i++ )
+        {
+            mySeedlingsEncountered[i] = false;
+            mySeedlingIndices[mySeedlings[i]] = i;
+        }
 
         mySonifier = GetComponent<Scene12SonifyFlowerSeedlings>();
         mySonifier.StartChuck( jumpDelay: 0.4f, launchASeedling: LaunchASeedling, numSeedlings: numSeedlings );
-
-        leftHand = leftController.GetComponentInChildren<ParticleSystem>();
-        rightHand = rightController.GetComponentInChildren<ParticleSystem>();
 
     }
 
@@ -54,62 +56,59 @@ public class Scene12SeedlingController : MonoBehaviour , CollisionResponder
     int currentSeedling = 0;
     void LaunchASeedling()
     {
-		Rigidbody seedling = mySeedlings[currentSeedling];
+        if( mySeedlingsEncountered[currentSeedling] )
+        {
+            Rigidbody seedling = mySeedlings[currentSeedling];
 
-		Vector3 seedlingVelocity = 0.15f * room.GetDirection() + 0.02f * RandomVector3();
-		seedling.AddForce( seedlingVelocity, ForceMode.VelocityChange );
+            // TODO: which direction should seedlings move in?
+            Vector3 seedlingVelocity = /* 0.15f * room.GetDirection() + */ 0.02f * RandomVector3();
+            seedling.AddForce( seedlingVelocity, ForceMode.VelocityChange );
 
-		Vector3 randomAngularVelocity = RandomVector3();
-		seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
+            Vector3 randomAngularVelocity = RandomVector3();
+            seedling.AddTorque( randomAngularVelocity, ForceMode.VelocityChange );
 
 
-		// animate particle
-		ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
-		emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.position );
-		emitParams.velocity = seedlingVelocity; // take only the y component?
-		myParticleEmitter.Emit( emitParams, count: 1 );
+            // animate particle
+            ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+            emitParams.position = myParticleEmitter.transform.InverseTransformPoint( seedling.position );
+            emitParams.velocity = seedlingVelocity; // take only the y component?
+            myParticleEmitter.Emit( emitParams, count: 1 );
+        }
 
         currentSeedling++; currentSeedling %= mySeedlings.Length;
-		
+
         // tell chuck what the next distance will be
-        mySonifier.InformOfNextDistance( ( audioListenerPosition.position - mySeedlings[currentSeedling].transform.position ).magnitude );
+        if( mySeedlingsEncountered[currentSeedling] )
+        {
+            mySonifier.InformOfNextDistance( ( audioListenerPosition.position - mySeedlings[currentSeedling].transform.position ).magnitude );
+        }
+        else
+        {
+            mySonifier.MuteNextNote();
+        }
+
+    }
+
+    public void EnableSeedling( Rigidbody seedling )
+    {
+        mySeedlingsEncountered[mySeedlingIndices[seedling]] = true;
+        mySonifier.IncreaseNoteSpeed();
     }
 
     void Update()
     {
-		ProcessController( leftController );
-        ProcessController( rightController );
+
     }
 
-	void ProcessController( ControllerAccessors controller )
-	{
-        if( controller.IsFirstSqueezed() )
-        {
-            controller.RecordSqueezeStartTime();
-        }
 
-		if( controller.IsSqueezed() )
-        {
-            float timeElapsed = controller.ElapsedSqueezeTime();
-            
-            // map within low intensity values. this movement is not intense so vibration is not strong.
-            ushort intensity = (ushort) timeElapsed.MapClamp( 0, maxSqueezeTime, 30, 180 );
-            controller.Vibrate( intensity );
-        }
-	}
-
-	Vector3 RandomVector3()
-	{
-		return new Vector3(
-			Random.Range( -1f, 1f ),
-			Random.Range( -1f, 1f ),
-			Random.Range( -1f, 1f )
-		);
-	}
-
-    public void RespondToCollision()
+    Vector3 RandomVector3()
     {
-        // when we hit the ground, stop the happiness
-        mySonifier.SlowMovementHappened();
+        return new Vector3(
+            Random.Range( -1f, 1f ),
+            Random.Range( -1f, 1f ),
+            Random.Range( -1f, 1f )
+        );
     }
+
+
 }

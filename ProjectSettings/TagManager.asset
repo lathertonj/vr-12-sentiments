@@ -9,6 +9,7 @@ TagManager:
   - Chord2
   - Seedling
   - Ground
+  - Room
   layers:
   - Default
   - TransparentFX

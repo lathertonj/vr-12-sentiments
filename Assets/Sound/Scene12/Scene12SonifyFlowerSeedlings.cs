@@ -95,7 +95,7 @@ public class Scene12SonifyFlowerSeedlings : MonoBehaviour {
 					{3} => now;
 
                     // --> make the jumps fast
-                    0.94 *=> noteLength;
+                    0.98 *=> noteLength;
                     if( noteLength < minSpeed )
                     {{
                         minSpeed => noteLength;
@@ -148,14 +148,14 @@ public class Scene12SonifyFlowerSeedlings : MonoBehaviour {
             {{
                 while( true )
                 {{
-                    if( scene12HappyMode || maybe )
+                    if( scene12HappyMode && maybe )
                     {{
                         Math.random2f( 0.7, 0.9 ) => s.energy;
                         1 => s.noteOn;
                     }}
                     noteLength => now;
     
-                    if( scene12HappyMode || maybe )
+                    if( scene12HappyMode && maybe )
                     {{
                         Math.random2f( 0.3, 0.5 ) => s.energy;
                         1 => s.noteOn;
@@ -214,18 +214,23 @@ public class Scene12SonifyFlowerSeedlings : MonoBehaviour {
         gameObject.AddComponent<ChuckEventListener>().ListenForEvent( myChuck, myJumpEvent, launchASeedling );
     }
 
-    public void FastMovementHappened()
+    public void IncreaseNoteSpeed()
     {
         myChuck.BroadcastEvent( myIncreaseSpeedEvent );
     }
 
-    public void SlowMovementHappened()
+    public void DecreaseNoteSpeed()
     {
         myChuck.BroadcastEvent( myDecreaseSpeedEvent );
     }
 
     public void InformOfNextDistance( float distance )
     {
-        myChuck.SetFloat( myNextLoudness, distance.PowMapClamp( 0, 1, 1, 0.3f, 2 ) );
+        myChuck.SetFloat( myNextLoudness, distance.PowMapClamp( 0, 1, 1, 0.35f, 2 ) );
+    }
+
+    public void MuteNextNote()
+    {
+        myChuck.SetFloat( myNextLoudness, 0 );
     }
 }
