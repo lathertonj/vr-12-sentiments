@@ -60,7 +60,6 @@ public class Scene12LookUpGrowth : MonoBehaviour
                 float position = currentSize.MapClamp( startSize, endSize, 0, 1 );
                 float extraMultiplier = growthMultiplierCurve.Evaluate( position );
                 currentSize *= Mathf.Pow( 1 + growthMultiplicationPerSecond * extraMultiplier, Time.deltaTime );
-                Debug.Log( currentSize );
                 break;
         }
 
