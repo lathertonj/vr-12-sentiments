@@ -61,7 +61,13 @@ public class Scene12SeedlingController : MonoBehaviour
             Rigidbody seedling = mySeedlings[currentSeedling];
 
             // TODO: which direction should seedlings move in?
-            Vector3 seedlingVelocity = /* 0.15f * room.GetDirection() + */ 0.02f * RandomVector3();
+            // how about: tangent to the player?
+            Vector3 seedlingToPlayer = seedling.transform.position - audioListenerPosition.position;
+            seedlingToPlayer.y = 0;
+            // rotate 90 degrees 
+            Vector3 seedlingAlongPlayer = Quaternion.AngleAxis( 90, Vector3.up ) * seedlingToPlayer;
+            seedlingAlongPlayer.Normalize();
+            Vector3 seedlingVelocity = 1.5f * seedlingAlongPlayer + 0.02f * RandomVector3();
             seedling.AddForce( seedlingVelocity, ForceMode.VelocityChange );
 
             Vector3 randomAngularVelocity = RandomVector3();

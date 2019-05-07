@@ -14,6 +14,8 @@ public class Scene12LookUpGrowth : MonoBehaviour
 
     public AnimationCurve growthMultiplierCurve = AnimationCurve.EaseInOut( 0, 3, 1, 0 );
 
+    public RotateSeedlings seedlingsToRotate;
+
     private float currentSize;
 
     void Start()
@@ -67,6 +69,9 @@ public class Scene12LookUpGrowth : MonoBehaviour
         {
             currentSize = endSize;
         }
+
+        seedlingsToRotate.SetAmount( currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f ) );
+        Debug.Log(currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f ));
     }
 
     void NotGrow()
