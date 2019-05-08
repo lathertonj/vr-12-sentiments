@@ -17,13 +17,14 @@ public class Scene12LookUpGrowth : MonoBehaviour
     public RotateSeedlings seedlingsToRotate;
     private Scene12LookUpParticleSystemManager particleManager;
     private float normalizedSize;
+    private float sizeSlew = 2f;
 
-    private float currentSize;
+    private float currentSize, goalSize;
 
     void Start()
     {
         room.localScale = startSize * Vector3.one;
-        currentSize = startSize;
+        currentSize = goalSize = startSize;
         particleManager = GetComponent<Scene12LookUpParticleSystemManager>();
     }
 
@@ -59,19 +60,21 @@ public class Scene12LookUpGrowth : MonoBehaviour
         switch( growthMethod )
         {
             case GrowthMethod.Additive:
-                currentSize += growthAdditionPerSecond * Time.deltaTime;
+                goalSize += growthAdditionPerSecond * Time.deltaTime;
                 break;
             case GrowthMethod.Multiplicative:
                 float position = currentSize.MapClamp( startSize, endSize, 0, 1 );
                 float extraMultiplier = growthMultiplierCurve.Evaluate( position );
-                currentSize *= Mathf.Pow( 1 + growthMultiplicationPerSecond * extraMultiplier, Time.deltaTime );
+                goalSize *= Mathf.Pow( 1 + growthMultiplicationPerSecond * extraMultiplier, Time.deltaTime );
                 break;
         }
 
-        if( currentSize > endSize )
+        if( goalSize > endSize )
         {
-            currentSize = endSize;
+            goalSize = endSize;
         }
+
+        SlewSize();
 
         normalizedSize = currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f );
         seedlingsToRotate.SetAmount( normalizedSize );
@@ -80,9 +83,17 @@ public class Scene12LookUpGrowth : MonoBehaviour
 
     void NotGrow()
     {
-        // do nothing?
+        // when we are not growing, we are still slewing our size
+        SlewSize();
+    }
+
+    void SlewSize()
+    {
+        currentSize += sizeSlew * Time.deltaTime * ( goalSize - currentSize );
     }
 }
+
+
 
 public enum GrowthMethod
 {
