@@ -15,6 +15,8 @@ public class Scene12LookUpGrowth : MonoBehaviour
     public AnimationCurve growthMultiplierCurve = AnimationCurve.EaseInOut( 0, 3, 1, 0 );
 
     public RotateSeedlings seedlingsToRotate;
+    private Scene12LookUpParticleSystemManager particleManager;
+    private float normalizedSize;
 
     private float currentSize;
 
@@ -22,6 +24,7 @@ public class Scene12LookUpGrowth : MonoBehaviour
     {
         room.localScale = startSize * Vector3.one;
         currentSize = startSize;
+        particleManager = GetComponent<Scene12LookUpParticleSystemManager>();
     }
 
     void Update()
@@ -70,8 +73,9 @@ public class Scene12LookUpGrowth : MonoBehaviour
             currentSize = endSize;
         }
 
-        seedlingsToRotate.SetAmount( currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f ) );
-        Debug.Log(currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f ));
+        normalizedSize = currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f );
+        seedlingsToRotate.SetAmount( normalizedSize );
+        particleManager.SetNormalizedSize( normalizedSize );
     }
 
     void NotGrow()
