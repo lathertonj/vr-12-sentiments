@@ -5201,7 +5201,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!21 &213492628
+--- !u!21 &160010315
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -17190,7 +17190,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 50, y: 3, z: 50}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!43 &1595895800
+--- !u!43 &1562244043
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -22888,7 +22888,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891209394}
-  m_Mesh: {fileID: 1595895800}
+  m_Mesh: {fileID: 1562244043}
 --- !u!23 &1889040916
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -22906,7 +22906,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 213492628}
+  - {fileID: 160010315}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -23028,7 +23028,6 @@ GameObject:
   - component: {fileID: 1891347827}
   - component: {fileID: 1891347828}
   - component: {fileID: 1891347830}
-  - component: {fileID: 1891347831}
   - component: {fileID: 1891347832}
   m_Layer: 0
   m_Name: Camera (eye)
@@ -23067,7 +23066,6 @@ GameObject:
   - component: {fileID: 1889040916}
   - component: {fileID: 1887976336}
   - component: {fileID: 1880417008}
-  - component: {fileID: 1891347818}
   m_Layer: 0
   m_Name: '[CameraRig]'
   m_TagString: Untagged
@@ -23165,22 +23163,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1891347818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1891209394}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 292e6376a4310364bb2365979885ee8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  minSpeedWithoutStopping: 0.1
-  mostlyIgnoreMovementRequests: 0
-  timeToReturnToOriginalDirection: 1
-  percentOfRequestToConsider: 0.5
 --- !u!54 &1891347824
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -23414,20 +23396,6 @@ MonoBehaviour:
   - 69
   - 74
   - 74+12
---- !u!114 &1891347831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1891190808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 722d822a0ba10a04db7bc05902f413a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionRespondersToInform:
-  - {fileID: 1158063228}
 --- !u!114 &1891347832
 MonoBehaviour:
   m_ObjectHideFlags: 0
