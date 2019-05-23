@@ -101,7 +101,7 @@ public class Scene12LookUpChords : MonoBehaviour
 				buf.length() => dur bufferlen;
 				
 				// LiSa params
-				100 => lisa.maxVoices;
+				10 => lisa.maxVoices;
 				0.1 => lisa.gain;
 				true => lisa.loop;
 				false => lisa.record;
