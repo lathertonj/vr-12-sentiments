@@ -229,7 +229,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
             class Supersaw extends Chubgraph
             {{
                 SawOsc osc => Gain out => outlet;
-                5 => int numDelays;
+                3 => int numDelays;
                 1.0 / (1 + numDelays) => out.gain;
                 DelayA theDelays[numDelays];
                 SinOsc lfos[numDelays];
@@ -514,7 +514,7 @@ public class Scene10SeedlingArpeggio : MonoBehaviour
 				buf.length() => dur bufferlen;
 				
 				// LiSa params
-				100 => lisa.maxVoices;
+				10 => lisa.maxVoices;
 				0.1 => lisa.gain;
 				true => lisa.loop;
 				false => lisa.record;

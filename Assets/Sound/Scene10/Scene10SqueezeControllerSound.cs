@@ -36,7 +36,7 @@ public class Scene10SqueezeControllerSound : MonoBehaviour
             class Supersaw extends Chubgraph
             {{
                 SawOsc osc => Gain out => outlet;
-                5 => int numDelays;
+                3 => int numDelays;
                 1.0 / (1 + numDelays) => out.gain;
                 DelayA theDelays[numDelays];
                 SinOsc lfos[numDelays];
