@@ -8,6 +8,7 @@ public class Scene12SproutlingChords : MonoBehaviour
     private ChuckSubInstance myChuck;
     private NPCLeafController3 myLeaf;
     private string myLoudness;
+    private float fadeInVolume = 0f;
 
     // Use this for initialization
     void Start()
@@ -15,6 +16,7 @@ public class Scene12SproutlingChords : MonoBehaviour
         myLeaf = GetComponentInChildren<NPCLeafController3>();
         myChuck = GetComponent<ChuckSubInstance>();
         myLoudness = myChuck.GetUniqueVariableName();
+        StartCoroutine( FadeInVolume( 3f ) );
         myChuck.RunCode( string.Format( @"
             // using a carrier wave (saw oscillator for example,) 
             // and modulating its signal using a comb filter 
@@ -172,10 +174,22 @@ public class Scene12SproutlingChords : MonoBehaviour
         ", myLoudness, string.Join( ",", notes ) ) );
     }
 
+    IEnumerator FadeInVolume( float fadeInTime )
+    {
+        yield return new WaitForSecondsRealtime( 0.5f );
+        float startTime = Time.time;
+        while( Time.time < startTime + fadeInTime )
+        {
+            fadeInVolume = ( Time.time - startTime ).PowMapClamp( 0, fadeInTime, 0, 1, 2f );
+            yield return null;
+        }
+        fadeInVolume = 1;
+    }
+
     // Update is called once per frame
     void Update()
     {
         // set loudness
-        myChuck.SetFloat( myLoudness, myLeaf.myHeight.Map( -1, 1, 0, 1 ) );
+        myChuck.SetFloat( myLoudness, fadeInVolume * myLeaf.myHeight.Map( -1, 1, 0, 1 ) );
     }
 }
