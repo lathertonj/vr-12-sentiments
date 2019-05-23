@@ -26,6 +26,8 @@ public class ChuckEventListener : MonoBehaviour
         userCallback = callback;
         myChuck = chuck;
         myEventName = eventToListenFor;
+        // make sure it exists
+        myChuck.RunCode( string.Format( @"global Event {0};", eventToListenFor ) );
         myChuck.StartListeningForChuckEvent( myEventName, myVoidCallback );
     }
 
