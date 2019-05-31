@@ -40,30 +40,30 @@ public class NPCLeafController3 : MonoBehaviour
         float height = 0;
         if( goingUp )
         {
-            float elapsedTime = Time.time - lastUpTime;
+            float elapsedTime = Time.timeSinceLevelLoad - lastUpTime;
             height = elapsedTime / upTime;
             if( elapsedTime > upTime )
             {
                 goingUp = false;
-                lastDownTime = Time.time;
+                lastDownTime = Time.timeSinceLevelLoad;
             }
         }
         else
         {
-            float elapsedTime = Time.time - lastDownTime;
+            float elapsedTime = Time.timeSinceLevelLoad - lastDownTime;
             height = 1 - elapsedTime / downTime;
             if( elapsedTime > downTime )
             {
                 goingUp = true;
-                lastUpTime = Time.time;
+                lastUpTime = Time.timeSinceLevelLoad;
             }
         }
         // map from linear [0, 1] to curvy [-1, 1]
         height = -Mathf.Cos( Mathf.PI * Mathf.Clamp01( height ) );
         transform.localPosition = new Vector3(
-            xEffectSize * Mathf.Cos( 2 * Mathf.PI * ( Time.time + xPhase ) / xCycle ),
+            xEffectSize * Mathf.Cos( 2 * Mathf.PI * ( Time.timeSinceLevelLoad + xPhase ) / xCycle ),
             yEffectSize * height,    
-            zEffectSize * Mathf.Cos( 2 * Mathf.PI * ( Time.time + zPhase ) / zCycle )
+            zEffectSize * Mathf.Cos( 2 * Mathf.PI * ( Time.timeSinceLevelLoad + zPhase ) / zCycle )
         );
 
         // map to angle
