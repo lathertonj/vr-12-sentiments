@@ -279,7 +279,7 @@ public class Scene12LookUpChords : MonoBehaviour
             true => sceneIsOver;
 			
 			// reverb tail
-			10::second => now;
+			20::second => now;
         
         ",
             string.Join( ",", ahhChord1 ),

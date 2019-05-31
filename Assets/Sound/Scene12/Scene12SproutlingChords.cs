@@ -165,11 +165,20 @@ public class Scene12SproutlingChords : MonoBehaviour
                     10::ms => now;
                 }}
             }}
-            spork ~ RespondToLoudness();
+            spork ~ RespondToLoudness() @=> Shred respondToLoudnessShred;
 
             global Event scene12Finish;
 
             scene12Finish => now;
+            respondToLoudnessShred.exit();
+
+            now + 20::second => time endTime;
+
+            while( now < endTime )
+            {{
+                0.997 * volumeControl.gain() => volumeControl.gain;
+                10::ms => now;
+            }}
             
         ", myLoudness, string.Join( ",", notes ) ) );
     }

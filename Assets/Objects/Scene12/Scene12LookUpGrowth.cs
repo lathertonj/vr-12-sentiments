@@ -20,6 +20,8 @@ public class Scene12LookUpGrowth : MonoBehaviour
     private float sizeSlew = 2f;
 
     private float currentSize, goalSize;
+    public static bool doneGrowing = false;
+    public static bool currentlyLookingUp = false;
 
     void Start()
     {
@@ -72,6 +74,7 @@ public class Scene12LookUpGrowth : MonoBehaviour
         if( goalSize > endSize )
         {
             goalSize = endSize;
+            doneGrowing = true;
         }
 
         SlewSize();
@@ -79,12 +82,16 @@ public class Scene12LookUpGrowth : MonoBehaviour
         normalizedSize = currentSize.PowMapClamp( startSize, endSize, 0, 1, 0.6f );
         seedlingsToRotate.SetAmount( normalizedSize );
         particleManager.SetNormalizedSize( normalizedSize );
+
+        currentlyLookingUp = true;
     }
 
     void NotGrow()
     {
         // when we are not growing, we are still slewing our size
         SlewSize();
+
+        currentlyLookingUp = false;
     }
 
     void SlewSize()

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Scene12AhhSqueeze : MonoBehaviour
+public class Scene12AhhSqueeze_Unused : MonoBehaviour
 {
 	ChuckSubInstance myChuck;
 	ControllerAccessors myController;
