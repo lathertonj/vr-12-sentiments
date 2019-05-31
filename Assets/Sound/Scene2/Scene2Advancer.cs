@@ -72,7 +72,7 @@ public class Scene2Advancer : MonoBehaviour
     void FadeAudioAndVisuals()
     {
         // fade visuals
-        SteamVR_Fade.Start( skyColor, duration: 3f );
+        SteamVR_Fade.Start( skyColor, duration: 2f );
 
         // fade audio
         TheChuck.instance.BroadcastEvent( "scene2AllShutOff" );
