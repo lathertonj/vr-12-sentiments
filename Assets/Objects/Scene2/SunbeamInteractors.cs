@@ -12,6 +12,8 @@ public class SunbeamInteractors : MonoBehaviour
     public static float sunbeamFadeinTime = 5;
     public static bool turnDownVibrate = false;
     private float vibrateIntensity = 1;
+    // the maximum value is 3999 but the controllers can't vibrate at maximum intensity for a long period of time
+    private ushort maxVibrate = 1000;
 
     // Use this for initialization
     void Start()
@@ -29,19 +31,19 @@ public class SunbeamInteractors : MonoBehaviour
 
         if( SunbeamController.haveExpanded )
         {
-            currentStrength = 3999;
+            currentStrength = maxVibrate;
             myController.Vibrate( (ushort) ( currentStrength * vibrateIntensity ) );
         }
         else if( currentSunbeam != null )
         {
             float elapsedTime = Time.time - sunbeamTime;
             // map [0, 5] seconds --> [min, max] for haptic pulse
-            currentStrength = (ushort) ( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, 3999, 3 )
+            currentStrength = (ushort) ( elapsedTime.PowMapClamp( 0, sunbeamFadeinTime, 0, maxVibrate, 3 )
                 * currentSunbeamController.GetStrength()
             );
             myController.Vibrate( (ushort) ( currentStrength * vibrateIntensity ) );
 
-            sunbeamAccumulated += currentStrength * 1.0f / 3999 * Time.deltaTime;
+            sunbeamAccumulated += currentStrength * 1.0f / maxVibrate * Time.deltaTime;
         }
         else
         {
@@ -49,7 +51,7 @@ public class SunbeamInteractors : MonoBehaviour
         }
 
         // color the glow
-        float glowAlpha = ( (float) currentStrength ).PowMapClamp( 0, 3999, 0, glowLeafOriginalColor.a, 0.65f );
+        float glowAlpha = ( (float) currentStrength ).PowMapClamp( 0, maxVibrate, 0, glowLeafOriginalColor.a, 0.65f );
         Color currentGlow = new Color(
             glowLeafOriginalColor.r,
             glowLeafOriginalColor.g,
