@@ -89,7 +89,7 @@ public class SunbeamController : MonoBehaviour
     // called every time the sunbeam moves
     void SwitchLocation()
     {
-        if( !shouldFade ) return;
+        if( !shouldFade || shouldStopFading ) return;
 
         // new angle 
         float newXRotation = Random.Range( -maxBaseAngle, maxBaseAngle );
